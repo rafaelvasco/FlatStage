@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+        <ContentWithTargetPath Include=".\Runtime\win-x64\BGFX.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>BGFX.dll</TargetPath>
+        </ContentWithTargetPath>
+        <ContentWithTargetPath Include=".\Runtime\win-x64\SDL2.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>SDL2.dll</TargetPath>
+        </ContentWithTargetPath>
+        <ContentWithTargetPath Include=".\Runtime\win-x64\miniaudio.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>miniaudio.dll</TargetPath>
+        </ContentWithTargetPath>
+    </ItemGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+
+        <DebugSymbols>False</DebugSymbols>
+        <DebugType>None</DebugType>
+
+        <OptimizationPreference>Speed</OptimizationPreference>
+        <PublishTrimmed>true</PublishTrimmed>
+        <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+        <EventSourceSupport>false</EventSourceSupport>
+        <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
+        <SelfContained>true</SelfContained>
+
+    </PropertyGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Assets\**\*.fsb" />
+    </ItemGroup>
+
+</Project>

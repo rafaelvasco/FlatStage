@@ -1,0 +1,12 @@
+﻿[[shaders]]
+id = "canvas2d"
+vs_path = "Shaders/canvas2d_vs.sc"
+fs_path = "Shaders/canvas2d_fs.sc"
+
+[[images]]
+id = "stagelogo"
+path = "Textures/stagelogo.png"
+
+[[images]]
+id = "stagelogo2"
+path = "Textures/stagelogo2.png"
