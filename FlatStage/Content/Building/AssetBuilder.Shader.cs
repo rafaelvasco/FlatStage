@@ -14,7 +14,10 @@ internal static partial class AssetBuilder
 
         var shaderData = BuildShaderData(rootPath, shaderAssetInfo, graphicsBackend);
 
+        var assetDirectory = Path.GetDirectoryName(shaderAssetInfo.VsPath) ?? "";
+
         var assetFullBinPath = Path.Combine(rootPath, ContentProperties.AssetsFolder,
+            assetDirectory,
             shaderAssetInfo.Id + ContentProperties.ShaderAppendStrings[graphicsBackend] + ContentProperties.BinaryExt);
 
         using var stream = File.OpenWrite(assetFullBinPath);

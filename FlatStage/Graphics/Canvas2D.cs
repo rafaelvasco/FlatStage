@@ -356,7 +356,7 @@ public class Canvas2D
 
     public void Draw(
         Texture2D texture,
-        Rect destRect,
+        RectF destRect,
         Color color
     )
     {
@@ -388,7 +388,7 @@ public class Canvas2D
 
     public void Draw(
         Texture2D texture,
-        Rect destRect,
+        RectF destRect,
         Rect? srcRect,
         Color color
     )
@@ -436,7 +436,7 @@ public class Canvas2D
 
     public void Draw(
         Texture2D texture,
-        Rect destRect,
+        RectF destRect,
         Rect? srcRect,
         Color color,
         float rotation,
@@ -560,14 +560,16 @@ public class Canvas2D
             }
         }
 
+        var colorPremultiplied = new Color(color.Rf * color.Af, color.Gf * color.Af, color.Bf * color.Af, color.Af);
+
         quad.TopLeft.Z = depth;
         quad.TopRight.Z = depth;
         quad.BottomRight.Z = depth;
         quad.BottomLeft.Z = depth;
-        quad.TopLeft.Color = color;
-        quad.TopRight.Color = color;
-        quad.BottomRight.Color = color;
-        quad.BottomLeft.Color = color;
+        quad.TopLeft.Color = colorPremultiplied;
+        quad.TopRight.Color = colorPremultiplied;
+        quad.BottomRight.Color = colorPremultiplied;
+        quad.BottomLeft.Color = colorPremultiplied;
     }
 
     private void CheckBegin(string method)

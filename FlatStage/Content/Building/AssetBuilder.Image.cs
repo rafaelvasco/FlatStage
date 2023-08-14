@@ -14,7 +14,10 @@ internal static partial class AssetBuilder
 
         var imageData = BuildImageData(rootPath, imageAssetInfo);
 
+        var assetDirectory = Path.GetDirectoryName(imageAssetInfo.Path) ?? "";
+
         var assetFullBinPath = Path.Combine(rootPath, ContentProperties.AssetsFolder,
+            assetDirectory,
             imageAssetInfo.Id + ContentProperties.BinaryExt);
 
         using var stream = File.OpenWrite(assetFullBinPath);
@@ -31,6 +34,10 @@ internal static partial class AssetBuilder
         using var stream = File.OpenRead(Path.Combine(rootPath, ContentProperties.AssetsFolder, imageAssetInfo.Path!));
 
         var stbImage = ImageResult.FromStream(stream, ColorComponents.RedGreenBlueAlpha);
+
+        Blitter.Begin(stbImage.Data, stbImage.Width, stbImage.Height);
+        Blitter.ConvertRgbaToBgra(premultiplyAlpha: true);
+        Blitter.End();
 
         var result = new ImageData
         {

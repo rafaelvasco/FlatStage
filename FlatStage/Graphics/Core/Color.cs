@@ -1076,7 +1076,6 @@ public struct Color : IEquatable<Color>
     }
 
 
-
     /// <summary>
     /// Compares whether current instance is equal to specified <see cref="Color"/>.
     /// </summary>

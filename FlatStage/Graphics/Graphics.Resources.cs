@@ -19,10 +19,6 @@ public static unsafe partial class Graphics
     {
         IDefinitionData.ThrowIfInValid(props, "Graphics::CreateTexture");
 
-        Blitter.Begin(props.Data, props.Width, props.Height);
-        Blitter.ConvertRgbaToBgra();
-        Blitter.End();
-
         if (mutable)
         {
             var textureHandle = Bgfx.create_texture_2d(

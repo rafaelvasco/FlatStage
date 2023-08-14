@@ -11,14 +11,17 @@ internal static partial class AssetBuilder
 
         Console.WriteLine($"Building Audio: {audioAssetInfo.Id}");
 
-        var imageData = BuildAudioData(rootPath, audioAssetInfo);
+        var audioData = BuildAudioData(rootPath, audioAssetInfo);
+
+        var assetDirectory = Path.GetDirectoryName(audioAssetInfo.Path) ?? "";
 
         var assetFullBinPath = Path.Combine(rootPath, ContentProperties.AssetsFolder,
+            assetDirectory,
             audioAssetInfo.Id + ContentProperties.BinaryExt);
 
         using var stream = File.OpenWrite(assetFullBinPath);
 
-        BinarySerializer.Serialize(stream, ref imageData);
+        BinarySerializer.Serialize(stream, ref audioData);
 
         Console.WriteLine($"Audio {audioAssetInfo.Id} built successfully.");
 

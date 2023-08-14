@@ -44,8 +44,7 @@ public class Tutorial03 : Game
 
         if (Input.Mouse.ButtonPressed(MouseButton.Left))
         {
-            _effect.PlayEx(0f, (float)RandomEx.Instance.Gen(0.1, 0.5));
-            _effect.Play();
+            _effect.PlayEx(0f, Random.Default.Next(1, 5) / 10f);
         }
     }
 }

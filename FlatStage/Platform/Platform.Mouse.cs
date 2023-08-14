@@ -1,4 +1,5 @@
 using System;
+using FlatStage.Foundation.SDL2;
 using static FlatStage.Foundation.SDL2.SDL;
 
 namespace FlatStage;
