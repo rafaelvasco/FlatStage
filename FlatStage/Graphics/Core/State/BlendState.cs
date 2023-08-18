@@ -1,6 +1,6 @@
 using FlatStage.Foundation.BGFX;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public class BlendState
 {
@@ -83,7 +83,6 @@ public class BlendState
     }
 
     public Color BlendColor { get; set; } = Color.White;
-
 
     private BlendState(
         Blend colorSurfaceBlend,

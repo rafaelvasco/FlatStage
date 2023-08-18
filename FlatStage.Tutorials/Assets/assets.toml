@@ -37,7 +37,7 @@ id = "delphi_loop"
 path = "delphi_loop.ogg"
 type = "Song"
 
-[[audios]]
-id = "delphi_loop_wav"
-path = "delphi_loop.wav"
-type = "Song"
+[[fonts]]
+id = "monogram"
+path = "monogram-extended.ttf"
+fontSize = 32

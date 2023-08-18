@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public struct Vertex2D
 {
@@ -15,7 +15,7 @@ public struct Vertex2D
 
     public static readonly int Stride;
 
-    public readonly override string ToString()
+    public override readonly string ToString()
     {
         return $"X: {X}, Y: {Y}, Z: {Z}, U: {U}, V: {V}";
     }

@@ -57,7 +57,7 @@ public class RandomState
     /// Most generators only use 1 seed, but some like the KnownSeriesRandom generator may use multiple seeds
     /// so that is why Seed is expressed as an array of integers here
     /// </remarks>
-    public int[] Seed { get; set; }
+    public required int[] Seed { get; set; }
 
     /// <summary>
     /// The number of times that the Next method has been called on the pseudo-random number generator being used

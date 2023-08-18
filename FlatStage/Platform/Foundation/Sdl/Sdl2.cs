@@ -181,7 +181,7 @@ public static class SDL
         }
 
         char* chars = stackalloc char[len];
-        int strLen = System.Text.Encoding.UTF8.GetChars((byte*)s, len, chars, len);
+        int strLen = Encoding.UTF8.GetChars((byte*)s, len, chars, len);
         string result = new string(chars, 0, strLen);
 #endif
 
@@ -1456,8 +1456,8 @@ public static class SDL
             return IntPtr.Zero;
         }
 
-        byte[] bytes = System.Text.Encoding.UTF8.GetBytes(str + '\0');
-        IntPtr mem = SDL.SDL_malloc((IntPtr)bytes.Length);
+        byte[] bytes = Encoding.UTF8.GetBytes(str + '\0');
+        IntPtr mem = SDL_malloc((IntPtr)bytes.Length);
         Marshal.Copy(bytes, 0, mem, bytes.Length);
         return mem;
     }

@@ -1,4 +1,6 @@
-﻿namespace FlatStage.Editor;
+﻿using FlatStage.Graphics;
+
+namespace FlatStage.Editor;
 
 public class Editor : Game
 {
@@ -9,7 +11,7 @@ public class Editor : Game
     protected override void Draw(Canvas2D canvas, float dt)
     {
         canvas.Begin();
-        
+
         canvas.End();
     }
 }

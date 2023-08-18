@@ -1,4 +1,4 @@
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 /// <summary>
 /// Defines stencil buffer operations.

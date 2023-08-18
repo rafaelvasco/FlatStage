@@ -1,8 +1,8 @@
+using FlatStage.Foundation.BGFX;
 using System;
 using System.Runtime.CompilerServices;
-using FlatStage.Foundation.BGFX;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public readonly unsafe struct TransientVertexBuffer<T> where T : struct
 {

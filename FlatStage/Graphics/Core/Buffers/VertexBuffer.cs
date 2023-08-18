@@ -1,7 +1,7 @@
-using System;
 using FlatStage.Foundation.BGFX;
+using System;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public sealed unsafe class VertexBuffer<T> : Disposable where T : struct
 {
@@ -17,7 +17,7 @@ public sealed unsafe class VertexBuffer<T> : Disposable where T : struct
 
         VertexCount = vertices.Length;
 
-        Graphics.RegisterRenderResource(this);
+        GraphicsContext.RegisterRenderResource(this);
     }
 
     protected override void Free()

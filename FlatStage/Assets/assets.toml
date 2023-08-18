@@ -1,7 +1,7 @@
 ﻿[[shaders]]
 id = "canvas2d"
-vs_path = "Shaders/canvas2d_vs.sc"
-fs_path = "Shaders/canvas2d_fs.sc"
+vsPath = "Shaders/canvas2d_vs.sc"
+fsPath = "Shaders/canvas2d_fs.sc"
 
 [[images]]
 id = "stagelogo"

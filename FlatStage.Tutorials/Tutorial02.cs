@@ -1,10 +1,13 @@
-﻿using FlatStage.Sound;
+﻿using FlatStage.ContentPipeline;
+using FlatStage.Input;
+using FlatStage.Graphics;
+using FlatStage.Sound;
 
 namespace FlatStage.Tutorials;
 
 public class Tutorial02 : Game
 {
-    private Texture2D? _texture;
+    private Texture? _texture;
 
     private float _particleX = 100.0f;
     private float _particleY = 100.0f;
@@ -18,13 +21,13 @@ public class Tutorial02 : Game
 
     protected override void Preload()
     {
-        _texture = Content.Get<Texture2D>("particles");
+        _texture = Content.Get<Texture>("particles");
 
         _bumpEffect = Content.Get<Audio>("blip");
 
         _bumpEffect.Volume = 0.1f;
 
-        Graphics.SetViewClear(0, Color.DarkBlue);
+        GraphicsContext.SetViewClear(0, Color.DarkBlue);
     }
 
     protected override void Draw(Canvas2D canvas, float dt)
@@ -56,22 +59,22 @@ public class Tutorial02 : Game
 
     protected override void Update(float dt)
     {
-        if (Input.Keyboard.KeyDown(Key.Left))
+        if (Control.Keyboard.KeyDown(Key.Left))
         {
             _dx -= Speed * dt;
         }
 
-        if (Input.Keyboard.KeyDown(Key.Right))
+        if (Control.Keyboard.KeyDown(Key.Right))
         {
             _dx += Speed * dt;
         }
 
-        if (Input.Keyboard.KeyDown(Key.Up))
+        if (Control.Keyboard.KeyDown(Key.Up))
         {
             _dy -= Speed * dt;
         }
 
-        if (Input.Keyboard.KeyDown(Key.Down))
+        if (Control.Keyboard.KeyDown(Key.Down))
         {
             _dy += Speed * dt;
         }
@@ -82,9 +85,9 @@ public class Tutorial02 : Game
         _particleX += _dx;
         _particleY += _dy;
 
-        if (_particleX > Graphics.BackbufferWidth - 32)
+        if (_particleX > GraphicsContext.BackbufferWidth - 32)
         {
-            _particleX = Graphics.BackbufferWidth - 32;
+            _particleX = GraphicsContext.BackbufferWidth - 32;
             _dx = -_dx;
             Bump();
         }
@@ -95,9 +98,9 @@ public class Tutorial02 : Game
             Bump();
         }
 
-        if (_particleY > Graphics.BackbufferHeight - 32)
+        if (_particleY > GraphicsContext.BackbufferHeight - 32)
         {
-            _particleY = Graphics.BackbufferHeight - 32;
+            _particleY = GraphicsContext.BackbufferHeight - 32;
             _dy = -_dy;
             Bump();
         }

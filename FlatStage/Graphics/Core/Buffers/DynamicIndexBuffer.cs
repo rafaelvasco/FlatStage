@@ -1,7 +1,7 @@
-using System;
 using FlatStage.Foundation.BGFX;
+using System;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public unsafe class DynamicIndexBuffer<T> : Disposable where T : struct
 {
@@ -28,7 +28,7 @@ public unsafe class DynamicIndexBuffer<T> : Disposable where T : struct
             IndexCount = 0;
         }
 
-        Graphics.RegisterRenderResource(this);
+        GraphicsContext.RegisterRenderResource(this);
     }
 
     public void SetData(T[] data, int startIndex = 0)
@@ -49,7 +49,6 @@ public unsafe class DynamicIndexBuffer<T> : Disposable where T : struct
             Bgfx.destroy_dynamic_index_buffer(Handle);
         }
     }
-
 
     internal Bgfx.DynamicIndexBufferHandle Handle { get; }
 }

@@ -1,7 +1,7 @@
-using System;
 using FlatStage.Foundation.BGFX;
+using System;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public unsafe class DynamicVertexBuffer<T> : Disposable where T : struct
 {
@@ -30,7 +30,7 @@ public unsafe class DynamicVertexBuffer<T> : Disposable where T : struct
             VertexCount = 0;
         }
 
-        Graphics.RegisterRenderResource(this);
+        GraphicsContext.RegisterRenderResource(this);
     }
 
     public void SetData(Memory<T> data, int startVertex = 0)
@@ -54,7 +54,6 @@ public unsafe class DynamicVertexBuffer<T> : Disposable where T : struct
 
         VertexCount = data.Length;
     }
-
 
     protected override void Free()
     {

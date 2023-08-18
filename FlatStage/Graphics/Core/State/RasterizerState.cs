@@ -1,9 +1,8 @@
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public class RasterizerState
 {
     public CullMode CullMode { get; set; }
-
 
     public bool ScissorTestEnable { get; set; }
 

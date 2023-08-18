@@ -1,4 +1,4 @@
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 using Foundation.BGFX;
 
@@ -11,8 +11,7 @@ internal struct RenderTargetProps : IDefinitionData
     public const Bgfx.SamplerFlags Flags = Bgfx.SamplerFlags.UClamp | Bgfx.SamplerFlags.VClamp |
                                            Bgfx.SamplerFlags.MinPoint | Bgfx.SamplerFlags.MagPoint;
 
-
-    public readonly override string ToString()
+    public override readonly string ToString()
     {
         return $"[Width: {Width}, Height: {Height}]";
     }
@@ -29,7 +28,7 @@ internal struct RenderTargetProps : IDefinitionData
 
 public class RenderTarget : Disposable
 {
-    public Texture2D Texture => _texture;
+    public Texture Texture => _texture;
 
     public int Width => _texture.Width;
 
@@ -38,7 +37,7 @@ public class RenderTarget : Disposable
     internal RenderTarget(Bgfx.FrameBufferHandle handle, int width, int height)
     {
         Handle = handle;
-        _texture = new Texture2D("renderTargetTex" + handle.idx, Graphics.GetFrameBufferTexture(handle, 0), width,
+        _texture = new Texture("renderTargetTex" + handle.idx, GraphicsContext.GetFrameBufferTexture(handle, 0), width,
             height);
     }
 
@@ -48,5 +47,5 @@ public class RenderTarget : Disposable
 
     internal readonly Bgfx.FrameBufferHandle Handle;
 
-    private readonly Texture2D _texture;
+    private readonly Texture _texture;
 }

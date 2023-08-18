@@ -1,5 +1,9 @@
 using System;
 using System.Runtime;
+using FlatStage.ContentPipeline;
+using FlatStage.Input;
+using FlatStage.Graphics;
+using FlatStage.Platform;
 using FlatStage.Sound;
 
 namespace FlatStage;
@@ -10,66 +14,65 @@ public partial class Stage : Disposable
 
     public static Size WindowSize
     {
-        get => Platform.GetWindowSize();
+        get => PlatformContext.GetWindowSize();
         set
         {
-            var size = Platform.GetWindowSize();
+            var size = PlatformContext.GetWindowSize();
             if (value.Width == size.Width && value.Height == size.Height)
             {
                 return;
             }
 
-            Platform.SetWindowSize(value.Width, value.Height);
+            PlatformContext.SetWindowSize(value.Width, value.Height);
         }
     }
 
     public static string Title
     {
-        get => Platform.GetWindowTitle();
-        set => Platform.SetWindowTitle(value);
+        get => PlatformContext.GetWindowTitle();
+        set => PlatformContext.SetWindowTitle(value);
     }
 
     public static bool Resizable
     {
-        get => (Platform.GetWindowFlags() & WindowFlags.Resizable) != 0;
-        set => Platform.SetWindowResizable(value);
+        get => (PlatformContext.GetWindowFlags() & WindowFlags.Resizable) != 0;
+        set => PlatformContext.SetWindowResizable(value);
     }
 
     public static bool Borderless
     {
-        get => (Platform.GetWindowFlags() & WindowFlags.Borderless) != 0;
-        set => Platform.SetWindowBorderless(value);
+        get => (PlatformContext.GetWindowFlags() & WindowFlags.Borderless) != 0;
+        set => PlatformContext.SetWindowBorderless(value);
     }
 
     public static bool Fullscreen
     {
-        get => Platform.IsFullscreen();
+        get => PlatformContext.IsFullscreen();
         set
         {
-            if (Platform.IsFullscreen() == value)
+            if (PlatformContext.IsFullscreen() == value)
             {
                 return;
             }
 
-            Platform.SetWindowFullscreen(value);
+            PlatformContext.SetWindowFullscreen(value);
         }
     }
 
     public static bool ShowCursor
     {
-        get => Platform.CursorVisible();
-        set => Platform.ShowCursor(value);
+        get => PlatformContext.CursorVisible();
+        set => PlatformContext.ShowCursor(value);
     }
 
     public static void ShowMessageBox(string title, string message)
     {
-        Platform.ShowMessageBox(title, message);
+        PlatformContext.ShowMessageBox(title, message);
     }
 
     public Stage()
     {
         _instance = this;
-
 
         Console.WriteLine(":::::::::::::::::::::::::::::::::::::::::");
         Console.WriteLine($"::::::: FlatStage {Version} Start :::::::::::::");
@@ -83,19 +86,19 @@ public partial class Stage : Disposable
 
         Console.WriteLine(settings);
 
-        Platform.Init(settings);
+        PlatformContext.Init(settings);
 
-        Input.Init(settings);
+        Control.Init(settings);
 
-        Graphics.Init(settings);
+        GraphicsContext.Init(settings);
 
-        AudioManager.Init();
+        AudioContext.Init();
 
         InitLoop();
 
-        Platform.OnQuit = Exit;
-        Platform.WindowMinimized = () => { IsActive = false; };
-        Platform.WindowRestored = () => { IsActive = true; };
+        PlatformContext.OnQuit = Exit;
+        PlatformContext.WindowMinimized = () => { IsActive = false; };
+        PlatformContext.WindowRestored = () => { IsActive = true; };
 
         GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
     }
@@ -115,9 +118,9 @@ public partial class Stage : Disposable
 
         Tick(_runningGame);
 
-        Platform.ShowWindow(true);
+        PlatformContext.ShowWindow(true);
 
-        _prevFrameTime = Platform.GetPerfCounter();
+        _prevFrameTime = PlatformContext.GetPerfCounter();
         _frameAccum = 0;
 
         while (_running)
@@ -128,7 +131,7 @@ public partial class Stage : Disposable
 
     public static void Exit()
     {
-        AudioManager.StopAll();
+        AudioContext.StopAll();
 
         if (!_instance._running)
         {
@@ -147,9 +150,9 @@ public partial class Stage : Disposable
         _runningGame?.InternalUnload();
 
         Content.Shutdown();
-        AudioManager.Shutdown();
-        Graphics.Shutdown();
-        Platform.Shutdown();
+        AudioContext.Shutdown();
+        GraphicsContext.Shutdown();
+        PlatformContext.Shutdown();
     }
 
     private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -159,7 +162,7 @@ public partial class Stage : Disposable
 
     private static void ShowExceptionMessage(Exception ex)
     {
-        Platform.ShowRuntimeError("FlatStage", $"An Error Occurred: {ex.Message}");
+        PlatformContext.ShowRuntimeError("FlatStage", $"An Error Occurred: {ex.Message}");
     }
 
     private static Stage _instance = null!;

@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace FlatStage;
+using FlatStage.ContentPipeline;
 
+namespace FlatStage.Platform;
 
 public abstract class Executor
 {
@@ -25,7 +26,7 @@ public class BuildExecutor : Executor
         {
             throw new ApplicationException("Informed Path doesn't exist!");
         }
-        
+
         AssetBuilder.BuildAssets(gameFolderPath);
     }
 }
@@ -33,7 +34,6 @@ public class BuildExecutor : Executor
 public static class CliExecutor
 {
     private static readonly Dictionary<string, Executor> Executors = new();
-
 
     static CliExecutor()
     {

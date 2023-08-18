@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "FlatStage.Editor": {
+      "commandName": "Project",
+      "commandLineArgs": "Build G:\\DotNet\\FlatStage\\FlatStage.Tutorials",
+      "hotReloadEnabled": false
+    }
+  }
+}

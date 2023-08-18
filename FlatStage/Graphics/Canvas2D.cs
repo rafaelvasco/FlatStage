@@ -1,7 +1,8 @@
+using FlatStage.ContentPipeline;
 using System;
 using System.Runtime.CompilerServices;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 [Flags]
 public enum FlipMode
@@ -30,7 +31,6 @@ public class Canvas2D
         1.0f
     };
 
-
     public Canvas2D(int maxQuads = 2048)
     {
         if (!Calc.IsPowerOfTwo(maxQuads))
@@ -38,7 +38,7 @@ public class Canvas2D
             maxQuads = Calc.NextPowerOfTwo(maxQuads);
         }
 
-        Graphics.BackBufferSizeChanged = ApplyRenderViewArea;
+        GraphicsContext.BackBufferSizeChanged = ApplyRenderViewArea;
 
         _quadBatcher = new QuadBatcher(maxQuads);
 
@@ -46,7 +46,7 @@ public class Canvas2D
 
         _defaultShader = Content.Get<ShaderProgram>("canvas2d", embeddedAsset: true);
 
-        _defaultTexture = Content.Get<Texture2D>("stagelogo", embeddedAsset: true);
+        _defaultTexture = Content.Get<Texture>("stagelogo", embeddedAsset: true);
 
         _currentShader = _defaultShader;
 
@@ -58,9 +58,8 @@ public class Canvas2D
 
         _rasterizerState = RasterizerState.CullCounterClockWise;
 
-        ApplyRenderViewArea(new Size(Graphics.BackbufferWidth, Graphics.BackbufferHeight));
+        ApplyRenderViewArea(new Size(GraphicsContext.BackbufferWidth, GraphicsContext.BackbufferHeight));
     }
-
 
     public void Begin()
     {
@@ -95,7 +94,6 @@ public class Canvas2D
         );
     }
 
-
     public void Begin(BlendState blendState)
     {
         Begin(
@@ -106,7 +104,6 @@ public class Canvas2D
             null
         );
     }
-
 
     public void Begin(
         BlendState blendState,
@@ -123,7 +120,6 @@ public class Canvas2D
             shader
         );
     }
-
 
     public void Begin(
         BlendState blendState,
@@ -161,7 +157,7 @@ public class Canvas2D
         _beginCalled = false;
     }
 
-    public void Draw(Texture2D texture, float x, float y, Color color)
+    public void Draw(Texture texture, float x, float y, Color color)
     {
         CheckBegin("Draw");
 
@@ -172,14 +168,14 @@ public class Canvas2D
         PushQuad(texture, ref quad);
     }
 
-    public void Draw(Texture2D texture, Quad quad)
+    public void Draw(Texture texture, Quad quad)
     {
         CheckBegin("Draw");
 
         PushQuad(texture, ref quad);
     }
 
-    public void Draw(Texture2D texture, float x, float y, Rect? srcRect, Color color)
+    public void Draw(Texture texture, float x, float y, Rect? srcRect, Color color)
     {
         CheckBegin("Draw");
 
@@ -187,10 +183,10 @@ public class Canvas2D
         float destW, destH;
         if (srcRect.HasValue)
         {
-            sourceX = srcRect.Value.X / (float)texture.Width;
-            sourceY = srcRect.Value.Y / (float)texture.Height;
-            sourceW = srcRect.Value.Width / (float)texture.Width;
-            sourceH = srcRect.Value.Height / (float)texture.Height;
+            sourceX = srcRect.Value.X * texture.TexelWidth;
+            sourceY = srcRect.Value.Y * texture.TexelHeight;
+            sourceW = srcRect.Value.Width * texture.TexelWidth;
+            sourceH = srcRect.Value.Height * texture.TexelHeight;
             destW = srcRect.Value.Width;
             destH = srcRect.Value.Height;
         }
@@ -211,7 +207,7 @@ public class Canvas2D
         PushQuad(texture, ref quad);
     }
 
-    public void Draw(Texture2D texture, float x, float y, Vec2 origin, Color color)
+    public void Draw(Texture texture, float x, float y, Vec2 origin, Color color)
     {
         CheckBegin("Draw");
         var quad = new Quad();
@@ -223,7 +219,7 @@ public class Canvas2D
     }
 
     public void Draw(
-        Texture2D texture,
+        Texture texture,
         float x,
         float y,
         Rect? srcRect,
@@ -242,16 +238,16 @@ public class Canvas2D
         float destH = scale;
         if (srcRect.HasValue)
         {
-            sourceX = srcRect.Value.X / (float)texture.Width;
-            sourceY = srcRect.Value.Y / (float)texture.Height;
+            sourceX = srcRect.Value.X * texture.TexelWidth;
+            sourceY = srcRect.Value.Y * texture.TexelHeight;
             sourceW = Math.Sign(srcRect.Value.Width) * Math.Max(
                 Math.Abs(srcRect.Value.Width),
                 Calc.MachineEpsilonFloat
-            ) / texture.Width;
+            ) * texture.TexelWidth;
             sourceH = Math.Sign(srcRect.Value.Height) * Math.Max(
                 Math.Abs(srcRect.Value.Height),
                 Calc.MachineEpsilonFloat
-            ) / texture.Height;
+            ) * texture.TexelHeight;
             destW *= srcRect.Value.Width;
             destH *= srcRect.Value.Height;
         }
@@ -290,7 +286,7 @@ public class Canvas2D
     }
 
     public void Draw(
-        Texture2D texture,
+        Texture texture,
         float x,
         float y,
         Rect? srcRect,
@@ -307,16 +303,16 @@ public class Canvas2D
         float sourceX, sourceY, sourceW, sourceH;
         if (srcRect.HasValue)
         {
-            sourceX = srcRect.Value.X / (float)texture.Width;
-            sourceY = srcRect.Value.Y / (float)texture.Height;
+            sourceX = srcRect.Value.X * texture.TexelWidth;
+            sourceY = srcRect.Value.Y * texture.TexelHeight;
             sourceW = Math.Sign(srcRect.Value.Width) * Math.Max(
                 Math.Abs(srcRect.Value.Width),
                 Calc.MachineEpsilonFloat
-            ) / texture.Width;
+            ) * texture.TexelWidth;
             sourceH = Math.Sign(srcRect.Value.Height) * Math.Max(
                 Math.Abs(srcRect.Value.Height),
                 Calc.MachineEpsilonFloat
-            ) / texture.Height;
+            ) * texture.TexelHeight;
             scale.X *= srcRect.Value.Width;
             scale.Y *= srcRect.Value.Height;
         }
@@ -355,7 +351,7 @@ public class Canvas2D
     }
 
     public void Draw(
-        Texture2D texture,
+        Texture texture,
         RectF destRect,
         Color color
     )
@@ -387,7 +383,7 @@ public class Canvas2D
     }
 
     public void Draw(
-        Texture2D texture,
+        Texture texture,
         RectF destRect,
         Rect? srcRect,
         Color color
@@ -397,10 +393,10 @@ public class Canvas2D
         float sourceX, sourceY, sourceW, sourceH;
         if (srcRect.HasValue)
         {
-            sourceX = srcRect.Value.X / (float)texture.Width;
-            sourceY = srcRect.Value.Y / (float)texture.Height;
-            sourceW = srcRect.Value.Width / (float)texture.Width;
-            sourceH = srcRect.Value.Height / (float)texture.Height;
+            sourceX = srcRect.Value.X * texture.TexelWidth;
+            sourceY = srcRect.Value.Y * texture.TexelHeight;
+            sourceW = srcRect.Value.Width * texture.TexelWidth;
+            sourceH = srcRect.Value.Height * texture.TexelHeight;
         }
         else
         {
@@ -435,7 +431,7 @@ public class Canvas2D
     }
 
     public void Draw(
-        Texture2D texture,
+        Texture texture,
         RectF destRect,
         Rect? srcRect,
         Color color,
@@ -449,16 +445,16 @@ public class Canvas2D
         float sourceX, sourceY, sourceW, sourceH;
         if (srcRect.HasValue)
         {
-            sourceX = srcRect.Value.X / (float)texture.Width;
-            sourceY = srcRect.Value.Y / (float)texture.Height;
+            sourceX = srcRect.Value.X * texture.TexelWidth;
+            sourceY = srcRect.Value.Y / texture.TexelHeight;
             sourceW = Math.Sign(srcRect.Value.Width) * Math.Max(
                 Math.Abs(srcRect.Value.Width),
                 Calc.MachineEpsilonFloat
-            ) / texture.Width;
+            ) * texture.TexelWidth;
             sourceH = Math.Sign(srcRect.Value.Height) * Math.Max(
                 Math.Abs(srcRect.Value.Height),
                 Calc.MachineEpsilonFloat
-            ) / texture.Height;
+            ) * texture.TexelHeight;
         }
         else
         {
@@ -492,8 +488,93 @@ public class Canvas2D
         PushQuad(texture, ref quad);
     }
 
+    /// <summary>
+    /// Submit a text string of quads for drawing in the current batch
+    /// </summary>
+    /// <param name="font">The TextureFont object;</param>
+    /// <param name="text">The text to draw;</param>
+    /// <param name="position">The drawing location on the screen;</param>
+    /// <param name="color">A color mask;</param>
+    public unsafe void DrawText(TextureFont font, string text, Vec2 position, Color color)
+    {
+        CheckValid(font, text);
+
+        var offset = Vec2.Zero;
+        var firstGlyphOfLine = true;
+
+        fixed (TextureFont.Glyph* glyphsPtr = font.Glyphs)
+        {
+            for (var i = 0; i < text.Length; ++i)
+            {
+                var c = text[i];
+
+                if (c == '\r')
+                {
+                    continue;
+                }
+
+                if (c == '\n')
+                {
+                    offset.X = 0;
+                    offset.Y = font.LineSpacing;
+                    firstGlyphOfLine = true;
+                    continue;
+                }
+
+                var currentGlyphIndex = font.GetGlyphIndexOrDefault(c);
+
+                var currentGlyphPtr = glyphsPtr + currentGlyphIndex;
+
+                // The first character on a line might have a negative left side bearing.
+                // In this scenario, Canvas2D/Texture2D normally offset the text to the right,
+                //  so that text does not hang off the left side of its rectangle.
+                if (firstGlyphOfLine)
+                {
+                    offset.X = Calc.Max(currentGlyphPtr->LeftSideBearing, 0);
+                    firstGlyphOfLine = false;
+                }
+                else
+                {
+                    offset.X += font.Spacing * currentGlyphPtr->LeftSideBearing;
+                }
+
+                var p = offset;
+
+                p.X += currentGlyphPtr->Cropping.X;
+                p.Y += currentGlyphPtr->Cropping.Y;
+                p += position;
+
+                var quad = new Quad();
+
+                GenerateQuad(
+                    ref quad,
+                    currentGlyphPtr->BoundsInTexture.X * font.Texture.TexelWidth,
+                    currentGlyphPtr->BoundsInTexture.Y * font.Texture.TexelHeight,
+                    currentGlyphPtr->BoundsInTexture.Width * font.Texture.TexelWidth,
+                    currentGlyphPtr->BoundsInTexture.Height * font.Texture.TexelHeight,
+                    p.X,
+                    p.Y,
+                    currentGlyphPtr->BoundsInTexture.Width,
+                    currentGlyphPtr->BoundsInTexture.Height,
+                    color,
+                    0.0f,
+                    0.0f,
+                    0.0f,
+                    1.0f,
+                    0.0f,
+                    0
+                );
+
+                PushQuad(font.Texture, ref quad);
+
+                offset.X += currentGlyphPtr->Width + currentGlyphPtr->RightSideBearing;
+            }
+        }
+
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void PushQuad(Texture2D texture, ref Quad quad)
+    private void PushQuad(Texture texture, ref Quad quad)
     {
         if (_currentTexture == null)
         {
@@ -511,6 +592,16 @@ public class Canvas2D
         }
 
         _quadBatcher.PushQuad(ref quad);
+    }
+
+    void CheckValid(TextureFont textureFont, string text)
+    {
+        if (textureFont == null)
+            throw new ArgumentNullException("textureFont");
+        if (text == null)
+            throw new ArgumentNullException("text");
+        if (!_beginCalled)
+            throw new InvalidOperationException("DrawString was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawString.");
     }
 
     private static unsafe void GenerateQuad(
@@ -543,7 +634,6 @@ public class Canvas2D
         quad.BottomRight.Y = destinationY + (cornerX + destinationW) * sin + (cornerY + destinationH) * cos;
         quad.BottomLeft.X = destinationX + cornerX * cos - (cornerY + destinationH) * sin;
         quad.BottomLeft.Y = destinationY + cornerX * sin + (cornerY + destinationH) * cos;
-
 
         fixed (float* flipX = &CornerOffsetX[0])
         {
@@ -590,16 +680,15 @@ public class Canvas2D
         _viewport.Width = size.Width;
         _viewport.Height = size.Height;
 
-        Graphics.SetViewRect(_renderPass, _viewport.X, _viewport.Y, _viewport.Width, _viewport.Height);
+        GraphicsContext.SetViewRect(_renderPass, _viewport.X, _viewport.Y, _viewport.Width, _viewport.Height);
 
         _projectionMatrix = Matrix.CreateOrthographicOffCenter(0f, _viewport.Width, _viewport.Height, 0f,
             -1.0f, 1.0f);
     }
 
-
     private void Flush()
     {
-        Graphics.Touch(_renderPass);
+        GraphicsContext.Touch(_renderPass);
 
         ApplyRenderState();
 
@@ -610,7 +699,7 @@ public class Canvas2D
 
         _quadBatcher.Submit();
 
-        Graphics.Render(_renderPass, _currentShader);
+        GraphicsContext.Render(_renderPass, _currentShader);
 
         _drawCalls++;
 
@@ -626,25 +715,23 @@ public class Canvas2D
 
     private void ApplyRenderState()
     {
-        Graphics.SetState(_blendState, _rasterizerState);
-        Graphics.SetSampleState(0, _samplerState);
+        GraphicsContext.SetState(_blendState, _rasterizerState);
+        GraphicsContext.SetSampleState(0, _samplerState);
 
-        Graphics.SetViewTransform(_renderPass, _transformMatrix, _projectionMatrix);
+        GraphicsContext.SetViewTransform(_renderPass, _transformMatrix, _projectionMatrix);
         _currentShader.SetTexture(_renderPass, _currentTexture ?? _defaultTexture);
     }
-
 
     private readonly QuadBatcher _quadBatcher;
 
     private bool _beginCalled;
 
-    private Texture2D? _currentTexture;
+    private Texture? _currentTexture;
 
-    private readonly Texture2D _defaultTexture;
+    private readonly Texture _defaultTexture;
 
     private readonly ShaderProgram _defaultShader;
     private ShaderProgram _currentShader;
-
 
     private BlendState _blendState;
     private SamplerState _samplerState;

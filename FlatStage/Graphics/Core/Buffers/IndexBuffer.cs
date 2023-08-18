@@ -1,7 +1,7 @@
-using System;
 using FlatStage.Foundation.BGFX;
+using System;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public sealed unsafe class IndexBuffer<T> : Disposable where T : struct
 {
@@ -13,7 +13,7 @@ public sealed unsafe class IndexBuffer<T> : Disposable where T : struct
 
         IndexCount = indices.Length;
 
-        Graphics.RegisterRenderResource(this);
+        GraphicsContext.RegisterRenderResource(this);
     }
 
     protected override void Free()

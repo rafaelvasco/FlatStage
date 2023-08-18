@@ -1,6 +1,6 @@
 using FlatStage.Foundation.BGFX;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 /// <summary>
 /// Defines a function for color blending.

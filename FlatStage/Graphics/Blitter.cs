@@ -2,7 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public static unsafe class Blitter
 {
@@ -41,6 +41,14 @@ public static unsafe class Blitter
         _ready = true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void CheckReady()
+    {
+        if (!_ready)
+        {
+            throw new Exception("Blitter: Not Ready. All calls must happen inside Begin/End block");
+        }
+    }
 
     public static void End()
     {
@@ -76,10 +84,7 @@ public static unsafe class Blitter
 
     public static void PixelSet(int x, int y)
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         if (!_clipRect.Contains(x, y))
         {
@@ -103,12 +108,9 @@ public static unsafe class Blitter
         *(ptrIdx + 3) = a;
     }
 
-    public static Color? PixelGet(int x, int y)
+    public static Color PixelGet(int x, int y)
     {
-        if (!_ready)
-        {
-            return null;
-        }
+        CheckReady();
 
         byte* ptr = (byte*)_pixels;
 
@@ -124,10 +126,7 @@ public static unsafe class Blitter
 
     public static void Clear()
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         byte* ptr = (byte*)_pixels;
 
@@ -144,10 +143,7 @@ public static unsafe class Blitter
 
     public static void Fill()
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         ref var col = ref _drawColor;
 
@@ -167,6 +163,8 @@ public static unsafe class Blitter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void HLine(int sx, int ex, int y)
     {
+        CheckReady();
+
         var minX = _clipRect.Left;
         var maxX = _clipRect.Right;
 
@@ -210,10 +208,7 @@ public static unsafe class Blitter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static void VLine(int sy, int ey, int x)
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         if (x < _clipRect.Left || x > _clipRect.Right)
         {
@@ -259,10 +254,7 @@ public static unsafe class Blitter
 
     public static void FillRect(int x, int y, int w, int h)
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         ref var col = ref _drawColor;
 
@@ -291,10 +283,7 @@ public static unsafe class Blitter
 
     public static void DrawRect(int x, int y, int w, int h, int lineSize = 1)
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         lineSize = Calc.Max(lineSize, 1);
 
@@ -316,10 +305,7 @@ public static unsafe class Blitter
 
     public static void DrawLine(int x0, int y0, int x1, int y1, int lineSize = 1)
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         void OnePxLine()
         {
@@ -391,10 +377,7 @@ public static unsafe class Blitter
 
     public static void DrawCircle(int centerX, int centerY, int radius)
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         if (radius > 0)
         {
@@ -419,10 +402,7 @@ public static unsafe class Blitter
 
     public static void FillCircle(int centerX, int centerY, int radius)
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         if (radius < 0 || centerX < -radius || centerY < -radius || centerX - _clipRect.Width > radius ||
             centerY - _clipRect.Height > radius)
@@ -469,6 +449,8 @@ public static unsafe class Blitter
 
     public static void DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, int lineSize = 1)
     {
+        CheckReady();
+
         DrawLine(x1, y1, x2, y2, lineSize);
         DrawLine(x2, y2, x3, y3, lineSize);
         DrawLine(x3, y3, x1, y1, lineSize);
@@ -476,10 +458,7 @@ public static unsafe class Blitter
 
     public static void ColorAdd(byte r, byte g, byte b, byte a)
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         byte* ptr = (byte*)_pixels;
 
@@ -501,10 +480,7 @@ public static unsafe class Blitter
 
     public static void ColorMult(float r, float g, float b, float a)
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         byte* ptr = (byte*)_pixels;
 
@@ -531,16 +507,12 @@ public static unsafe class Blitter
 
     public static void PixelShift(int shiftX, int shiftY)
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         Span<byte> copy = GetCopy(_pixelsSizeInBytes);
 
         int sw = _surfaceW;
         int sh = _surfaceH;
-
 
         byte* ptr = (byte*)_pixels;
 
@@ -592,10 +564,36 @@ public static unsafe class Blitter
         bool flip = false
     )
     {
-        if (!_ready)
+
+
+        fixed (byte* paste = &MemoryMarshal.GetReference(pastePixels))
         {
-            return;
+            Blit(
+                paste,
+                pastePixelsW,
+                pastePixelsH,
+                x, y,
+                region,
+                w,
+                h,
+                flip
+            );
         }
+    }
+
+    public static unsafe void Blit(
+        byte* pastePixels,
+        int pastePixelsW,
+        int pastePixelsH,
+        int x,
+        int y,
+        Rect region = default,
+        int w = 0,
+        int h = 0,
+        bool flip = false
+    )
+    {
+        CheckReady();
 
         if (region.IsEmpty)
         {
@@ -626,94 +624,90 @@ public static unsafe class Blitter
 
         byte* ptr = (byte*)_pixels;
 
-        fixed (byte* paste = &MemoryMarshal.GetReference(pastePixels))
+        if (!flip)
         {
-            if (!flip)
+            for (int px = minX; px < maxX; ++px)
             {
-                for (int px = minX; px < maxX; ++px)
+                for (int py = minY; py < maxY; ++py)
                 {
-                    for (int py = minY; py < maxY; ++py)
+                    byte* srcIdx = pastePixels + (region.X + (int)((px - x) / factorW) +
+                                            (region.Y + (int)((py - y) / factorH)) * pastePixelsW) * 4;
+
+                    if (*(srcIdx + 3) == 0)
                     {
-                        byte* srcIdx = paste + (region.X + (int)((px - x) / factorW) +
-                                                (region.Y + (int)((py - y) / factorH)) * pastePixelsW) * 4;
+                        continue;
+                    }
 
-                        if (*(srcIdx + 3) == 0)
-                        {
-                            continue;
-                        }
+                    byte* ptrIdx = ptr + (px + py * sw) * 4;
 
-                        byte* ptrIdx = ptr + (px + py * sw) * 4;
+                    if (col.Abgr == 1)
+                    {
+                        *ptrIdx = *srcIdx;
+                        *(ptrIdx + 1) = *(srcIdx + 1);
+                        *(ptrIdx + 2) = *(srcIdx + 2);
+                        *(ptrIdx + 3) = *(srcIdx + 3);
+                    }
+                    else
+                    {
+                        var sbf = *srcIdx / 255.0f;
+                        var sgf = *(srcIdx + 1) / 255.0f;
+                        var srf = *(srcIdx + 2) / 255.0f;
+                        var saf = *(srcIdx + 3) / 255.0f;
 
-                        if (col.Abgr == 1)
-                        {
-                            *ptrIdx = *srcIdx;
-                            *(ptrIdx + 1) = *(srcIdx + 1);
-                            *(ptrIdx + 2) = *(srcIdx + 2);
-                            *(ptrIdx + 3) = *(srcIdx + 3);
-                        }
-                        else
-                        {
-                            var sbf = *srcIdx / 255.0f;
-                            var sgf = *(srcIdx + 1) / 255.0f;
-                            var srf = *(srcIdx + 2) / 255.0f;
-                            var saf = *(srcIdx + 3) / 255.0f;
+                        var bf = col.B / 255.0f;
+                        var gf = col.G / 255.0f;
+                        var rf = col.R / 255.0f;
+                        var af = col.A / 255.0f;
 
-                            var bf = col.B / 255.0f;
-                            var gf = col.G / 255.0f;
-                            var rf = col.R / 255.0f;
-                            var af = col.A / 255.0f;
-
-                            *ptrIdx = (byte)(sbf * bf * 255.0f);
-                            *(ptrIdx + 1) = (byte)(sgf * gf * 255.0f);
-                            *(ptrIdx + 2) = (byte)(srf * rf * 255.0f);
-                            *(ptrIdx + 3) = (byte)(saf * af * 255.0f);
-                        }
+                        *ptrIdx = (byte)(sbf * bf * 255.0f);
+                        *(ptrIdx + 1) = (byte)(sgf * gf * 255.0f);
+                        *(ptrIdx + 2) = (byte)(srf * rf * 255.0f);
+                        *(ptrIdx + 3) = (byte)(saf * af * 255.0f);
                     }
                 }
             }
-            else
+        }
+        else
+        {
+            var startPixX = region.Right - 1;
+
+            for (int px = minX; px < maxX; ++px)
             {
-                var startPixX = region.Right - 1;
-
-                for (int px = minX; px < maxX; ++px)
+                for (int py = minY; py < maxY; ++py)
                 {
-                    for (int py = minY; py < maxY; ++py)
+                    byte* srcIdx = pastePixels + (startPixX + (int)((px - x) / factorW) +
+                                            (region.Y + (int)((py - y) / factorH)) * pastePixelsW) * 4;
+
+                    if (*(srcIdx + 3) == 0)
                     {
-                        byte* srcIdx = paste + (startPixX + (int)((px - x) / factorW) +
-                                                (region.Y + (int)((py - y) / factorH)) * pastePixelsW) * 4;
+                        continue;
+                    }
 
-                        if (*(srcIdx + 3) == 0)
-                        {
-                            continue;
-                        }
+                    byte* ptrIdx = ptr + (px + py * sw) * 4;
 
+                    if (col.Abgr == 1)
+                    {
+                        *ptrIdx = *srcIdx;
+                        *(ptrIdx + 1) = *(srcIdx + 1);
+                        *(ptrIdx + 2) = *(srcIdx + 2);
+                        *(ptrIdx + 3) = *(srcIdx + 3);
+                    }
+                    else
+                    {
+                        var sbf = *srcIdx / 255.0f;
+                        var sgf = *(srcIdx + 1) / 255.0f;
+                        var srf = *(srcIdx + 2) / 255.0f;
+                        var saf = *(srcIdx + 3) / 255.0f;
 
-                        byte* ptrIdx = ptr + (px + py * sw) * 4;
+                        var bf = col.B / 255.0f;
+                        var gf = col.G / 255.0f;
+                        var rf = col.R / 255.0f;
+                        var af = col.A / 255.0f;
 
-                        if (col.Abgr == 1)
-                        {
-                            *ptrIdx = *srcIdx;
-                            *(ptrIdx + 1) = *(srcIdx + 1);
-                            *(ptrIdx + 2) = *(srcIdx + 2);
-                            *(ptrIdx + 3) = *(srcIdx + 3);
-                        }
-                        else
-                        {
-                            var sbf = *srcIdx / 255.0f;
-                            var sgf = *(srcIdx + 1) / 255.0f;
-                            var srf = *(srcIdx + 2) / 255.0f;
-                            var saf = *(srcIdx + 3) / 255.0f;
-
-                            var bf = col.B / 255.0f;
-                            var gf = col.G / 255.0f;
-                            var rf = col.R / 255.0f;
-                            var af = col.A / 255.0f;
-
-                            *ptrIdx = (byte)(sbf * bf * 255.0f);
-                            *(ptrIdx + 1) = (byte)(sgf * gf * 255.0f);
-                            *(ptrIdx + 2) = (byte)(srf * rf * 255.0f);
-                            *(ptrIdx + 3) = (byte)(saf * af * 255.0f);
-                        }
+                        *ptrIdx = (byte)(sbf * bf * 255.0f);
+                        *(ptrIdx + 1) = (byte)(sgf * gf * 255.0f);
+                        *(ptrIdx + 2) = (byte)(srf * rf * 255.0f);
+                        *(ptrIdx + 3) = (byte)(saf * af * 255.0f);
                     }
                 }
             }
@@ -726,10 +720,7 @@ public static unsafe class Blitter
 
     public static void ConvertRgbaToBgra(bool premultiplyAlpha = true)
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         byte* ptr = (byte*)_pixels;
 
@@ -760,10 +751,7 @@ public static unsafe class Blitter
 
     public static void ConvertBgraToRgba()
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         byte* ptr = (byte*)_pixels;
 
@@ -784,10 +772,7 @@ public static unsafe class Blitter
 
     public static void DropShadow(int offsetX, int offsetY, Color color)
     {
-        if (!_ready)
-        {
-            return;
-        }
+        CheckReady();
 
         byte r = color.R;
         byte g = color.G;

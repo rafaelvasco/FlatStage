@@ -1,7 +1,8 @@
+using FlatStage.Platform;
 using System;
 using System.Text;
 
-namespace FlatStage;
+namespace FlatStage.Input;
 
 [Flags]
 public enum MouseButton
@@ -127,7 +128,6 @@ public readonly struct MouseState
         return HashCode.Combine(X, Y, Buttons, ScrollWheelValue);
     }
 
-
     /// <summary>
     /// Returns a string describing the mouse state.
     /// </summary>
@@ -200,19 +200,19 @@ public class Mouse
 
     internal Mouse()
     {
-        _msState = Platform.GetMouseState();
+        _msState = PlatformContext.GetMouseState();
 
-        Platform.MouseDown = button => { OnMouseDown?.Invoke(button); };
+        PlatformContext.MouseDown = button => { OnMouseDown?.Invoke(button); };
 
-        Platform.MouseUp = button => { OnMouseUp?.Invoke(button); };
+        PlatformContext.MouseUp = button => { OnMouseUp?.Invoke(button); };
 
-        Platform.MouseMove = (x, y) => { OnMouseMove?.Invoke(x, y); };
+        PlatformContext.MouseMove = (x, y) => { OnMouseMove?.Invoke(x, y); };
     }
 
     internal void UpdateState()
     {
         _prevMsState = _msState;
-        _msState = Platform.GetMouseState();
+        _msState = PlatformContext.GetMouseState();
     }
 
     private MouseState _msState;

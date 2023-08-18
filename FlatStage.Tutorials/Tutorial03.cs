@@ -1,4 +1,7 @@
-﻿using FlatStage.Sound;
+﻿using FlatStage.ContentPipeline;
+using FlatStage.Input;
+using FlatStage.Graphics;
+using FlatStage.Sound;
 
 namespace FlatStage.Tutorials;
 
@@ -9,12 +12,12 @@ public class Tutorial03 : Game
 
     protected override void Preload()
     {
-        _song1 = Content.Get<Audio>("delphi_loop_wav");
+        _song1 = Content.Get<Audio>("delphi_loop");
         _effect = Content.Get<Audio>("blip");
 
         _effect.Volume = 0.1f;
 
-        Graphics.SetViewClear(0, Color.Black);
+        GraphicsContext.SetViewClear(0, Color.Black);
     }
 
     protected override void Draw(Canvas2D canvas, float dt)
@@ -30,7 +33,7 @@ public class Tutorial03 : Game
 
     protected override void Update(float dt)
     {
-        if (Input.Keyboard.KeyPressed(Key.Space))
+        if (Control.Keyboard.KeyPressed(Key.Space))
         {
             if (!_song1.IsPlaying)
             {
@@ -42,7 +45,7 @@ public class Tutorial03 : Game
             }
         }
 
-        if (Input.Mouse.ButtonPressed(MouseButton.Left))
+        if (Control.Mouse.ButtonPressed(MouseButton.Left))
         {
             _effect.PlayEx(0f, Random.Default.Next(1, 5) / 10f);
         }

@@ -1,6 +1,6 @@
 // using FlatStage.Foundation;
 
-// namespace FlatStage;
+// namespace FlatStage.Graphics;
 
 // public class DepthStencilState
 // {

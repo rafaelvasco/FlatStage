@@ -1,6 +1,6 @@
 ﻿using FlatStage;
 using FlatStage.Editor;
-
+using FlatStage.Platform;
 
 if (args.Length > 0)
 {

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+
+using FlatStage.ContentPipeline;
 using FlatStage.Foundation.BGFX;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public class ShaderParameter
 {
@@ -17,7 +19,6 @@ public class ShaderParameter
     public Vec4 Value => _value;
 
     private Vec4 _value;
-
 
     internal ShaderParameter(Bgfx.UniformHandle handle, string name)
     {
@@ -61,7 +62,7 @@ public class ShaderSampler
 {
     internal Bgfx.UniformHandle Handle { get; }
 
-    public Texture2D? Texture { get; internal set; }
+    public Texture? Texture { get; internal set; }
 
     internal ShaderSampler(Bgfx.UniformHandle handle)
     {
@@ -77,7 +78,7 @@ internal struct ShaderProgramProps : IDefinitionData
     public Memory<string> Samplers = Memory<string>.Empty;
     public Memory<string> Parameters = Memory<string>.Empty;
 
-    public readonly override string ToString()
+    public override readonly string ToString()
     {
         return
             $"VS: {VertexShader.Length}, FS: {FragmentShader.Length}, Samplers: {Samplers.Length}, Parameters: {Parameters.Length}";
@@ -114,7 +115,7 @@ public sealed class ShaderProgram : Asset
         }
     }
 
-    public void SetTexture(int slot, Texture2D texture)
+    public void SetTexture(int slot, Texture texture)
     {
         slot = Calc.Max(slot, 0);
 

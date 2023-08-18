@@ -1,5 +1,7 @@
 ﻿using System;
 
+using FlatStage.ContentPipeline;
+
 namespace FlatStage.Sound;
 
 public enum AudioType
@@ -17,14 +19,14 @@ public class Audio : Asset
 {
     internal int Handle { get; private set; }
 
-    public bool IsPlaying => AudioManager.GetPlaying(this);
+    public bool IsPlaying => AudioContext.GetPlaying(this);
 
     public AudioType Type { get; private set; }
 
     public float Volume
     {
-        get => AudioManager.GetVolume(this);
-        set => AudioManager.SetVolume(this, value);
+        get => AudioContext.GetVolume(this);
+        set => AudioContext.SetVolume(this, value);
     }
 
     public static AudioType ParseAudioTypeFromString(string value)
@@ -50,7 +52,7 @@ public class Audio : Asset
             return;
         }
 
-        AudioManager.Play(this);
+        AudioContext.Play(this);
     }
 
     public void PlayEx(float pan, float pitch)
@@ -60,7 +62,7 @@ public class Audio : Asset
             return;
         }
 
-        AudioManager.PlayEx(this, pan, pitch);
+        AudioContext.PlayEx(this, pan, pitch);
     }
 
     public void Pause()
@@ -70,7 +72,7 @@ public class Audio : Asset
             return;
         }
 
-        AudioManager.Stop(this, false);
+        AudioContext.Stop(this, false);
     }
 
     public void Stop()
@@ -80,11 +82,11 @@ public class Audio : Asset
             return;
         }
 
-        AudioManager.Stop(this, true);
+        AudioContext.Stop(this, true);
     }
 
     protected override void Free()
     {
-        AudioManager.DestroyAudio(this);
+        AudioContext.DestroyAudio(this);
     }
 }

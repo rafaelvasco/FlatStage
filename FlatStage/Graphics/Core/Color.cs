@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.Text;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 /// <summary>
 /// Describes a 32-bit packed color.
@@ -1075,7 +1075,6 @@ public struct Color : IEquatable<Color>
         _abgr = abgr;
     }
 
-
     /// <summary>
     /// Compares whether current instance is equal to specified <see cref="Color"/>.
     /// </summary>
@@ -1085,7 +1084,6 @@ public struct Color : IEquatable<Color>
     {
         return Abgr == other.Abgr;
     }
-
 
     public static implicit operator uint(Color color)
     {
@@ -1097,7 +1095,6 @@ public struct Color : IEquatable<Color>
         return new Color(value);
     }
 
-
     public static implicit operator Vec4(Color color)
     {
         return new Vec4(color.Rf, color.Gf, color.Bf, color.Af);
@@ -1108,12 +1105,10 @@ public struct Color : IEquatable<Color>
         return new Vec3(color.Rf, color.Gf, color.Bf);
     }
 
-
     public static implicit operator Color(Vec3 vec)
     {
         return new Color(vec.X, vec.Y, vec.Z);
     }
-
 
     public static implicit operator Color(Vec4 vec)
     {

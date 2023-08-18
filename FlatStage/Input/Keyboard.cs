@@ -1,7 +1,8 @@
+using FlatStage.Platform;
 using System;
 using System.Collections.Generic;
 
-namespace FlatStage;
+namespace FlatStage.Input;
 
 /// <summary>
 /// Defines the keys on a keyboard.
@@ -1017,18 +1018,18 @@ public class Keyboard
 
     internal Keyboard()
     {
-        _kbState = Platform.GetKeyboardState();
+        _kbState = PlatformContext.GetKeyboardState();
         _lastKbState = _kbState;
 
-        Platform.KeyDown = key => ProcessEvent(key, true);
-        Platform.KeyUp = key => ProcessEvent(key, false);
-        Platform.TextInput = ev => ProcessTextInput(ev);
+        PlatformContext.KeyDown = key => ProcessEvent(key, true);
+        PlatformContext.KeyUp = key => ProcessEvent(key, false);
+        PlatformContext.TextInput = ev => ProcessTextInput(ev);
     }
 
     internal void UpdateState()
     {
         _lastKbState = _kbState;
-        _kbState = Platform.GetKeyboardState();
+        _kbState = PlatformContext.GetKeyboardState();
     }
 
     public bool KeyDown(Key key) => _kbState[key];

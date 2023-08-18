@@ -1,3 +1,6 @@
+using FlatStage.Input;
+using FlatStage.Graphics;
+
 namespace FlatStage;
 
 public abstract class Game
@@ -28,19 +31,18 @@ public abstract class Game
 
         _timeDelta = dt;
 
-        if (Input.Keyboard.KeyPressed(Key.F11))
+        if (Control.Keyboard.KeyPressed(Key.F11))
         {
             Stage.Fullscreen = !Stage.Fullscreen;
         }
-        else if (Input.Keyboard.KeyPressed(Key.F2))
+        else if (Control.Keyboard.KeyPressed(Key.F2))
         {
             _drawDebugInfo = !_drawDebugInfo;
         }
 
-
 #endif
 
-        if (EscapeQuits && Input.Keyboard.KeyPressed(Key.Escape))
+        if (EscapeQuits && Control.Keyboard.KeyPressed(Key.Escape))
         {
             Stage.Exit();
         }
@@ -51,11 +53,11 @@ public abstract class Game
     internal void InternalDraw(float dt)
     {
 #if DEBUG
-        Graphics.ClearDebugText();
+        GraphicsContext.ClearDebugText();
         if (_drawDebugInfo)
         {
-            Graphics.DebugTextWrite(2, 2, DebugColor.White, DebugColor.Black, $"FLATSTAGE ENGINE {Stage.Version}");
-            Graphics.DebugTextWrite(2, 3, DebugColor.White, DebugColor.Black,
+            GraphicsContext.DebugTextWrite(2, 2, DebugColor.White, DebugColor.Black, $"FLATSTAGE ENGINE {Stage.Version}");
+            GraphicsContext.DebugTextWrite(2, 3, DebugColor.White, DebugColor.Black,
                 $"Variable Dt: {_timeDelta}, Fixed Dt: {_timeDeltaFixed}, Draw Dt: {dt}");
         }
 

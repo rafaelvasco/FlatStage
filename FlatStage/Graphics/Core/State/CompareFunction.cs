@@ -1,6 +1,6 @@
 using FlatStage.Foundation.BGFX;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 /// <summary>
 /// The comparison function used for depth, stencil, and alpha tests.

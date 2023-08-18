@@ -851,7 +851,7 @@ public struct Matrix : IEquatable<Matrix>
     /// <param name="result">The rotation <see cref="Matrix"/> around X axis as an output parameter.</param>
     public static void CreateRotationX(float radians, out Matrix result)
     {
-        result = Matrix.Identity;
+        result = Identity;
 
         float val1 = (float)Math.Cos(radians);
         float val2 = (float)Math.Sin(radians);
@@ -880,7 +880,7 @@ public struct Matrix : IEquatable<Matrix>
     /// <param name="result">The rotation <see cref="Matrix"/> around Y axis as an output parameter.</param>
     public static void CreateRotationY(float radians, out Matrix result)
     {
-        result = Matrix.Identity;
+        result = Identity;
 
         float val1 = (float)Math.Cos(radians);
         float val2 = (float)Math.Sin(radians);
@@ -909,7 +909,7 @@ public struct Matrix : IEquatable<Matrix>
     /// <param name="result">The rotation <see cref="Matrix"/> around Z axis as an output parameter.</param>
     public static void CreateRotationZ(float radians, out Matrix result)
     {
-        result = Matrix.Identity;
+        result = Identity;
 
         float val1 = (float)Math.Cos(radians);
         float val2 = (float)Math.Sin(radians);
@@ -1913,7 +1913,7 @@ public struct Matrix : IEquatable<Matrix>
     /// <returns>Sum of the matrixes.</returns>
     public static Matrix operator +(Matrix matrix1, Matrix matrix2)
     {
-        return Matrix.Add(matrix1, matrix2);
+        return Add(matrix1, matrix2);
     }
 
     /// <summary>
@@ -1924,7 +1924,7 @@ public struct Matrix : IEquatable<Matrix>
     /// <returns>The result of dividing the matrixes.</returns>
     public static Matrix operator /(Matrix matrix1, Matrix matrix2)
     {
-        return Matrix.Divide(matrix1, matrix2);
+        return Divide(matrix1, matrix2);
     }
 
     /// <summary>
@@ -1935,7 +1935,7 @@ public struct Matrix : IEquatable<Matrix>
     /// <returns>The result of dividing a matrix by a scalar.</returns>
     public static Matrix operator /(Matrix matrix, float divider)
     {
-        return Matrix.Divide(matrix, divider);
+        return Divide(matrix, divider);
     }
 
     /// <summary>

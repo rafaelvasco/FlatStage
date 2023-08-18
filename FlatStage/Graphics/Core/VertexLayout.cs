@@ -1,9 +1,9 @@
+using FlatStage.Foundation.BGFX;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using FlatStage.Foundation.BGFX;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public sealed unsafe class VertexLayout : Disposable
 {
@@ -35,7 +35,7 @@ public sealed unsafe class VertexLayout : Disposable
         Attributes = new List<VertexAttribute>(attributes);
         Stride = LayoutData->stride;
 
-        Graphics.RegisterRenderResource(this);
+        GraphicsContext.RegisterRenderResource(this);
     }
 
     protected override void Free()

@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
-using FlatStage.Sound;
+using FlatStage.Input;
+using FlatStage.Graphics;
+using FlatStage.Platform;
 
 namespace FlatStage;
 
@@ -59,7 +61,7 @@ public partial class Stage
     {
         ResetLoop(DefaultFramerate);
 
-        double time60Hz = Platform.GetPerfFreq() / 60;
+        double time60Hz = PlatformContext.GetPerfFreq() / 60;
         _snapFreqs = new[]
         {
             time60Hz, //60fps
@@ -84,8 +86,8 @@ public partial class Stage
         _frameAccum = 0;
         _prevFrameTime = 0;
         _fixedDeltatime = 1.0 / _updateRate;
-        _desiredFrametime = Platform.GetPerfFreq() / _updateRate;
-        _vsyncMaxError = Platform.GetPerfCounter() * 0.0002;
+        _desiredFrametime = PlatformContext.GetPerfFreq() / _updateRate;
+        _vsyncMaxError = PlatformContext.GetPerfCounter() * 0.0002;
     }
 
     private void Tick(Game game)
@@ -95,7 +97,7 @@ public partial class Stage
             Thread.Sleep((int)_inactiveSleepTime.TotalMilliseconds);
         }
 
-        double currentFrameTime = Platform.GetPerfCounter();
+        double currentFrameTime = PlatformContext.GetPerfCounter();
 
         double deltaTime = currentFrameTime - _prevFrameTime;
 
@@ -158,7 +160,7 @@ public partial class Stage
             _resync = false;
         }
 
-        Platform.ProcessEvents();
+        PlatformContext.ProcessEvents();
 
         // Unlocked Frame Rate, Interpolation Enabled
         if (UnlockFrameRate)
@@ -173,7 +175,7 @@ public partial class Stage
                 // and interleave it (so game state can always get animation frame it needs)
                 if (consumedDeltaTime > _desiredFrametime)
                 {
-                    Input.Update();
+                    Control.Update();
                     game.InternalUpdate((float)_fixedDeltatime);
                     consumedDeltaTime -= _desiredFrametime;
                 }
@@ -181,13 +183,13 @@ public partial class Stage
                 _frameAccum -= _desiredFrametime;
             }
 
-            Input.Update();
-            game.InternalUpdate((float)(consumedDeltaTime / Platform.GetPerfFreq()));
+            Control.Update();
+            game.InternalUpdate((float)(consumedDeltaTime / PlatformContext.GetPerfFreq()));
 
             if (!_suppressDraw)
             {
                 game.InternalDraw((float)(_frameAccum / _desiredFrametime));
-                Graphics.Present();
+                GraphicsContext.Present();
             }
             else
             {
@@ -201,7 +203,7 @@ public partial class Stage
             {
                 for (int i = 0; i < UpdateMult; ++i)
                 {
-                    Input.Update();
+                    Control.Update();
                     game.InternalFixedUpdate((float)_fixedDeltatime);
                     game.InternalUpdate((float)_fixedDeltatime);
 
@@ -212,7 +214,7 @@ public partial class Stage
             if (!_suppressDraw)
             {
                 game.InternalDraw(1.0f);
-                Graphics.Present();
+                GraphicsContext.Present();
             }
             else
             {

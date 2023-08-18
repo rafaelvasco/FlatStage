@@ -1,6 +1,8 @@
-using System;
+namespace FlatStage.Input;
 
-namespace FlatStage;
+using System;
+using FlatStage.Platform;
+using Graphics;
 
 /// <summary>
 /// Defines the buttons on gamepad.
@@ -432,8 +434,6 @@ public struct GamePadThumbSticks
         return value * (newLength / originalLength);
     }
 
-
-
     /// <summary>
     /// Determines whether two specified instances of <see cref="GamePadThumbSticks"/>
     /// are equal.
@@ -583,7 +583,6 @@ public readonly struct GamePadTriggers
 
 }
 
-
 /// <summary>
 /// Represents specific information about the state of a controller,
 /// including the current state of buttons and sticks.
@@ -637,7 +636,6 @@ public struct GamePadState
     }
 
     public readonly bool this[GamePadButtons button] => (Buttons & button) == button;
-
 
     /// <summary>
     /// Initializes a new instance of the GamePadState class using the specified
@@ -714,7 +712,7 @@ public class Gamepad
     internal const float RightDeadZone = 8689.0f / 32768.0f;
     internal const float TriggerThreshold = 30.0f / 255.0f;
 
-    public static int ConnectedGamePads => Platform.ConnectedGamePads;
+    public static int ConnectedGamePads => PlatformContext.ConnectedGamePads;
 
     public static readonly int MaxCount = 4;
 
@@ -730,9 +728,9 @@ public class Gamepad
 
         //var gamepad_mappings_text_content = gamepad_mappings_text_file.JoinedText;
 
-        //Platform.SetGamePadMappingsFile(gamepad_mappings_text_content);
+        //PlatformContext.SetGamePadMappingsFile(gamepad_mappings_text_content);
 
-        Platform.PreLookForGamepads();
+        PlatformContext.PreLookForGamepads();
 
         if (ConnectedGamePads <= 0) return;
 
@@ -762,7 +760,7 @@ public class Gamepad
 
     public GamePadCapabilities GetInfo(GamePadIndex gamepadIndex)
     {
-        return Platform.GetGamePadCapabilities((int)gamepadIndex);
+        return PlatformContext.GetGamePadCapabilities((int)gamepadIndex);
     }
 
     public bool ButtonPressed(GamePadButtons button, GamePadIndex gamePadIndex = GamePadIndex.One)
@@ -800,7 +798,7 @@ public class Gamepad
 
     public GamePadState GetState(GamePadIndex gamepadIndex = GamePadIndex.One)
     {
-        return Platform.GetGamePadState(
+        return PlatformContext.GetGamePadState(
             (int)gamepadIndex,
             GamePadDeadZone.IndependentAxes
         );
@@ -814,7 +812,7 @@ public class Gamepad
 
     public GamePadState GetState(GamePadIndex gamepadIndex, GamePadDeadZone deadZoneMode)
     {
-        return Platform.GetGamePadState(
+        return PlatformContext.GetGamePadState(
             (int)gamepadIndex,
             deadZoneMode
         );
@@ -822,7 +820,7 @@ public class Gamepad
 
     public bool SetVibration(GamePadIndex gamepadIndex, float leftMotor, float rightMotor)
     {
-        return Platform.SetGamePadVibration(
+        return PlatformContext.SetGamePadVibration(
             (int)gamepadIndex,
             leftMotor,
             rightMotor
@@ -831,12 +829,12 @@ public class Gamepad
 
     public string GetGuid(GamePadIndex gamepadIndex)
     {
-        return Platform.GetGamePadGuid((int)gamepadIndex);
+        return PlatformContext.GetGamePadGuid((int)gamepadIndex);
     }
 
     public void SetLightbar(GamePadIndex gamepadIndex, Color color)
     {
-        Platform.SetGamePadLightBar((int)gamepadIndex, color);
+        PlatformContext.SetGamePadLightBar((int)gamepadIndex, color);
     }
 
     internal static float ExcludeAxisDeadZone(float value, float deadZone)

@@ -1,10 +1,12 @@
-﻿using System;
+﻿using FlatStage.ContentPipeline;
+using FlatStage.Input;
+using FlatStage.Graphics;
 
 namespace FlatStage.Tetris;
 
 public class Tetris : Game
 {
-    private Texture2D _sheet = null!;
+    private Texture _sheet = null!;
 
     private const int MaxDelay = 200;
     private const int MinDelay = 25;
@@ -38,9 +40,9 @@ public class Tetris : Game
 
     protected override void Preload()
     {
-        _sheet = Content.Get<Texture2D>("tetris_sheet");
+        _sheet = Content.Get<Texture>("tetris_sheet");
 
-        Graphics.SetViewClear(0, Color.Black);
+        GraphicsContext.SetViewClear(0, Color.Black);
     }
 
     private void UpdateLayout()
@@ -155,8 +157,12 @@ public class Tetris : Game
         DrawBlock(canvas, gameState.CurrentBlock, _gridOffsetX, _gridOffsetY);
         DrawNextBlock(canvas, gameState.BlockQueue, _nextIndicatorOffsetX, _nextIndicatorOffsetY);
         DrawHeldBlock(canvas, gameState.HeldBlock, _currentIndicatorOffsetX, _currentIndicatorOffsetY);
-    }
 
+        if (gameState.GameOver)
+        {
+
+        }
+    }
 
     protected override void FixedUpdate(float dt)
     {
@@ -174,41 +180,44 @@ public class Tetris : Game
 
     protected override void Update(float dt)
     {
-        if (_gameState.GameOver)
+        if (!_gameState.GameOver)
         {
-            return;
+            if (Control.Keyboard.KeyPressed(Key.A))
+            {
+                _gameState.MoveBlockLeft();
+            }
+            else if (Control.Keyboard.KeyPressed(Key.D))
+            {
+                _gameState.MoveBlockRight();
+            }
+            else if (Control.Keyboard.KeyPressed(Key.J))
+            {
+                _gameState.RotateBlockCCW();
+            }
+            else if (Control.Keyboard.KeyPressed(Key.K))
+            {
+                _gameState.RotateBlockCW();
+            }
+            else if (Control.Keyboard.KeyPressed(Key.S))
+            {
+                _gameState.MoveBlockDown();
+            }
+
+            if (Control.Keyboard.KeyPressed(Key.Space))
+            {
+                _gameState.DropBlock();
+            }
+
+            if (Control.Keyboard.KeyPressed(Key.Enter))
+            {
+                _gameState.HoldBlock();
+            }
+        }
+        else
+        {
+
         }
 
-        if (Input.Keyboard.KeyPressed(Key.A))
-        {
-            _gameState.MoveBlockLeft();
-        }
-        else if (Input.Keyboard.KeyPressed(Key.D))
-        {
-            _gameState.MoveBlockRight();
-        }
-        else if (Input.Keyboard.KeyPressed(Key.J))
-        {
-            _gameState.RotateBlockCW();
-        }
-        else if (Input.Keyboard.KeyPressed(Key.K))
-        {
-            _gameState.RotateBlockCCW();
-        }
-        else if (Input.Keyboard.KeyPressed(Key.S))
-        {
-            _gameState.MoveBlockDown();
-        }
-
-        if (Input.Keyboard.KeyPressed(Key.Space))
-        {
-            _gameState.DropBlock();
-        }
-
-        if (Input.Keyboard.KeyPressed(Key.Enter))
-        {
-            _gameState.HoldBlock();
-        }
     }
 
     protected override void Draw(Canvas2D canvas, float dt)

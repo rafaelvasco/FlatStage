@@ -1,6 +1,6 @@
 using FlatStage.Foundation.BGFX;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public enum VertexAttributeRole
 {

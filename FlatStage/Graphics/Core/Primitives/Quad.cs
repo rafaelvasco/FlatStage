@@ -1,4 +1,4 @@
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public struct Quad
 {
@@ -6,7 +6,6 @@ public struct Quad
     public Vertex2D TopRight;
     public Vertex2D BottomRight;
     public Vertex2D BottomLeft;
-
 
     public Quad(
        float x1, float y1, float z1, Color color1, float t1X, float t1Y,

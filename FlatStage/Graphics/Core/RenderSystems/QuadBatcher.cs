@@ -1,6 +1,6 @@
 using System;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 public class QuadBatcher
 {
@@ -53,16 +53,15 @@ public class QuadBatcher
 
     public void Submit(int startingVertexIndex, int vertexCount, int startingIndiceIndex, int indexCount)
     {
-        Graphics.SetIndexBuffer(_indexBuffer, startingIndiceIndex, indexCount);
+        GraphicsContext.SetIndexBuffer(_indexBuffer, startingIndiceIndex, indexCount);
 
         var verticesSpan = new Span<Vertex2D>(_vertices, startingVertexIndex,
            vertexCount > 0 ? vertexCount : _vertexIndex);
 
         var transientVbo = new TransientVertexBuffer<Vertex2D>(verticesSpan, Vertex2D.Stride, Vertex2D.VertexLayout);
 
-        Graphics.SetTransientVertexBuffer(ref transientVbo, vertexCount);
+        GraphicsContext.SetTransientVertexBuffer(ref transientVbo, vertexCount);
     }
-
 
     private void BuildIndices(int maxQuads)
     {

@@ -1,6 +1,6 @@
 using FlatStage.Foundation.BGFX;
 
-namespace FlatStage;
+namespace FlatStage.Graphics;
 
 /// <summary>
 /// Defines modes for addressing texels using texture coordinates that are outside of the range of 0.0 to 1.0.
