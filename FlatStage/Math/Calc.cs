@@ -314,7 +314,6 @@ public static class Calc
     [Pure]
     public static float Floor(float n) => (float)Math.Floor(n);
 
-
     [Pure]
     public static int Min(int a, int b) => Math.Min(a, b);
 
@@ -344,7 +343,6 @@ public static class Calc
     {
         return Min(d, Min(a, Min(b, c)));
     }
-
 
     [Pure]
     public static int Max(int a, int b) => Math.Max(a, b);
@@ -459,19 +457,13 @@ public static class Calc
     public static float Lerp(float a, float b, float x) => a + (b - a) * x;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float UnclampedLerp(float from, float to, float t)
-    {
-        return from + (to - from) * t;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float LerpAngle(float a, float b, float t)
     {
         float num = Repeat(b - a, 360f);
         if (num > 180f)
             num -= 360f;
 
-        return a + num * Normalize(t);
+        return a + (num * Normalize(t));
     }
 
     /// <summary>
@@ -610,7 +602,6 @@ public static class Calc
     {
         return t - Floor(t / length) * length;
     }
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Wrap(float var, float min, float max)
@@ -857,7 +848,6 @@ public static class Calc
 
         return floatArr;
     }
-
 
     public static byte[] ConvertFloatArrayToByte(float[] array)
     {

@@ -5,14 +5,12 @@ using FlatStage.Sound;
 
 namespace FlatStage.Tutorials;
 
-public class Tutorial02 : Game
+public class Tutorial02 : Scene
 {
     private Texture? _texture;
 
-    private float _particleX = 100.0f;
-    private float _particleY = 100.0f;
-    private float _dx;
-    private float _dy;
+    private Vec2 _particlePos = new Vec2(100.0f, 100.0f);
+    private Vec2 _delta;
 
     private const float Speed = 90;
     private const float Friction = 0.98f;
@@ -40,7 +38,7 @@ public class Tutorial02 : Game
             null
         );
 
-        canvas.Draw(_texture!, _particleX, _particleY, new Rect(96, 64, 32, 32), Color.Cyan);
+        canvas.Draw(_texture!, _particlePos, new Rect(96, 64, 32, 32), Vec2.Zero, Color.Cyan);
 
         canvas.End();
     }
@@ -51,8 +49,8 @@ public class Tutorial02 : Game
 
     private void Bump()
     {
-        var pan = (_particleX - Stage.WindowSize.Width / 2f) / (Stage.WindowSize.Width / 2f);
-        var pitch = (_dx * _dx + _dy * _dy) * 0.0005f + 0.2f;
+        var pan = (_particlePos.X - Stage.WindowSize.Width / 2f) / (Stage.WindowSize.Width / 2f);
+        var pitch = (_delta.X * _delta.X + _delta.Y * _delta.Y) * 0.0005f + 0.2f;
 
         _bumpEffect.PlayEx(pan, pitch);
     }
@@ -61,53 +59,51 @@ public class Tutorial02 : Game
     {
         if (Control.Keyboard.KeyDown(Key.Left))
         {
-            _dx -= Speed * dt;
+            _delta.X -= Speed * dt;
         }
 
         if (Control.Keyboard.KeyDown(Key.Right))
         {
-            _dx += Speed * dt;
+            _delta.X += Speed * dt;
         }
 
         if (Control.Keyboard.KeyDown(Key.Up))
         {
-            _dy -= Speed * dt;
+            _delta.Y -= Speed * dt;
         }
 
         if (Control.Keyboard.KeyDown(Key.Down))
         {
-            _dy += Speed * dt;
+            _delta.Y += Speed * dt;
         }
 
-        _dx *= Friction;
-        _dy *= Friction;
+        _delta *= Friction;
 
-        _particleX += _dx;
-        _particleY += _dy;
+        _particlePos += _delta;
 
-        if (_particleX > GraphicsContext.BackbufferWidth - 32)
+        if (_particlePos.X > GraphicsContext.BackbufferWidth - 32)
         {
-            _particleX = GraphicsContext.BackbufferWidth - 32;
-            _dx = -_dx;
+            _particlePos.X = GraphicsContext.BackbufferWidth - 32;
+            _delta.X = -_delta.X;
             Bump();
         }
-        else if (_particleX < 0)
+        else if (_particlePos.X < 0)
         {
-            _particleX = 0;
-            _dx = -_dx;
+            _particlePos.X = 0;
+            _delta.X = -_delta.X;
             Bump();
         }
 
-        if (_particleY > GraphicsContext.BackbufferHeight - 32)
+        if (_particlePos.Y > GraphicsContext.BackbufferHeight - 32)
         {
-            _particleY = GraphicsContext.BackbufferHeight - 32;
-            _dy = -_dy;
+            _particlePos.Y = GraphicsContext.BackbufferHeight - 32;
+            _delta.Y = -_delta.Y;
             Bump();
         }
-        else if (_particleY < 0)
+        else if (_particlePos.Y < 0)
         {
-            _particleY = 0;
-            _dy = -_dy;
+            _particlePos.Y = 0;
+            _delta.Y = -_delta.Y;
             Bump();
         }
     }

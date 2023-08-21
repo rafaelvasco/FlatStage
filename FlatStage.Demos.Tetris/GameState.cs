@@ -1,7 +1,13 @@
-﻿namespace FlatStage.Tetris;
+﻿using System;
+
+namespace FlatStage.Tetris;
 
 public class GameState
 {
+    public Action<int> OnClearLines = null!;
+    public Action<int> OnPlaceBlock = null!;
+    public Action OnGameOver = null!;
+
     private Block currentBlock = null!;
 
     public Block CurrentBlock
@@ -119,14 +125,22 @@ public class GameState
             GameGrid[p.Row + CurrentBlock.OffsetRow, p.Column + CurrentBlock.OffsetCol] = CurrentBlock.Id;
         }
 
-        Score += GameGrid.ClearFullRows();
+        var cleared = GameGrid.ClearFullRows();
+
+        if (cleared > 0)
+        {
+            Score += cleared;
+            OnClearLines(cleared);
+        }
 
         if (IsGameOver())
         {
+            OnGameOver();
             GameOver = true;
         }
         else
         {
+            OnPlaceBlock(CurrentBlock.Id);
             CurrentBlock = BlockQueue.GetAndUpdate();
             CanHold = true;
         }

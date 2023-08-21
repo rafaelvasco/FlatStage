@@ -2,7 +2,7 @@
   "profiles": {
     "FlatStage.Editor": {
       "commandName": "Project",
-      "commandLineArgs": "Build G:\\DotNet\\FlatStage\\FlatStage.Tutorials",
+      "commandLineArgs": "Build G:\\DotNet\\FlatStage\\FlatStage.Demos.Tetris",
       "hotReloadEnabled": false
     }
   }

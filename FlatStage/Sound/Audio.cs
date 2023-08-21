@@ -47,17 +47,18 @@ public class Audio : Asset
 
     public void Play()
     {
-        if (IsPlaying)
+        if (Type == AudioType.Song && IsPlaying)
         {
             return;
         }
 
+        Console.WriteLine("AudioPlay");
         AudioContext.Play(this);
     }
 
     public void PlayEx(float pan, float pitch)
     {
-        if (IsPlaying)
+        if (Type == AudioType.Song && IsPlaying)
         {
             return;
         }

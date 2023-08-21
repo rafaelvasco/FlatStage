@@ -104,9 +104,6 @@ public class BlendState
                 (Bgfx.StateFlags)_alphaBlendFunc) |
             BgfxUtils.STATE_BLEND_FUNC_SEPARATE((Bgfx.StateFlags)_colorSrcBlend, (Bgfx.StateFlags)_colorDestBlend,
                 (Bgfx.StateFlags)_alphaSrcBlend, (Bgfx.StateFlags)_alphaDestBlend);
-
-        // State = BgfxUtils.STATE_BLEND_FUNC_SEPARATE(Bgfx.StateFlags.BlendSrcAlpha,
-        //         Bgfx.StateFlags.BlendInvSrcAlpha, Bgfx.StateFlags.BlendOne, Bgfx.StateFlags.BlendInvSrcAlpha);
     }
 
     public static readonly BlendState Additive = new(
@@ -119,13 +116,6 @@ public class BlendState
     public static readonly BlendState AlphaBlend = new(
         Blend.One,
         Blend.One,
-        Blend.InverseSourceAlpha,
-        Blend.InverseSourceAlpha
-    );
-
-    public static readonly BlendState NonPremultiplied = new(
-        Blend.SourceAlpha,
-        Blend.SourceAlpha,
         Blend.InverseSourceAlpha,
         Blend.InverseSourceAlpha
     );

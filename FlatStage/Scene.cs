@@ -3,11 +3,11 @@ using FlatStage.Graphics;
 
 namespace FlatStage;
 
-public abstract class Game
+public abstract class Scene
 {
     public bool EscapeQuits { get; set; } = false;
 
-    public Game()
+    public Scene()
     {
         _canvas = new Canvas2D();
 

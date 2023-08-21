@@ -15,7 +15,7 @@ public class BuildExecutor : Executor
 {
     public override void Execute(Span<string> parameters)
     {
-        if (parameters.Length == 0)
+        if (parameters.Length != 1)
         {
             throw new ArgumentException("Invalid Build Usage: Example: Build [GameProjectPath]");
         }
@@ -31,6 +31,29 @@ public class BuildExecutor : Executor
     }
 }
 
+public class BuildSingleAssetExecutor : Executor
+{
+    public override void Execute(Span<string> parameters)
+    {
+        if (parameters.Length != 2)
+        {
+            throw new ArgumentException("Invalid Build Usage: Example: BuildAsset [GameProjectPath] [AssetId]");
+        }
+
+        var gameFolderPath = parameters[0];
+
+        if (!Directory.Exists(gameFolderPath))
+        {
+            throw new ApplicationException("Informed Path doesn't exist!");
+        }
+
+        var assetId = parameters[1];
+
+        AssetBuilder.BuildAsset(gameFolderPath, assetId);
+
+    }
+}
+
 public static class CliExecutor
 {
     private static readonly Dictionary<string, Executor> Executors = new();
@@ -38,6 +61,7 @@ public static class CliExecutor
     static CliExecutor()
     {
         Executors.Add("BUILD", new BuildExecutor());
+        Executors.Add("BUILDASSET", new BuildSingleAssetExecutor());
     }
 
     public static void Process(string[] args)

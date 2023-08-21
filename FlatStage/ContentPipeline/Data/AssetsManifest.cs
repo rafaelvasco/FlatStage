@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using FlatStage.Sound;
@@ -13,6 +14,60 @@ public class AssetsManifest : IDefinitionData
     public Dictionary<string, AudioAssetInfo>? Audios { get; internal set; }
 
     public Dictionary<string, FontAssetInfo>? Fonts { get; internal set; }
+
+    private Dictionary<string, AssetInfo>? FlatMap;
+
+    public AssetInfo GetAssetInfo(string id)
+    {
+        if (FlatMap == null)
+        {
+            BuildFlapMap();
+        }
+
+        if (FlatMap!.TryGetValue(id, out var assetInfo))
+        {
+            return assetInfo;
+        }
+
+        throw new Exception($"Could not find Asset: {id}");
+    }
+
+    private void BuildFlapMap()
+    {
+        FlatMap = new Dictionary<string, AssetInfo>();
+
+        if (Images != null)
+        {
+            foreach (var (key, imageInfo) in Images)
+            {
+                FlatMap[key] = imageInfo;
+            }
+        }
+
+        if (Shaders != null)
+        {
+            foreach (var (key, shaderInfo) in Shaders)
+            {
+                FlatMap[key] = shaderInfo;
+            }
+        }
+
+        if (Audios != null)
+        {
+            foreach (var (key, audioInfo) in Audios)
+            {
+                FlatMap[key] = audioInfo;
+            }
+        }
+
+        if (Fonts != null)
+        {
+            foreach (var (key, fontInfo) in Fonts)
+            {
+                FlatMap[key] = fontInfo;
+            }
+        }
+    }
 
     internal bool IsEmpty => Images == null && Shaders == null && Audios == null && Fonts == null;
 

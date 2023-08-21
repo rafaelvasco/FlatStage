@@ -171,6 +171,24 @@ internal unsafe class FontCompiler : IDisposable
 
         }
 
+        // Offset EveryGlyph By The Minimum YOffset of All Glyphs
+        var minOffsetY = int.MaxValue;
+
+        foreach (var (_, glyph) in glyphInfos)
+        {
+            if (glyph.YOffset < minOffsetY)
+            {
+                minOffsetY = glyph.YOffset;
+            }
+        }
+
+        foreach (var (key, _) in glyphInfos)
+        {
+            var gl = glyphInfos[key];
+            gl.YOffset -= minOffsetY;
+            glyphInfos[key] = gl;
+        }
+
         var finalFontImage = BuildFontImage(fontBitmapData, finalBitmapSize, finalBitmapSize);
 
         var resultFontData = new FontData

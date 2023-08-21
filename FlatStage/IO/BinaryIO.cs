@@ -12,9 +12,7 @@ internal static class BinaryIO
            assetDirectory,
            assetInfo.Id + (fileNameAppend ?? string.Empty) + ContentProperties.BinaryExt);
 
-        var exists = File.Exists(assetFullBinPath);
-
-        using var stream = File.Open(assetFullBinPath, exists ? FileMode.Truncate : FileMode.Create);
+        using var stream = File.Open(assetFullBinPath, FileMode.OpenOrCreate);
 
         BinarySerializer.Serialize(stream, ref data);
 

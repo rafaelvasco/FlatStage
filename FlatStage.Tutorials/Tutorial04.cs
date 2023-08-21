@@ -3,7 +3,7 @@ using FlatStage.Graphics;
 
 namespace FlatStage.Tutorials;
 
-public class Tutorial04 : Game
+public class Tutorial04 : Scene
 {
     private TextureFont _font = null!;
 
@@ -18,7 +18,8 @@ public class Tutorial04 : Game
     {
         canvas.Begin();
 
-        canvas.DrawText(_font, "Hello World!", new Vec2(300, 300), Color.White);
+        canvas.DrawText(_font, "Flat Stage Engine!", new Vec2(0, 0), Color.White);
+        canvas.DrawText(_font, "Flat Stage Engine!", new Vec2(50, 50), new Vec2(2.0f, 2.0f), Color.White);
 
         canvas.End();
     }

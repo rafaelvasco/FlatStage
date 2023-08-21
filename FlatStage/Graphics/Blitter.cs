@@ -565,7 +565,6 @@ public static unsafe class Blitter
     )
     {
 
-
         fixed (byte* paste = &MemoryMarshal.GetReference(pastePixels))
         {
             Blit(
@@ -640,7 +639,7 @@ public static unsafe class Blitter
 
                     byte* ptrIdx = ptr + (px + py * sw) * 4;
 
-                    if (col.Abgr == 1)
+                    if (col.PackedValue == 1)
                     {
                         *ptrIdx = *srcIdx;
                         *(ptrIdx + 1) = *(srcIdx + 1);
@@ -685,7 +684,7 @@ public static unsafe class Blitter
 
                     byte* ptrIdx = ptr + (px + py * sw) * 4;
 
-                    if (col.Abgr == 1)
+                    if (col.PackedValue == 1)
                     {
                         *ptrIdx = *srcIdx;
                         *(ptrIdx + 1) = *(srcIdx + 1);
