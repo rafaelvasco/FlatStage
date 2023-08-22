@@ -5,7 +5,7 @@ using FlatStage.Sound;
 
 namespace FlatStage.Tutorials;
 
-public class Tutorial02 : Scene
+public class Tutorial02 : Game
 {
     private Texture? _texture;
 

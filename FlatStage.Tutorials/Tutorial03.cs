@@ -5,7 +5,7 @@ using FlatStage.Sound;
 
 namespace FlatStage.Tutorials;
 
-public class Tutorial03 : Scene
+public class Tutorial03 : Game
 {
     private Audio _song1 = null!;
     private Audio _effect = null!;

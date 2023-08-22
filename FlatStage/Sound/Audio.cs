@@ -52,7 +52,6 @@ public class Audio : Asset
             return;
         }
 
-        Console.WriteLine("AudioPlay");
         AudioContext.Play(this);
     }
 

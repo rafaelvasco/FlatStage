@@ -124,16 +124,16 @@ public class TextureFont : Asset
     }
 
     /// <summary>
-    /// Returns the size of a string when rendered in this font.
+    /// Returns the size of the contents of a string when
+    /// rendered in this font.
     /// </summary>
     /// <param name="text">The text to measure.</param>
     /// <returns>The size, in pixels, of 'text' when rendered in
     /// this font.</returns>
-    public Vec2 MeasureString(string text)
+    public Vec2 MeasureString(string text, float scaleX = 1.0f, float scaleY = 1.0f)
     {
-        var source = new CharacterSource(text);
-        MeasureString(ref source, out var size);
-
+        var charSource = new CharSource(text);
+        MeasureString(in charSource, scaleX, scaleY, out var size);
         return size;
     }
 
@@ -144,14 +144,14 @@ public class TextureFont : Asset
     /// <param name="text">The text to measure.</param>
     /// <returns>The size, in pixels, of 'text' when rendered in
     /// this font.</returns>
-    public Vec2 MeasureString(StringBuilder text)
+    public Vec2 MeasureString(StringBuilder text, float scaleX = 1.0f, float scaleY = 1.0f)
     {
-        var source = new CharacterSource(text);
-        MeasureString(ref source, out var size);
+        var charSource = new CharSource(text);
+        MeasureString(in charSource, scaleX, scaleY, out var size);
         return size;
     }
 
-    internal unsafe void MeasureString(ref CharacterSource text, out Vec2 size)
+    internal unsafe void MeasureString(in CharSource text, float scaleX, float scaleY, out Vec2 size)
     {
         if (text.Length == 0)
         {
@@ -214,8 +214,8 @@ public class TextureFont : Asset
             }
         }
 
-        size.X = width;
-        size.Y = offset.Y + finalLineHeight;
+        size.X = width * scaleX;
+        size.Y = (offset.Y + finalLineHeight) * scaleY;
     }
 
     internal unsafe bool TryGetGlyphIndex(char c, out int index)
@@ -275,37 +275,6 @@ public class TextureFont : Asset
     protected override void Free()
     {
         Texture.Dispose();
-    }
-
-    internal struct CharacterSource
-    {
-        private readonly string? _string;
-        private readonly StringBuilder? _builder;
-
-        public CharacterSource(string s)
-        {
-            _string = s;
-            _builder = null;
-            Length = s.Length;
-        }
-
-        public CharacterSource(StringBuilder builder)
-        {
-            _builder = builder;
-            _string = null;
-            Length = _builder.Length;
-        }
-
-        public readonly int Length;
-        public char this[int index]
-        {
-            get
-            {
-                if (_string != null)
-                    return _string[index];
-                return _builder![index];
-            }
-        }
     }
 
     private struct CharacterRegion

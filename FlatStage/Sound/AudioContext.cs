@@ -124,6 +124,7 @@ public static unsafe class AudioContext
             var sound = _soundsArray + index;
 
             MiniAudio.ma_sound_start(sound);
+            MiniAudio.ma_sound_seek_to_pcm_frame(sound, 0);
         }
     }
 
@@ -144,6 +145,7 @@ public static unsafe class AudioContext
             }
 
             MiniAudio.ma_sound_start(sound);
+            MiniAudio.ma_sound_seek_to_pcm_frame(sound, 0);
         }
     }
 

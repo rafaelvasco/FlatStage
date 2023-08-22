@@ -3,7 +3,7 @@ using FlatStage.Graphics;
 
 namespace FlatStage.Tutorials;
 
-public class Tutorial04 : Scene
+public class Tutorial04 : Game
 {
     private TextureFont _font = null!;
 

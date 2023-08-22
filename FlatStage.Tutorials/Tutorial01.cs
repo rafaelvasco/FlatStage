@@ -3,7 +3,7 @@ using FlatStage.Graphics;
 
 namespace FlatStage.Tutorials;
 
-public class Tutorial01 : Scene
+public class Tutorial01 : Game
 {
     private Texture? _texture = null!;
 

@@ -90,7 +90,7 @@ public partial class Stage
         _vsyncMaxError = PlatformContext.GetPerfCounter() * 0.0002;
     }
 
-    private void Tick(Scene game)
+    private void Tick(Game game)
     {
         if (!IsActive && InactiveSleepTime.TotalMilliseconds >= 1.0)
         {

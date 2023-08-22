@@ -103,7 +103,7 @@ public partial class Stage : Disposable
         GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
     }
 
-    public void Run(Scene game)
+    public void Run(Game game)
     {
         if (_running)
         {
@@ -166,5 +166,5 @@ public partial class Stage : Disposable
     }
 
     private static Stage _instance = null!;
-    private static Scene? _runningGame;
+    private static Game? _runningGame;
 }

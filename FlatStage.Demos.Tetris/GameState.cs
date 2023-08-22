@@ -2,15 +2,15 @@
 
 namespace FlatStage.Tetris;
 
-public class GameState
+public static class GameState
 {
-    public Action<int> OnClearLines = null!;
-    public Action<int> OnPlaceBlock = null!;
-    public Action OnGameOver = null!;
+    public static Action<int> OnClearLines = null!;
+    public static Action<int> OnPlaceBlock = null!;
+    public static Action OnGameOver = null!;
 
-    private Block currentBlock = null!;
+    private static Block currentBlock = null!;
 
-    public Block CurrentBlock
+    public static Block CurrentBlock
     {
         get => currentBlock;
         private set
@@ -30,14 +30,14 @@ public class GameState
         }
     }
 
-    public GameGrid GameGrid { get; }
-    public BlockQueue BlockQueue { get; }
-    public bool GameOver { get; private set; }
-    public int Score { get; private set; }
-    public Block? HeldBlock { get; private set; }
-    public bool CanHold { get; private set; }
+    public static GameGrid GameGrid { get; private set; } = null!;
+    public static BlockQueue BlockQueue { get; private set; } = null!;
+    public static bool GameOver { get; private set; }
+    public static int Score { get; private set; }
+    public static Block? HeldBlock { get; private set; }
+    public static bool CanHold { get; private set; }
 
-    public GameState()
+    public static void Init()
     {
         GameGrid = new GameGrid(22, 10);
         BlockQueue = new BlockQueue();
@@ -45,15 +45,16 @@ public class GameState
         CanHold = true;
     }
 
-    public void Restart()
+    public static void Restart()
     {
         GameGrid.ClearAll();
         CurrentBlock = BlockQueue.GetAndUpdate();
         GameOver = false;
         CanHold = true;
+        Score = 0;
     }
 
-    public void HoldBlock()
+    public static void HoldBlock()
     {
         if (!CanHold)
         {
@@ -73,7 +74,7 @@ public class GameState
         CanHold = false;
     }
 
-    public void RotateBlockCW()
+    public static void RotateBlockCW()
     {
         CurrentBlock.RotateCW();
 
@@ -83,7 +84,7 @@ public class GameState
         }
     }
 
-    public void RotateBlockCCW()
+    public static void RotateBlockCCW()
     {
         CurrentBlock.RotateCCW();
 
@@ -93,7 +94,7 @@ public class GameState
         }
     }
 
-    public void MoveBlockLeft()
+    public static void MoveBlockLeft()
     {
         CurrentBlock.Move(0, -1);
 
@@ -103,7 +104,7 @@ public class GameState
         }
     }
 
-    public void MoveBlockRight()
+    public static void MoveBlockRight()
     {
         CurrentBlock.Move(0, 1);
 
@@ -113,12 +114,12 @@ public class GameState
         }
     }
 
-    private bool IsGameOver()
+    private static bool IsGameOver()
     {
         return !(GameGrid.IsRowEmpty(0) && GameGrid.IsRowEmpty(1));
     }
 
-    private void PlaceBlock()
+    private static void PlaceBlock()
     {
         foreach (GridPos p in CurrentBlock.TilePositions())
         {
@@ -146,7 +147,7 @@ public class GameState
         }
     }
 
-    public void MoveBlockDown()
+    public static void MoveBlockDown()
     {
         CurrentBlock.Move(1, 0);
 
@@ -157,7 +158,7 @@ public class GameState
         }
     }
 
-    private bool CurrentBlockFits()
+    private static bool CurrentBlockFits()
     {
         foreach (GridPos p in CurrentBlock.TilePositions())
         {
@@ -170,7 +171,7 @@ public class GameState
         return true;
     }
 
-    private int TileDropDistance(Block block, GridPos p)
+    private static int TileDropDistance(Block block, GridPos p)
     {
         int drop = 0;
 
@@ -182,7 +183,7 @@ public class GameState
         return drop;
     }
 
-    public int BlockDropDistance()
+    public static int BlockDropDistance()
     {
         int drop = GameGrid.Rows;
 
@@ -194,7 +195,7 @@ public class GameState
         return drop;
     }
 
-    public void DropBlock()
+    public static void DropBlock()
     {
         CurrentBlock.Move(BlockDropDistance(), 0);
         PlaceBlock();

@@ -25,3 +25,8 @@ type = "Effect"
 id = "placeblock_sfx"
 path = "placeblock_sfx.flac"
 type = "Effect"
+
+[[fonts]]
+id = "monogram"
+path = "monogram-extended.ttf"
+fontSize = 32

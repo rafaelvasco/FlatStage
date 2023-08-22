@@ -90,17 +90,7 @@ public class Canvas2D
             throw new InvalidOperationException("Draw was called, but Begin has not yet been called. Begin must be called successfully before you can call Draw.");
     }
 
-    void CheckValid(TextureFont font, string text)
-    {
-        if (font == null)
-            throw new ArgumentNullException("font");
-        if (text == null)
-            throw new ArgumentNullException("text");
-        if (!_beginCalled)
-            throw new InvalidOperationException("DrawText was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawText.");
-    }
-
-    void CheckValid(TextureFont font, StringBuilder text)
+    void CheckValid(TextureFont font, in CharSource? text)
     {
         if (font == null)
             throw new ArgumentNullException("font");
@@ -332,7 +322,31 @@ public class Canvas2D
         PushQuad(texture, ref quad);
     }
 
-    public unsafe void DrawText(TextureFont font, string text, Vec2 position, Color color)
+    public void DrawText(TextureFont font, string text, Vec2 position, Color color)
+    {
+        var charSource = new CharSource(text);
+        DrawText(font, in charSource, position, color);
+    }
+
+    public void DrawText(TextureFont font, string text, Vec2 position, Vec2 scale, Color color)
+    {
+        var charSource = new CharSource(text);
+        DrawText(font, in charSource, position, scale, color);
+    }
+
+    public void DrawText(TextureFont font, StringBuilder text, Vec2 position, Color color)
+    {
+        var charSource = new CharSource(text);
+        DrawText(font, in charSource, position, color);
+    }
+
+    public void DrawText(TextureFont font, StringBuilder text, Vec2 position, Vec2 scale, Color color)
+    {
+        var charSource = new CharSource(text);
+        DrawText(font, in charSource, position, scale, color);
+    }
+
+    internal unsafe void DrawText(TextureFont font, in CharSource text, Vec2 position, Color color)
     {
         CheckValid(font, text);
 
@@ -408,7 +422,7 @@ public class Canvas2D
 
     }
 
-    public unsafe void DrawText(TextureFont font, string text, Vec2 position, Vec2 scale, Color color)
+    internal unsafe void DrawText(TextureFont font, in CharSource text, Vec2 position, Vec2 scale, Color color)
     {
         CheckValid(font, text);
 

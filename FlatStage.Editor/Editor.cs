@@ -2,7 +2,7 @@
 
 namespace FlatStage.Editor;
 
-public class Editor : Scene
+public class Editor : Game
 {
     protected override void Update(float dt)
     {
