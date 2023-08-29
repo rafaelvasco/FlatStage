@@ -1,0 +1,855 @@
+Index: 32
+Glyph:
+X: 1
+Y: 1
+W: 10
+H: 16
+XOffset: 5
+YOffSet: 22
+XAdvance: 10
+Index: 33
+Glyph:
+X: 13
+Y: 1
+W: 4
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 6
+Index: 34
+Glyph:
+X: 19
+Y: 1
+W: 10
+H: 6
+XOffset: 1
+YOffSet: 2
+XAdvance: 12
+Index: 35
+Glyph:
+X: 31
+Y: 1
+W: 14
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 16
+Index: 36
+Glyph:
+X: 47
+Y: 1
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 37
+Glyph:
+X: 61
+Y: 1
+W: 16
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 18
+Index: 38
+Glyph:
+X: 79
+Y: 1
+W: 14
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 16
+Index: 39
+Glyph:
+X: 95
+Y: 1
+W: 4
+H: 8
+XOffset: 1
+YOffSet: 0
+XAdvance: 6
+Index: 40
+Glyph:
+X: 101
+Y: 1
+W: 6
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 8
+Index: 41
+Glyph:
+X: 109
+Y: 1
+W: 6
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 8
+Index: 42
+Glyph:
+X: 117
+Y: 1
+W: 12
+H: 14
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 43
+Glyph:
+X: 131
+Y: 1
+W: 12
+H: 12
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 44
+Glyph:
+X: 145
+Y: 1
+W: 4
+H: 6
+XOffset: 1
+YOffSet: 18
+XAdvance: 6
+Index: 45
+Glyph:
+X: 151
+Y: 1
+W: 10
+H: 4
+XOffset: 1
+YOffSet: 12
+XAdvance: 12
+Index: 46
+Glyph:
+X: 163
+Y: 1
+W: 4
+H: 4
+XOffset: 1
+YOffSet: 18
+XAdvance: 6
+Index: 47
+Glyph:
+X: 169
+Y: 1
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 48
+Glyph:
+X: 183
+Y: 1
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 49
+Glyph:
+X: 197
+Y: 1
+W: 6
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 8
+Index: 50
+Glyph:
+X: 205
+Y: 1
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 51
+Glyph:
+X: 219
+Y: 1
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 52
+Glyph:
+X: 233
+Y: 1
+W: 14
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 16
+Index: 53
+Glyph:
+X: 151
+Y: 7
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 54
+Glyph:
+X: 131
+Y: 15
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 55
+Glyph:
+X: 117
+Y: 17
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 56
+Glyph:
+X: 1
+Y: 23
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 57
+Glyph:
+X: 15
+Y: 23
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 58
+Glyph:
+X: 249
+Y: 1
+W: 4
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 6
+Index: 59
+Glyph:
+X: 145
+Y: 9
+W: 4
+H: 18
+XOffset: 1
+YOffSet: 6
+XAdvance: 6
+Index: 60
+Glyph:
+X: 29
+Y: 23
+W: 12
+H: 14
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 61
+Glyph:
+X: 43
+Y: 23
+W: 12
+H: 10
+XOffset: 1
+YOffSet: 8
+XAdvance: 14
+Index: 62
+Glyph:
+X: 57
+Y: 23
+W: 12
+H: 14
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 63
+Glyph:
+X: 71
+Y: 23
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 64
+Glyph:
+X: 85
+Y: 23
+W: 20
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 22
+Index: 65
+Glyph:
+X: 165
+Y: 23
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 66
+Glyph:
+X: 179
+Y: 23
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 67
+Glyph:
+X: 193
+Y: 23
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 68
+Glyph:
+X: 207
+Y: 23
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 69
+Glyph:
+X: 221
+Y: 23
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 70
+Glyph:
+X: 235
+Y: 23
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 71
+Glyph:
+X: 145
+Y: 29
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 72
+Glyph:
+X: 43
+Y: 35
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 73
+Glyph:
+X: 249
+Y: 19
+W: 4
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 6
+Index: 74
+Glyph:
+X: 131
+Y: 37
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 75
+Glyph:
+X: 29
+Y: 39
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 76
+Glyph:
+X: 57
+Y: 39
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 77
+Glyph:
+X: 107
+Y: 39
+W: 16
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 18
+Index: 78
+Glyph:
+X: 159
+Y: 43
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 79
+Glyph:
+X: 173
+Y: 43
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 80
+Glyph:
+X: 187
+Y: 43
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 81
+Glyph:
+X: 201
+Y: 43
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 82
+Glyph:
+X: 215
+Y: 43
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 83
+Glyph:
+X: 229
+Y: 43
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 84
+Glyph:
+X: 243
+Y: 43
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 85
+Glyph:
+X: 1
+Y: 45
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 86
+Glyph:
+X: 15
+Y: 45
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 87
+Glyph:
+X: 71
+Y: 45
+W: 16
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 18
+Index: 88
+Glyph:
+X: 89
+Y: 45
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 89
+Glyph:
+X: 145
+Y: 49
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 90
+Glyph:
+X: 43
+Y: 55
+W: 12
+H: 18
+XOffset: 1
+YOffSet: 4
+XAdvance: 14
+Index: 91
+Glyph:
+X: 125
+Y: 57
+W: 6
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 8
+Index: 92
+Glyph:
+X: 29
+Y: 59
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 93
+Glyph:
+X: 133
+Y: 57
+W: 6
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 8
+Index: 94
+Glyph:
+X: 57
+Y: 59
+W: 12
+H: 12
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 95
+Glyph:
+X: 103
+Y: 59
+W: 14
+H: 4
+XOffset: 0
+YOffSet: 24
+XAdvance: 14
+Index: 96
+Glyph:
+X: 159
+Y: 63
+W: 6
+H: 6
+XOffset: 1
+YOffSet: 2
+XAdvance: 8
+Index: 97
+Glyph:
+X: 167
+Y: 63
+W: 12
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 98
+Glyph:
+X: 181
+Y: 63
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 99
+Glyph:
+X: 195
+Y: 63
+W: 12
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 100
+Glyph:
+X: 209
+Y: 63
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 101
+Glyph:
+X: 223
+Y: 63
+W: 12
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 102
+Glyph:
+X: 237
+Y: 63
+W: 8
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 10
+Index: 103
+Glyph:
+X: 1
+Y: 65
+W: 12
+H: 22
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 104
+Glyph:
+X: 15
+Y: 65
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 105
+Glyph:
+X: 119
+Y: 59
+W: 4
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 6
+Index: 106
+Glyph:
+X: 247
+Y: 63
+W: 8
+H: 26
+XOffset: -1
+YOffSet: 2
+XAdvance: 6
+Index: 107
+Glyph:
+X: 71
+Y: 65
+W: 12
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 14
+Index: 108
+Glyph:
+X: 85
+Y: 65
+W: 4
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 6
+Index: 109
+Glyph:
+X: 91
+Y: 65
+W: 16
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 18
+Index: 110
+Glyph:
+X: 141
+Y: 69
+W: 12
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 111
+Glyph:
+X: 57
+Y: 73
+W: 12
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 112
+Glyph:
+X: 43
+Y: 75
+W: 12
+H: 22
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 113
+Glyph:
+X: 125
+Y: 79
+W: 12
+H: 22
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 114
+Glyph:
+X: 29
+Y: 81
+W: 12
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 115
+Glyph:
+X: 109
+Y: 81
+W: 12
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 116
+Glyph:
+X: 155
+Y: 71
+W: 8
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 10
+Index: 117
+Glyph:
+X: 165
+Y: 81
+W: 12
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 118
+Glyph:
+X: 195
+Y: 81
+W: 12
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 119
+Glyph:
+X: 91
+Y: 83
+W: 16
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 18
+Index: 120
+Glyph:
+X: 223
+Y: 81
+W: 12
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 121
+Glyph:
+X: 179
+Y: 85
+W: 12
+H: 22
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 122
+Glyph:
+X: 209
+Y: 85
+W: 12
+H: 16
+XOffset: 1
+YOffSet: 6
+XAdvance: 14
+Index: 123
+Glyph:
+X: 237
+Y: 85
+W: 8
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 10
+Index: 124
+Glyph:
+X: 15
+Y: 87
+W: 4
+H: 26
+XOffset: 1
+YOffSet: 2
+XAdvance: 6
+Index: 125
+Glyph:
+X: 71
+Y: 87
+W: 8
+H: 20
+XOffset: 1
+YOffSet: 2
+XAdvance: 10
+Index: 126
+Glyph:
+X: 139
+Y: 87
+W: 14
+H: 6
+XOffset: 1
+YOffSet: 2
+XAdvance: 16

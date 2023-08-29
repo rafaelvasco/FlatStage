@@ -201,7 +201,7 @@ internal static partial class PlatformContext
     {
         switch (evt.type)
         {
-            case SDL_EventType.SDL_KEYDOWN:
+            case SDL_EventType.SDL_KEYDOWN when evt.key.repeat == 0:
                 {
                     Key key = ConvertKey((int)evt.key.keysym.sym);
 

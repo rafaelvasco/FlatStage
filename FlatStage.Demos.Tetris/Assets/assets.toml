@@ -23,10 +23,20 @@ type = "Effect"
 
 [[audios]]
 id = "placeblock_sfx"
-path = "placeblock_sfx.flac"
+path = "placeblock_sfx.wav"
 type = "Effect"
 
-[[fonts]]
-id = "monogram"
-path = "monogram-extended.ttf"
-fontSize = 32
+[[audios]]
+id = "clear_max"
+path = "clear_max.wav"
+type = "Effect"
+
+[[audios]]
+id = "menu_hover"
+path = "menu.wav"
+type = "Effect"
+
+[[audios]]
+id = "title_song"
+path = "title_song.wav"
+type = "Song"

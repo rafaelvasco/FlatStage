@@ -5,38 +5,38 @@ namespace FlatStage.Foundation.MiniAudio
 {
     public partial struct ma_job
     {
-        [NativeTypeName("__AnonymousRecord_miniaudio_L6350_C5")]
+        
         public _toc_e__Union toc;
 
-        [NativeTypeName("ma_uint64")]
+        
         public ulong next;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint order;
 
-        [NativeTypeName("__AnonymousRecord_miniaudio_L6363_C5")]
+        
         public _data_e__Union data;
 
         [StructLayout(LayoutKind.Explicit)]
         public partial struct _toc_e__Union
         {
             [FieldOffset(0)]
-            [NativeTypeName("__AnonymousRecord_miniaudio_L6352_C9")]
+            
             public _breakup_e__Struct breakup;
 
             [FieldOffset(0)]
-            [NativeTypeName("ma_uint64")]
+            
             public ulong allocation;
 
             public partial struct _breakup_e__Struct
             {
-                [NativeTypeName("ma_uint16")]
+                
                 public ushort code;
 
-                [NativeTypeName("ma_uint16")]
+                
                 public ushort slot;
 
-                [NativeTypeName("ma_uint32")]
+                
                 public uint refcount;
             }
         }
@@ -45,26 +45,26 @@ namespace FlatStage.Foundation.MiniAudio
         public partial struct _data_e__Union
         {
             [FieldOffset(0)]
-            [NativeTypeName("__AnonymousRecord_miniaudio_L6366_C9")]
+            
             public _custom_e__Struct custom;
 
             [FieldOffset(0)]
-            [NativeTypeName("__AnonymousRecord_miniaudio_L6374_C9")]
+            
             public _resourceManager_e__Union resourceManager;
 
             [FieldOffset(0)]
-            [NativeTypeName("__AnonymousRecord_miniaudio_L6452_C9")]
+            
             public _device_e__Union device;
 
             public partial struct _custom_e__Struct
             {
-                [NativeTypeName("ma_job_proc")]
+                
                 public IntPtr proc;
 
-                [NativeTypeName("ma_uintptr")]
+                
                 public ulong data0;
 
-                [NativeTypeName("ma_uintptr")]
+                
                 public ulong data1;
             }
 
@@ -72,39 +72,39 @@ namespace FlatStage.Foundation.MiniAudio
             public partial struct _resourceManager_e__Union
             {
                 [FieldOffset(0)]
-                [NativeTypeName("__AnonymousRecord_miniaudio_L6376_C13")]
+                
                 public _loadDataBufferNode_e__Struct loadDataBufferNode;
 
                 [FieldOffset(0)]
-                [NativeTypeName("__AnonymousRecord_miniaudio_L6388_C13")]
+                
                 public _freeDataBufferNode_e__Struct freeDataBufferNode;
 
                 [FieldOffset(0)]
-                [NativeTypeName("__AnonymousRecord_miniaudio_L6395_C13")]
+                
                 public _pageDataBufferNode_e__Struct pageDataBufferNode;
 
                 [FieldOffset(0)]
-                [NativeTypeName("__AnonymousRecord_miniaudio_L6404_C13")]
+                
                 public _loadDataBuffer_e__Struct loadDataBuffer;
 
                 [FieldOffset(0)]
-                [NativeTypeName("__AnonymousRecord_miniaudio_L6417_C13")]
+                
                 public _freeDataBuffer_e__Struct freeDataBuffer;
 
                 [FieldOffset(0)]
-                [NativeTypeName("__AnonymousRecord_miniaudio_L6424_C13")]
+                
                 public _loadDataStream_e__Struct loadDataStream;
 
                 [FieldOffset(0)]
-                [NativeTypeName("__AnonymousRecord_miniaudio_L6433_C13")]
+                
                 public _freeDataStream_e__Struct freeDataStream;
 
                 [FieldOffset(0)]
-                [NativeTypeName("__AnonymousRecord_miniaudio_L6439_C13")]
+                
                 public _pageDataStream_e__Struct pageDataStream;
 
                 [FieldOffset(0)]
-                [NativeTypeName("__AnonymousRecord_miniaudio_L6444_C13")]
+                
                 public _seekDataStream_e__Struct seekDataStream;
 
                 public unsafe partial struct _loadDataBufferNode_e__Struct
@@ -113,19 +113,19 @@ namespace FlatStage.Foundation.MiniAudio
 
                     public void* pDataBufferNode;
 
-                    [NativeTypeName("char *")]
+                    
                     public sbyte* pFilePath;
 
-                    [NativeTypeName("wchar_t *")]
+                    
                     public ushort* pFilePathW;
 
-                    [NativeTypeName("ma_uint32")]
+                    
                     public uint flags;
 
-                    [NativeTypeName("ma_async_notification *")]
+                    
                     public void* pInitNotification;
 
-                    [NativeTypeName("ma_async_notification *")]
+                    
                     public void* pDoneNotification;
 
                     public ma_fence* pInitFence;
@@ -139,7 +139,7 @@ namespace FlatStage.Foundation.MiniAudio
 
                     public void* pDataBufferNode;
 
-                    [NativeTypeName("ma_async_notification *")]
+                    
                     public void* pDoneNotification;
 
                     public ma_fence* pDoneFence;
@@ -153,7 +153,7 @@ namespace FlatStage.Foundation.MiniAudio
 
                     public void* pDecoder;
 
-                    [NativeTypeName("ma_async_notification *")]
+                    
                     public void* pDoneNotification;
 
                     public ma_fence* pDoneFence;
@@ -163,29 +163,29 @@ namespace FlatStage.Foundation.MiniAudio
                 {
                     public void* pDataBuffer;
 
-                    [NativeTypeName("ma_async_notification *")]
+                    
                     public void* pInitNotification;
 
-                    [NativeTypeName("ma_async_notification *")]
+                    
                     public void* pDoneNotification;
 
                     public ma_fence* pInitFence;
 
                     public ma_fence* pDoneFence;
 
-                    [NativeTypeName("ma_uint64")]
+                    
                     public ulong rangeBegInPCMFrames;
 
-                    [NativeTypeName("ma_uint64")]
+                    
                     public ulong rangeEndInPCMFrames;
 
-                    [NativeTypeName("ma_uint64")]
+                    
                     public ulong loopPointBegInPCMFrames;
 
-                    [NativeTypeName("ma_uint64")]
+                    
                     public ulong loopPointEndInPCMFrames;
 
-                    [NativeTypeName("ma_uint32")]
+                    
                     public uint isLooping;
                 }
 
@@ -193,7 +193,7 @@ namespace FlatStage.Foundation.MiniAudio
                 {
                     public void* pDataBuffer;
 
-                    [NativeTypeName("ma_async_notification *")]
+                    
                     public void* pDoneNotification;
 
                     public ma_fence* pDoneFence;
@@ -203,16 +203,16 @@ namespace FlatStage.Foundation.MiniAudio
                 {
                     public void* pDataStream;
 
-                    [NativeTypeName("char *")]
+                    
                     public sbyte* pFilePath;
 
-                    [NativeTypeName("wchar_t *")]
+                    
                     public ushort* pFilePathW;
 
-                    [NativeTypeName("ma_uint64")]
+                    
                     public ulong initialSeekPoint;
 
-                    [NativeTypeName("ma_async_notification *")]
+                    
                     public void* pInitNotification;
 
                     public ma_fence* pInitFence;
@@ -222,7 +222,7 @@ namespace FlatStage.Foundation.MiniAudio
                 {
                     public void* pDataStream;
 
-                    [NativeTypeName("ma_async_notification *")]
+                    
                     public void* pDoneNotification;
 
                     public ma_fence* pDoneFence;
@@ -232,7 +232,7 @@ namespace FlatStage.Foundation.MiniAudio
                 {
                     public void* pDataStream;
 
-                    [NativeTypeName("ma_uint32")]
+                    
                     public uint pageIndex;
                 }
 
@@ -240,7 +240,7 @@ namespace FlatStage.Foundation.MiniAudio
                 {
                     public void* pDataStream;
 
-                    [NativeTypeName("ma_uint64")]
+                    
                     public ulong frameIndex;
                 }
             }
@@ -249,21 +249,21 @@ namespace FlatStage.Foundation.MiniAudio
             public partial struct _device_e__Union
             {
                 [FieldOffset(0)]
-                [NativeTypeName("__AnonymousRecord_miniaudio_L6454_C13")]
+                
                 public _aaudio_e__Union aaudio;
 
                 [StructLayout(LayoutKind.Explicit)]
                 public partial struct _aaudio_e__Union
                 {
                     [FieldOffset(0)]
-                    [NativeTypeName("__AnonymousRecord_miniaudio_L6456_C17")]
+                    
                     public _reroute_e__Struct reroute;
 
                     public unsafe partial struct _reroute_e__Struct
                     {
                         public void* pDevice;
 
-                        [NativeTypeName("ma_uint32")]
+                        
                         public uint deviceType;
                     }
                 }

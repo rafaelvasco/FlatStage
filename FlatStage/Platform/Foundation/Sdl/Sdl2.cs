@@ -33,7 +33,6 @@
 #region Using Statements
 
 using System;
-using System.Diagnostics;
 #if NET6_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -58,7 +57,7 @@ public static class SDL
     internal static T PtrToStructure<
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors |
                                     DynamicallyAccessedMemberTypes.NonPublicConstructors)]
-        T>(IntPtr ptr)
+    T>(IntPtr ptr)
     {
         return Marshal.PtrToStructure<T>(ptr);
     }
@@ -167,11 +166,11 @@ public static class SDL
          * -flibit
          */
 #if NETSTANDARD2_0
-			/* Modern C# lets you just send the byte*, nice! */
-			string result = System.Text.Encoding.UTF8.GetString(
-				(byte*) s,
-				(int) (ptr - (byte*) s)
-			);
+            /* Modern C# lets you just send the byte*, nice! */
+            string result = System.Text.Encoding.UTF8.GetString(
+                (byte*) s,
+                (int) (ptr - (byte*) s)
+            );
 #else
         /* Old C# requires an extra memcpy, bleh! */
         int len = (int)(ptr - (byte*)s);
@@ -2346,7 +2345,6 @@ public static class SDL
         IntPtr window,
         SDL_bool grabbed
     );
-
 
     /* window refers to an SDL_Window*, icon to an SDL_Surface* */
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
@@ -4531,7 +4529,7 @@ public static class SDL
     public const int SDL_WINDOW_LACKS_SHAPE = -3;
 
     [DllImport(nativeLibName, EntryPoint = "SDL_CreateShapedWindow", CallingConvention = CallingConvention.Cdecl)]
-    private static unsafe extern IntPtr INTERNAL_SDL_CreateShapedWindow(
+    private static extern unsafe IntPtr INTERNAL_SDL_CreateShapedWindow(
         byte* title,
         uint x,
         uint y,
@@ -5498,8 +5496,8 @@ public static class SDL
         public UInt32 timestamp;
 
         public Int32 which; /* joystick id for ADDED,
-						 * else instance id
-						 */
+                         * else instance id
+                         */
     }
 
     /* Game controller touchpad event structure (event.ctouchpad.*) */
@@ -6754,27 +6752,27 @@ public static class SDL
     }
 
     /**
-		 *  \brief Get the number of registered touch devices.
- 		 */
+         *  \brief Get the number of registered touch devices.
+         */
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern int SDL_GetNumTouchDevices();
 
     /**
-		 *  \brief Get the touch ID with the given index, or 0 if the index is invalid.
-		 */
+         *  \brief Get the touch ID with the given index, or 0 if the index is invalid.
+         */
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern long SDL_GetTouchDevice(int index);
 
     /**
-		 *  \brief Get the number of active fingers for a given touch device.
-		 */
+         *  \brief Get the number of active fingers for a given touch device.
+         */
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern int SDL_GetNumTouchFingers(long touchID);
 
     /**
-		 *  \brief Get the finger object of the given touch, with the given index.
-		 *  Returns pointer to SDL_Finger.
-		 */
+         *  \brief Get the finger object of the given touch, with the given index.
+         *  Returns pointer to SDL_Finger.
+         */
     [DllImport(nativeLibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr SDL_GetTouchFinger(long touchID, int index);
 
@@ -8910,7 +8908,7 @@ public static class SDL
 
     /* Only available in 2.0.14 or higher. */
     [DllImport(nativeLibName, EntryPoint = "SDL_AndroidRequestPermission", CallingConvention = CallingConvention.Cdecl)]
-    private static unsafe extern SDL_bool INTERNAL_SDL_AndroidRequestPermission(
+    private static extern unsafe SDL_bool INTERNAL_SDL_AndroidRequestPermission(
         byte* permission
     );
 
@@ -8928,7 +8926,7 @@ public static class SDL
 
     /* Only available in 2.0.16 or higher. */
     [DllImport(nativeLibName, EntryPoint = "SDL_AndroidShowToast", CallingConvention = CallingConvention.Cdecl)]
-    private static unsafe extern int INTERNAL_SDL_AndroidShowToast(
+    private static extern unsafe int INTERNAL_SDL_AndroidShowToast(
         byte* message,
         int duration,
         int gravity,
@@ -9276,7 +9274,7 @@ public static class SDL
 
     /* Only available in 2.0.14 or higher. */
     [DllImport(nativeLibName, EntryPoint = "SDL_OpenURL", CallingConvention = CallingConvention.Cdecl)]
-    private static unsafe extern int INTERNAL_SDL_OpenURL(byte* url);
+    private static extern unsafe int INTERNAL_SDL_OpenURL(byte* url);
 
     public static unsafe int SDL_OpenURL(string url)
     {

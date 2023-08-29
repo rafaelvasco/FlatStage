@@ -1,142 +1,102 @@
-﻿using FlatStage.ContentPipeline;
-using FlatStage.Input;
-using FlatStage.Graphics;
-using FlatStage.Sound;
+﻿using FlatStage.Graphics;
 
 namespace FlatStage.Tetris;
 
 public class Tetris : Game
 {
-    private Audio _sfxRotate = null!;
-    private Audio _sfxGameOver = null!;
-    private Audio _sfxLineClear = null!;
-    private Audio _sfxPlaceBlock = null!;
 
-    private TetrisView _view = null!;
-
-    private const int MaxDelay = 200;
-    private const int MinDelay = 25;
-    private const int DelayDecrease = 5;
-    private const int MoveDownDelay = 5;
-
-    private int _ticks;
-    private int _moveDownTicks;
+    private TetrisView _tetrisView = null!;
+    private TetrisController _tetrisController = null!;
 
     public Tetris()
     {
-        _drawDebugInfo = false;
-        GameState.Init();
+        _tetrisController = new TetrisController();
+        _tetrisView = new TetrisView(_tetrisController);
     }
 
     protected override void Preload()
     {
+        GameContent.Load();
 
-        _sfxRotate = Content.Get<Audio>("rotate_sfx");
-        _sfxLineClear = Content.Get<Audio>("lineclear_sfx");
-        _sfxGameOver = Content.Get<Audio>("gameover_sfx");
-        _sfxPlaceBlock = Content.Get<Audio>("placeblock_sfx");
-
-        _view = new TetrisView();
-        _view.Load();
-        _view.UpdateLayout();
+        _tetrisView.UpdateLayout();
 
         GraphicsContext.SetViewClear(0, Color.Black);
 
-        GameState.OnClearLines = OnClearLines;
-        GameState.OnPlaceBlock = OnPlaceBlock;
-        GameState.OnGameOver = OnGameOver;
+        _tetrisController.OnClearLines = OnClearLines;
+        _tetrisController.OnPlaceBlock = OnPlaceBlock;
+        _tetrisController.OnRotateBlock = OnRotateBlock;
+        _tetrisController.OnGameStateChanged = OnGameStateChanged;
 
+        _tetrisController.OnExitTriggered = () => Stage.Exit();
+        _tetrisController.OnMenuHovered = () => GameContent.SfxMenuHover.Play();
+
+        GameContent.SngTitle.Play();
     }
 
-    private void OnClearLines(int lineCount)
+    private void OnGameStateChanged(GameStateId id)
     {
-        _sfxLineClear.Play();
+        switch (id)
+        {
+            case GameStateId.Game:
+                {
+                    if (GameContent.SngTitle.IsPlaying)
+                    {
+                        GameContent.SngTitle.Stop();
+                    }
+
+                    break;
+                }
+            case GameStateId.Menu:
+                {
+                    GameContent.SngTitle.Play();
+                    break;
+                }
+            case GameStateId.GameOver:
+                {
+                    GameContent.SfxGameOver.Play();
+                    break;
+                }
+        }
+    }
+
+    private void OnRotateBlock()
+    {
+        GameContent.SfxRotate.Play();
+    }
+
+    private void OnClearLines(int lineCount, bool doubleScore)
+    {
+        if (!doubleScore)
+        {
+            GameContent.SfxLineClear.Play();
+        }
+        else
+        {
+            GameContent.SfxFullLinesClear.Play();
+        }
     }
 
     private void OnPlaceBlock(int blockId)
     {
-        _sfxPlaceBlock.Play();
-    }
-
-    private void OnGameOver()
-    {
-        _sfxGameOver.Play();
+        GameContent.SfxPlaceBlock.Play();
     }
 
     protected override void FixedUpdate(float dt)
     {
-        _view.Process();
-
-        if (GameState.GameOver) return;
-
-        _ticks += 1;
-
-        float delay = Calc.Max(MinDelay, MaxDelay - (GameState.Score * DelayDecrease));
-
-        if (!(_ticks > delay)) return;
-
-        _ticks = 0;
-        GameState.MoveBlockDown();
+        _tetrisController.TickFixed();
+        _tetrisView.Update();
     }
 
     protected override void Update(float dt)
     {
-        if (!GameState.GameOver)
-        {
-            if (Control.Keyboard.KeyPressed(Key.A))
-            {
-                GameState.MoveBlockLeft();
-            }
-            else if (Control.Keyboard.KeyPressed(Key.D))
-            {
-                GameState.MoveBlockRight();
-            }
-            else if (Control.Keyboard.KeyPressed(Key.J))
-            {
-                GameState.RotateBlockCCW();
-                _sfxRotate.Play();
-            }
-            else if (Control.Keyboard.KeyPressed(Key.K))
-            {
-                GameState.RotateBlockCW();
-                _sfxRotate.Play();
-            }
-            else if (Control.Keyboard.KeyDown(Key.S))
-            {
-                _moveDownTicks += 1;
-
-                if (_moveDownTicks > MoveDownDelay)
-                {
-                    _moveDownTicks = 0;
-                    GameState.MoveBlockDown();
-                }
-            }
-
-            if (Control.Keyboard.KeyPressed(Key.Space))
-            {
-                GameState.DropBlock();
-            }
-
-            if (Control.Keyboard.KeyPressed(Key.Enter))
-            {
-                GameState.HoldBlock();
-            }
-        }
-        else
-        {
-            if (Control.Keyboard.KeyPressed(Key.Space))
-            {
-                GameState.Restart();
-            }
-        }
-
+        _tetrisController.Tick();
     }
 
     protected override void Draw(Canvas2D canvas, float dt)
     {
         canvas.Begin();
 
-        _view.Draw(canvas, dt);
+        _tetrisView.Draw(canvas, dt);
 
         canvas.End();
     }

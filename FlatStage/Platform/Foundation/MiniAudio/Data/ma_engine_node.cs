@@ -6,10 +6,10 @@ namespace FlatStage.Foundation.MiniAudio
 
         public ma_engine* pEngine;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint sampleRate;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint volumeSmoothTimeInPCMFrames;
 
         public ma_mono_expansion_mode monoExpansionMode;
@@ -32,19 +32,19 @@ namespace FlatStage.Foundation.MiniAudio
 
         public float oldDopplerPitch;
 
-        [NativeTypeName("ma_bool32")]
+        
         public uint isPitchDisabled;
 
-        [NativeTypeName("ma_bool32")]
+        
         public uint isSpatializationDisabled;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint pinnedListenerIndex;
 
-        [NativeTypeName("__AnonymousRecord_miniaudio_L11078_C5")]
+        
         public _fadeSettings_e__Struct fadeSettings;
 
-        [NativeTypeName("ma_bool8")]
+        
         public byte _ownsHeap;
 
         public void* _pHeap;

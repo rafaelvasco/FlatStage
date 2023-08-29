@@ -6,29 +6,29 @@ namespace FlatStage.Foundation.MiniAudio
     {
         public ma_device_id id;
 
-        [NativeTypeName("char[256]")]
+        
         public fixed sbyte name[256];
 
-        [NativeTypeName("ma_bool32")]
+        
         public uint isDefault;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint nativeDataFormatCount;
 
-        [NativeTypeName("struct (anonymous struct at miniaudio/vendor/miniaudio.h:7020:5)[64]")]
+        
         public _nativeDataFormats_e__FixedBuffer nativeDataFormats;
 
         public partial struct _Anonymous_e__Struct
         {
             public ma_format format;
 
-            [NativeTypeName("ma_uint32")]
+            
             public uint channels;
 
-            [NativeTypeName("ma_uint32")]
+            
             public uint sampleRate;
 
-            [NativeTypeName("ma_uint32")]
+            
             public uint flags;
         }
 

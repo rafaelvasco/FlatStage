@@ -8,10 +8,10 @@ namespace FlatStage.Foundation.MiniAudio
 
         public ma_paged_audio_buffer_page* pCurrent;
 
-        [NativeTypeName("ma_uint64")]
+        
         public ulong relativeCursor;
 
-        [NativeTypeName("ma_uint64")]
+        
         public ulong absoluteCursor;
     }
 }

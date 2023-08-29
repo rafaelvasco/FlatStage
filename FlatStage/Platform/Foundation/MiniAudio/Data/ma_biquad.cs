@@ -4,7 +4,7 @@ namespace FlatStage.Foundation.MiniAudio
     {
         public ma_format format;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint channels;
 
         public ma_biquad_coefficient b0;
@@ -23,7 +23,7 @@ namespace FlatStage.Foundation.MiniAudio
 
         public void* _pHeap;
 
-        [NativeTypeName("ma_bool32")]
+        
         public uint _ownsHeap;
     }
 }

@@ -6,85 +6,85 @@ namespace FlatStage.Foundation.MiniAudio
     {
         public ma_device_type deviceType;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint sampleRate;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint periodSizeInFrames;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint periodSizeInMilliseconds;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint periods;
 
         public ma_performance_profile performanceProfile;
 
-        [NativeTypeName("ma_bool8")]
+        
         public byte noPreSilencedOutputBuffer;
 
-        [NativeTypeName("ma_bool8")]
+        
         public byte noClip;
 
-        [NativeTypeName("ma_bool8")]
+        
         public byte noDisableDenormals;
 
-        [NativeTypeName("ma_bool8")]
+        
         public byte noFixedSizedCallback;
 
-        [NativeTypeName("ma_device_data_proc")]
+        
         public IntPtr dataCallback;
 
-        [NativeTypeName("ma_device_notification_proc")]
+        
         public IntPtr notificationCallback;
 
-        [NativeTypeName("ma_stop_proc")]
+        
         public IntPtr stopCallback;
 
         public void* pUserData;
 
         public ma_resampler_config resampling;
 
-        [NativeTypeName("__AnonymousRecord_miniaudio_L7046_C5")]
+        
         public _playback_e__Struct playback;
 
-        [NativeTypeName("__AnonymousRecord_miniaudio_L7056_C5")]
+        
         public _capture_e__Struct capture;
 
-        [NativeTypeName("__AnonymousRecord_miniaudio_L7067_C5")]
+        
         public _wasapi_e__Struct wasapi;
 
-        [NativeTypeName("__AnonymousRecord_miniaudio_L7077_C5")]
+        
         public _alsa_e__Struct alsa;
 
-        [NativeTypeName("__AnonymousRecord_miniaudio_L7084_C5")]
+        
         public _pulse_e__Struct pulse;
 
-        [NativeTypeName("__AnonymousRecord_miniaudio_L7089_C5")]
+        
         public _coreaudio_e__Struct coreaudio;
 
-        [NativeTypeName("__AnonymousRecord_miniaudio_L7093_C5")]
+        
         public _opensl_e__Struct opensl;
 
-        [NativeTypeName("__AnonymousRecord_miniaudio_L7099_C5")]
+        
         public _aaudio_e__Struct aaudio;
 
         public unsafe partial struct _playback_e__Struct
         {
-            [NativeTypeName("const ma_device_id *")]
+            
             public ma_device_id* pDeviceID;
 
             public ma_format format;
 
-            [NativeTypeName("ma_uint32")]
+            
             public uint channels;
 
-            [NativeTypeName("ma_channel *")]
+            
             public byte* pChannelMap;
 
             public ma_channel_mix_mode channelMixMode;
 
-            [NativeTypeName("ma_bool32")]
+            
             public uint calculateLFEFromSpatialChannels;
 
             public ma_share_mode shareMode;
@@ -92,20 +92,20 @@ namespace FlatStage.Foundation.MiniAudio
 
         public unsafe partial struct _capture_e__Struct
         {
-            [NativeTypeName("const ma_device_id *")]
+            
             public ma_device_id* pDeviceID;
 
             public ma_format format;
 
-            [NativeTypeName("ma_uint32")]
+            
             public uint channels;
 
-            [NativeTypeName("ma_channel *")]
+            
             public byte* pChannelMap;
 
             public ma_channel_mix_mode channelMixMode;
 
-            [NativeTypeName("ma_bool32")]
+            
             public uint calculateLFEFromSpatialChannels;
 
             public ma_share_mode shareMode;
@@ -115,52 +115,52 @@ namespace FlatStage.Foundation.MiniAudio
         {
             public ma_wasapi_usage usage;
 
-            [NativeTypeName("ma_bool8")]
+            
             public byte noAutoConvertSRC;
 
-            [NativeTypeName("ma_bool8")]
+            
             public byte noDefaultQualitySRC;
 
-            [NativeTypeName("ma_bool8")]
+            
             public byte noAutoStreamRouting;
 
-            [NativeTypeName("ma_bool8")]
+            
             public byte noHardwareOffloading;
 
-            [NativeTypeName("ma_uint32")]
+            
             public uint loopbackProcessID;
 
-            [NativeTypeName("ma_bool8")]
+            
             public byte loopbackProcessExclude;
         }
 
         public partial struct _alsa_e__Struct
         {
-            [NativeTypeName("ma_bool32")]
+            
             public uint noMMap;
 
-            [NativeTypeName("ma_bool32")]
+            
             public uint noAutoFormat;
 
-            [NativeTypeName("ma_bool32")]
+            
             public uint noAutoChannels;
 
-            [NativeTypeName("ma_bool32")]
+            
             public uint noAutoResample;
         }
 
         public unsafe partial struct _pulse_e__Struct
         {
-            [NativeTypeName("const char *")]
+            
             public sbyte* pStreamNamePlayback;
 
-            [NativeTypeName("const char *")]
+            
             public sbyte* pStreamNameCapture;
         }
 
         public partial struct _coreaudio_e__Struct
         {
-            [NativeTypeName("ma_bool32")]
+            
             public uint allowNominalSampleRateChange;
         }
 
@@ -170,7 +170,7 @@ namespace FlatStage.Foundation.MiniAudio
 
             public ma_opensl_recording_preset recordingPreset;
 
-            [NativeTypeName("ma_bool32")]
+            
             public uint enableCompatibilityWorkarounds;
         }
 
@@ -184,10 +184,10 @@ namespace FlatStage.Foundation.MiniAudio
 
             public ma_aaudio_allowed_capture_policy allowedCapturePolicy;
 
-            [NativeTypeName("ma_bool32")]
+            
             public uint noAutoStartAfterReroute;
 
-            [NativeTypeName("ma_bool32")]
+            
             public uint enableCompatibilityWorkarounds;
         }
     }

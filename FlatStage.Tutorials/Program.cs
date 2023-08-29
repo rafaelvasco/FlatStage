@@ -3,4 +3,4 @@ using FlatStage.Tutorials;
 
 using var stage = new Stage();
 
-stage.Run(new Tutorial01());
+stage.Run(new Tutorials());

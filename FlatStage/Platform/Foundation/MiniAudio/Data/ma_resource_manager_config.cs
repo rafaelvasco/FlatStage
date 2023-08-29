@@ -8,30 +8,30 @@ namespace FlatStage.Foundation.MiniAudio
 
         public ma_format decodedFormat;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint decodedChannels;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint decodedSampleRate;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint jobThreadCount;
 
-        [NativeTypeName("size_t")]
+        
         public ulong jobThreadStackSize;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint jobQueueCapacity;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint flags;
 
-        [NativeTypeName("ma_vfs *")]
+        
         public void* pVFS;
 
         public ma_decoding_backend_vtable** ppCustomDecodingBackendVTables;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint customDecodingBackendCount;
 
         public void* pCustomDecodingBackendUserData;

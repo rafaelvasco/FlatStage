@@ -8,10 +8,10 @@ namespace FlatStage.Foundation.MiniAudio
 
         public float volumeEnd;
 
-        [NativeTypeName("ma_uint64")]
+        
         public ulong lengthInFrames;
 
-        [NativeTypeName("ma_int64")]
+        
         public long cursorInFrames;
     }
 }

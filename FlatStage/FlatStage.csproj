@@ -5,7 +5,6 @@
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
     </PropertyGroup>
 
     <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
@@ -26,20 +25,6 @@
 			<TargetPath>freetype.dll</TargetPath>
 		</ContentWithTargetPath>
     </ItemGroup>
-
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-
-        <DebugSymbols>False</DebugSymbols>
-        <DebugType>None</DebugType>
-
-        <OptimizationPreference>Speed</OptimizationPreference>
-        <PublishTrimmed>true</PublishTrimmed>
-        <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
-        <EventSourceSupport>false</EventSourceSupport>
-        <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
-        <SelfContained>true</SelfContained>
-
-    </PropertyGroup>
 
     <ItemGroup>
         <EmbeddedResource Include="Assets\**\*.fsb" />

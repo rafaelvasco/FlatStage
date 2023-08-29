@@ -2,13 +2,13 @@ namespace FlatStage.Foundation.MiniAudio
 {
     public unsafe partial struct ma_spatializer
     {
-        [NativeTypeName("ma_uint32")]
+        
         public uint channelsIn;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint channelsOut;
 
-        [NativeTypeName("ma_channel *")]
+        
         public byte* pChannelMapIn;
 
         public ma_attenuation_model attenuationModel;
@@ -37,7 +37,7 @@ namespace FlatStage.Foundation.MiniAudio
 
         public float directionalAttenuationFactor;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint gainSmoothTimeInFrames;
 
         public ma_atomic_vec3f position;
@@ -56,7 +56,7 @@ namespace FlatStage.Foundation.MiniAudio
 
         public void* _pHeap;
 
-        [NativeTypeName("ma_bool32")]
+        
         public uint _ownsHeap;
     }
 }

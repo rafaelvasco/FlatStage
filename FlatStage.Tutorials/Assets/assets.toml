@@ -36,8 +36,3 @@ type = "Effect"
 id = "delphi_loop"
 path = "delphi_loop.ogg"
 type = "Song"
-
-[[fonts]]
-id = "monogram"
-path = "monogram-extended.ttf"
-fontSize = 32

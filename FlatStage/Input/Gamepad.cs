@@ -503,9 +503,9 @@ public readonly struct GamePadTriggers
     )
     {
         /* XNA applies dead zones before rounding/clamping values.
-		 * The public constructor does not allow this because the
-		 * dead zone must be known first.
-		 */
+         * The public constructor does not allow this because the
+         * dead zone must be known first.
+         */
         if (deadZoneMode == GamePadDeadZone.None)
         {
             Left = Calc.Clamp(leftTrigger, 0.0f, 1.0f);

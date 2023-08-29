@@ -94,6 +94,8 @@ public partial class Stage : Disposable
 
         AudioContext.Init();
 
+        BuiltinContent.Load();
+
         InitLoop();
 
         PlatformContext.OnQuit = Exit;
@@ -153,6 +155,10 @@ public partial class Stage : Disposable
         AudioContext.Shutdown();
         GraphicsContext.Shutdown();
         PlatformContext.Shutdown();
+
+        Console.WriteLine($"GEN0 GC: {GC.CollectionCount(0)}");
+        Console.WriteLine($"GEN1 GC: {GC.CollectionCount(1)}");
+        Console.WriteLine($"GEN3 GC: {GC.CollectionCount(3)}");
     }
 
     private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

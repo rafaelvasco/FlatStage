@@ -4,7 +4,7 @@ namespace FlatStage.Foundation.MiniAudio
     {
         public ma_gainer_config config;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint t;
 
         public float masterVolume;
@@ -15,7 +15,7 @@ namespace FlatStage.Foundation.MiniAudio
 
         public void* _pHeap;
 
-        [NativeTypeName("ma_bool32")]
+        
         public uint _ownsHeap;
     }
 }

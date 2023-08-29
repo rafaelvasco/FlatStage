@@ -2,10 +2,10 @@ namespace FlatStage.Foundation.MiniAudio
 {
     public unsafe partial struct ma_spatializer_listener_config
     {
-        [NativeTypeName("ma_uint32")]
+        
         public uint channelsOut;
 
-        [NativeTypeName("ma_channel *")]
+        
         public byte* pChannelMapOut;
 
         public ma_handedness handedness;

@@ -105,7 +105,7 @@ public static partial class DefinitionSerializer
                 var fontAssetInfo = new FontAssetInfo()
                 {
                     Id = id,
-                    FontSize = fontSize,
+                    FontSize = fontSize.IsInteger ? fontSize : int.Parse(fontSize),
                     Path = path,
                     CharRange = charRange!
                 };

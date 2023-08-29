@@ -6,25 +6,25 @@ namespace FlatStage.Foundation.MiniAudio
     {
         public int code;
 
-        [NativeTypeName("ma_event *")]
+        
         public void** pEvent;
 
-        [NativeTypeName("__AnonymousRecord_miniaudio_L7272_C5")]
+        
         public _data_e__Union data;
 
         [StructLayout(LayoutKind.Explicit)]
         public partial struct _data_e__Union
         {
             [FieldOffset(0)]
-            [NativeTypeName("__AnonymousRecord_miniaudio_L7274_C9")]
+            
             public _quit_e__Struct quit;
 
             [FieldOffset(0)]
-            [NativeTypeName("__AnonymousRecord_miniaudio_L7278_C9")]
+            
             public _createAudioClient_e__Struct createAudioClient;
 
             [FieldOffset(0)]
-            [NativeTypeName("__AnonymousRecord_miniaudio_L7285_C9")]
+            
             public _releaseAudioClient_e__Struct releaseAudioClient;
 
             public partial struct _quit_e__Struct

@@ -2,7 +2,6 @@ using System;
 
 namespace FlatStage;
 
-
 public struct Rect : IEquatable<Rect>
 {
     #region Public Properties
@@ -16,7 +15,6 @@ public struct Rect : IEquatable<Rect>
     /// Returns the x coordinate of the right edge of this <see cref="Rect"/>.
     /// </summary>
     public readonly int Right => X + Width;
-
 
     /// <summary>
     /// Returns the y coordinate of the top edge of this <see cref="Rect"/>.
@@ -121,6 +119,10 @@ public struct Rect : IEquatable<Rect>
         Y = y;
         Width = width;
         Height = height;
+    }
+
+    public Rect(float v1, int v2, int textW, int menuSpacing) : this()
+    {
     }
 
     #endregion

@@ -1,42 +1,11 @@
-﻿using FlatStage.ContentPipeline;
-using FlatStage.Graphics;
+﻿using FlatStage.Graphics;
 using System.Text;
 
 namespace FlatStage.Tetris;
+
 public class TetrisView
 {
-    private const string HeldIndicatorLabel = "HOLD";
-    private const string NextIndicatorLabel = "NEXT";
-    private const float BlockIndicatorsDistanceFromGrid = 50;
-    private const int TetraminoDisplaySize = 128;
-    private const int GameOverRegionIndex = 8;
-    private const int CellSize = 32;
-    private float FontScale = 2.0f;
-
-    private Texture _bg = null!;
-    private Texture _objects = null!;
-    private TextureFont _font = null!;
-
-    private StringBuilder _scoreString = new("SCORE: ");
-
-    private float _heldIndicatorOffsetX;
-    private float _heldIndicatorOffsetY;
-    private float _nextIndicatorOffsetX;
-    private float _nextIndicatorOffsetY;
-    private float _gridOffsetX;
-    private float _gridOffsetY;
-    private float _heldIndicatorLabelOffsetDelta;
-    private float _nextIndicatorLabelOffsetDelta;
-
-    private int _gridWidth;
-    private int _gridHeight;
-
-    private Vec2 _bgOffset;
-
-    private readonly Rect[] _objectsRegions = new Rect[9];
-    private readonly Rect[] _tetraminosImages = new Rect[8];
-
-    public TetrisView()
+    public TetrisView(TetrisController controller)
     {
         _tetraminosImages[0] = new(768, 768, 256, 256); // Empty
         _tetraminosImages[1] = new(512, 768, 256, 256); // I
@@ -56,19 +25,17 @@ public class TetrisView
         _objectsRegions[6] = new(512, 0, 256, 256);     // Purple
         _objectsRegions[7] = new(0, 256, 256, 256);     // Red,
         _objectsRegions[8] = new(0, 1038, 937, 550);    // GameOver
+
+        _controller = controller;
+
     }
 
-    public void Load()
-    {
-        _bg = Content.Get<Texture>("bg");
-        _objects = Content.Get<Texture>("tetris_sheet");
-        _font = Content.Get<TextureFont>("monogram");
-    }
+    /* ========================== INPUT AND PROCESS ================================== */
 
     public void UpdateLayout()
     {
-        _gridWidth = GameState.GameGrid.Columns * CellSize;
-        _gridHeight = GameState.GameGrid.Rows * CellSize;
+        _gridWidth = _controller.GameGrid.Columns * CellSize;
+        _gridHeight = _controller.GameGrid.Rows * CellSize;
 
         _gridOffsetX = (Stage.WindowSize.Width / 2f) - (_gridWidth / 2f);
         _gridOffsetY = (Stage.WindowSize.Height / 2f) - (_gridHeight / 2f);
@@ -79,21 +46,38 @@ public class TetrisView
         _nextIndicatorOffsetX = _gridOffsetX + _gridWidth + BlockIndicatorsDistanceFromGrid;
         _nextIndicatorOffsetY = _heldIndicatorOffsetY;
 
-        _heldIndicatorLabelOffsetDelta = (TetraminoDisplaySize / 2.0f) - (_font.MeasureString(HeldIndicatorLabel, FontScale, FontScale).X / 2.0f);
-        _nextIndicatorLabelOffsetDelta = (TetraminoDisplaySize / 2.0f) - (_font.MeasureString(NextIndicatorLabel, FontScale, FontScale).X / 2.0f);
+        _heldIndicatorLabelOffsetDelta = (TetraminoDisplaySize / 2.0f) - (GameContent.FntDefault.MeasureString(HeldIndicatorLabel, TextScale, TextScale).X / 2.0f);
+        _nextIndicatorLabelOffsetDelta = (TetraminoDisplaySize / 2.0f) - (GameContent.FntDefault.MeasureString(NextIndicatorLabel, TextScale, TextScale).X / 2.0f);
+
+        _menuSpacing = 80;
+
+        _menuYOffset = Stage.WindowSize.Height - (_controller.MenuItems.Length * _menuSpacing) - 100;
+
+        for (int i = 0; i < _controller.MenuItems.Length; ++i)
+        {
+            var label = _controller.MenuItems[i].Label;
+            float textW = GameContent.FntMenu.MeasureString(label, TextScale).X;
+
+            _controller.MenuItems[i].Rect = new Rect((int)((Stage.WindowSize.Width / 2f) - (textW / 2f)), (int)(_menuYOffset + (i * _menuSpacing)), (int)textW, (int)_menuSpacing);
+        }
+
+        var gameTitleTextW = GameContent.FntGameTitle.MeasureString(GameTitle, GameTitleScale).X;
+
+        _gameTitleXOffset = Stage.WindowSize.Width / 2f - gameTitleTextW / 2f;
+        _gameTitleYOffset = 100.0f;
     }
 
-    public void Process()
+    public void Update()
     {
         _bgOffset.X += 1.0f;
         _bgOffset.Y += 1.0f;
 
-        if (_bgOffset.X > _bg.Width)
+        if (_bgOffset.X > GameContent.TexBackground.Width)
         {
             _bgOffset.X = 0;
         }
 
-        if (_bgOffset.Y > _bg.Height)
+        if (_bgOffset.Y > GameContent.TexBackground.Height)
         {
             _bgOffset.Y = 0;
         }
@@ -102,22 +86,79 @@ public class TetrisView
     public void Draw(Canvas2D canvas, float dt)
     {
         DrawBackground(canvas, dt);
-        DrawGrid(canvas, GameState.GameGrid, _gridOffsetX, _gridOffsetY);
-        DrawGhostBlock(canvas, GameState.CurrentBlock, _gridOffsetX, _gridOffsetY);
-        DrawBlock(canvas, GameState.CurrentBlock, _gridOffsetX, _gridOffsetY);
-        DrawNextBlock(canvas, GameState.BlockQueue, _nextIndicatorOffsetX, _nextIndicatorOffsetY);
-        DrawHeldBlock(canvas, GameState.HeldBlock, _heldIndicatorOffsetX, _heldIndicatorOffsetY);
-        DrawTexts(canvas);
 
-        if (GameState.GameOver)
+        switch (_controller.GameStateId)
         {
-            DrawGameOver(canvas);
+            case GameStateId.Game:
+                {
+
+                    DrawGrid(canvas, _gridOffsetX, _gridOffsetY);
+                    DrawGhostBlock(canvas, _controller.CurrentBlock, _gridOffsetX, _gridOffsetY);
+                    DrawBlock(canvas, _controller.CurrentBlock, _gridOffsetX, _gridOffsetY);
+                    DrawNextBlock(canvas, _controller.BlockQueue, _nextIndicatorOffsetX, _nextIndicatorOffsetY);
+                    DrawHeldBlock(canvas, _controller.HeldBlock, _heldIndicatorOffsetX, _heldIndicatorOffsetY);
+                    DrawTexts(canvas);
+
+                    break;
+                }
+            case GameStateId.GameOver:
+                {
+                    DrawGameOver(canvas);
+
+                    break;
+                }
+
+            case GameStateId.Menu:
+                {
+                    DrawGameTitle(canvas);
+                    DrawMenu(canvas);
+                    break;
+                }
+        }
+    }
+
+    private void DrawGameTitle(Canvas2D canvas)
+    {
+        canvas.DrawText(GameContent.FntGameTitle, GameTitle, new Vec2(_gameTitleXOffset, _gameTitleYOffset + 16), new Vec2(GameTitleScale, GameTitleScale), Color.Red);
+        canvas.DrawText(GameContent.FntGameTitle, GameTitle, new Vec2(_gameTitleXOffset, _gameTitleYOffset + 8), new Vec2(GameTitleScale, GameTitleScale), Color.Cyan);
+        canvas.DrawText(GameContent.FntGameTitle, GameTitle, new Vec2(_gameTitleXOffset, _gameTitleYOffset), new Vec2(GameTitleScale, GameTitleScale), Color.White);
+    }
+
+    private void DrawMenu(Canvas2D canvas)
+    {
+        var menuItems = _controller.MenuItems;
+
+        for (int i = 0; i < menuItems.Length; i++)
+        {
+            string? label = menuItems[i].Label;
+
+            var rect = menuItems[i].Rect;
+
+            var color = Color.White;
+            var shadowColor = Color.Black;
+
+            var offsetX = rect.X;
+            var offsetY = rect.Y;
+
+            if (_controller.CurrentHoveredMenuIndex == i)
+            {
+                color = Color.Cyan;
+                offsetY = rect.Y - (MenuActiveYOffset / 2);
+            }
+
+            if (_controller.CurrentActiveMenuIndex == i)
+            {
+                offsetY = rect.Y + (MenuActiveYOffset / 2);
+            }
+
+            canvas.DrawText(GameContent.FntMenu, label, new Vec2(offsetX, rect.Y), new Vec2(TextScale, TextScale), shadowColor);
+            canvas.DrawText(GameContent.FntMenu, label, new Vec2(offsetX, offsetY - MenuActiveYOffset), new Vec2(TextScale, TextScale), color);
         }
     }
 
     private void DrawBackground(Canvas2D canvas, float dt)
     {
-        canvas.Draw(_bg,
+        canvas.Draw(GameContent.TexBackground,
             new RectF(0, 0,
                 Stage.WindowSize.Width,
                 Stage.WindowSize.Height),
@@ -127,8 +168,10 @@ public class TetrisView
             Color.White);
     }
 
-    private void DrawGrid(Canvas2D canvas, GameGrid grid, float offsetX, float offsetY)
+    private void DrawGrid(Canvas2D canvas, float offsetX, float offsetY)
     {
+        var grid = _controller.GameGrid;
+
         for (var r = 0; r < grid.Rows; ++r)
         {
             for (var c = 0; c < grid.Columns; ++c)
@@ -142,7 +185,7 @@ public class TetrisView
 
                 var alpha = id > 0 ? 1 : 0.85f;
 
-                canvas.Draw(_objects, destination, src, Color.White * alpha);
+                canvas.Draw(GameContent.TexObjects, destination, src, Color.White * alpha);
             }
         }
     }
@@ -157,13 +200,13 @@ public class TetrisView
             var y = ((position.Row + block.OffsetRow) * CellSize) + offsetY;
 
             var destination = new RectF(x, y, CellSize, CellSize);
-            canvas.Draw(_objects, destination, src, Color.White);
+            canvas.Draw(GameContent.TexObjects, destination, src, Color.White);
         }
     }
 
     private void DrawGhostBlock(Canvas2D canvas, Block block, float offsetX, float offsetY)
     {
-        var dropDistance = GameState.BlockDropDistance();
+        var dropDistance = _controller.BlockDropDistance();
 
         foreach (var position in block.TilePositions())
         {
@@ -174,20 +217,20 @@ public class TetrisView
 
             var src = _objectsRegions[block.Id];
 
-            canvas.Draw(_objects, destination, src, Color.White * 0.45f);
+            canvas.Draw(GameContent.TexObjects, destination, src, Color.White * 0.45f);
         }
     }
 
     private void DrawGameOver(Canvas2D canvas)
     {
-        canvas.Draw(_objects, new Vec2(Stage.WindowSize.Width / 2f, Stage.WindowSize.Height / 2f), _objectsRegions[GameOverRegionIndex], Color.White, 0f, new Vec2(0.5f, 0.5f), new Vec2(0.5f, 0.5f), FlipMode.None, 0f);
+        canvas.Draw(GameContent.TexObjects, new Vec2(Stage.WindowSize.Width / 2f, Stage.WindowSize.Height / 2f), _objectsRegions[GameOverRegionIndex], Color.White, 0f, new Vec2(0.5f, 0.5f), new Vec2(0.5f, 0.5f), FlipMode.None, 0f);
     }
 
     private void DrawNextBlock(Canvas2D canvas, BlockQueue blockQueue, float offsetX, float offsetY)
     {
         var next = blockQueue.NextBlock;
         var destination = new RectF(offsetX, offsetY, TetraminoDisplaySize, TetraminoDisplaySize);
-        canvas.Draw(_objects, destination, _tetraminosImages[next.Id], Color.Wheat);
+        canvas.Draw(GameContent.TexObjects, destination, _tetraminosImages[next.Id], Color.Wheat);
     }
 
     private void DrawHeldBlock(Canvas2D canvas, Block? heldBlock, float offsetX, float offsetY)
@@ -198,20 +241,57 @@ public class TetrisView
 
         var destination = new RectF(offsetX, offsetY, TetraminoDisplaySize, TetraminoDisplaySize);
 
-        canvas.Draw(_objects, destination, src, Color.Wheat);
+        canvas.Draw(GameContent.TexObjects, destination, src, Color.Wheat);
     }
 
     private void DrawTexts(Canvas2D canvas)
     {
         _scoreString.Clear();
         _scoreString.Append("SCORE: ");
-        _scoreString.Append(GameState.Score);
+        _scoreString.Append(_controller.Score);
 
-        var textSize = _font.MeasureString(_scoreString);
+        var textSize = GameContent.FntDefault.MeasureString(_scoreString);
 
-        canvas.DrawText(_font, _scoreString, new Vec2((Stage.WindowSize.Width / 8f) - (textSize.X / 2f), 50f), new Vec2(2.0f, 2.0f), Color.White);
+        canvas.DrawText(GameContent.FntDefault, _scoreString, new Vec2((Stage.WindowSize.Width / 8f) - (textSize.X / 2f), 50f), new Vec2(TextScale, TextScale), Color.Cyan);
 
-        canvas.DrawText(_font, HeldIndicatorLabel, new Vec2(_heldIndicatorOffsetX + _heldIndicatorLabelOffsetDelta, _heldIndicatorOffsetY + TetraminoDisplaySize + 10f), new Vec2(FontScale, FontScale), Color.White);
-        canvas.DrawText(_font, NextIndicatorLabel, new Vec2(_nextIndicatorOffsetX + _nextIndicatorLabelOffsetDelta, _nextIndicatorOffsetY + TetraminoDisplaySize + 10f), new Vec2(FontScale, FontScale), Color.White);
+        canvas.DrawText(GameContent.FntDefault, HeldIndicatorLabel, new Vec2(_heldIndicatorOffsetX + _heldIndicatorLabelOffsetDelta, _heldIndicatorOffsetY + TetraminoDisplaySize + 10f), new Vec2(TextScale, TextScale), Color.Cyan);
+        canvas.DrawText(GameContent.FntDefault, NextIndicatorLabel, new Vec2(_nextIndicatorOffsetX + _nextIndicatorLabelOffsetDelta, _nextIndicatorOffsetY + TetraminoDisplaySize + 10f), new Vec2(TextScale, TextScale), Color.Cyan);
     }
+
+    private const string GameTitle = "VETRIS";
+    private const string HeldIndicatorLabel = "HOLD";
+    private const string NextIndicatorLabel = "NEXT";
+
+    private const float TextScale = 2.0f;
+    private const float GameTitleScale = 8.0f;
+    private const float BlockIndicatorsDistanceFromGrid = 50;
+
+    private const int TetraminoDisplaySize = 128;
+    private const int GameOverRegionIndex = 8;
+    private const int MenuActiveYOffset = 4;
+    private const int CellSize = 32;
+
+    private readonly StringBuilder _scoreString = new("SCORE: ");
+    private readonly Rect[] _objectsRegions = new Rect[9];
+    private readonly Rect[] _tetraminosImages = new Rect[8];
+    private readonly TetrisController _controller;
+
+    private float _heldIndicatorOffsetX;
+    private float _heldIndicatorOffsetY;
+    private float _nextIndicatorOffsetX;
+    private float _nextIndicatorOffsetY;
+    private float _gridOffsetX;
+    private float _gridOffsetY;
+    private float _heldIndicatorLabelOffsetDelta;
+    private float _nextIndicatorLabelOffsetDelta;
+    private float _menuYOffset;
+    private float _menuSpacing;
+    private float _gameTitleXOffset;
+    private float _gameTitleYOffset;
+
+    private int _gridWidth;
+    private int _gridHeight;
+
+    private Vec2 _bgOffset;
+
 }

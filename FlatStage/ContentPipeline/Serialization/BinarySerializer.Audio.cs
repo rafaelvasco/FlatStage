@@ -22,6 +22,7 @@ public static partial class BinarySerializer
         writer.Write(audio.Data!.Length);
         writer.Write(audio.Data);
         writer.Write(audio.Type.ToString());
+        writer.Write(audio.Format.ToString());
     }
 
     private static AudioData DeserializeAudioData(Stream stream)
@@ -40,12 +41,14 @@ public static partial class BinarySerializer
         var dataLength = reader.ReadInt32();
         var data = reader.ReadBytes(dataLength);
         var audioType = reader.ReadString();
+        var audioFormat = reader.ReadString();
 
         var audioData = new AudioData()
         {
             Id = id,
             Data = data,
-            Type = Audio.ParseAudioTypeFromString(audioType)
+            Type = Audio.ParseAudioTypeFromString(audioType),
+            Format = Audio.ParseAudioFormatFromString(audioFormat),
         };
 
 #if DEBUG

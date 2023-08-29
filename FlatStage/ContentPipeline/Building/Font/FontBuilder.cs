@@ -1,11 +1,12 @@
 ﻿using System.IO;
 using System;
 using FlatStage.IO;
+using System.Text;
 
 namespace FlatStage.ContentPipeline;
 internal class FontBuilder : AssetBuilderAgent<FontData, FontAssetInfo>
 {
-    private const int DEFAULT_BITMAP_FONT_IMAGE_SIZE = 1024;
+    private const int DEFAULT_BITMAP_FONT_IMAGE_SIZE = 256;
 
     private static readonly CharRange _defaultCharRange = CharRange.BasicLatin;
 
@@ -29,8 +30,18 @@ internal class FontBuilder : AssetBuilderAgent<FontData, FontAssetInfo>
 #if DEBUG
 
         var debugFontImagePath = Path.Combine(Path.GetDirectoryName(assetOutPutPath)!, Path.GetFileNameWithoutExtension(assetOutPutPath) + ".png");
+        var debugFontTextPath = Path.Combine(Path.GetDirectoryName(assetOutPutPath)!, Path.GetFileNameWithoutExtension(assetOutPutPath) + ".txt");
 
         File.WriteAllBytes(debugFontImagePath, fontData.ImageData.Data);
+
+        StringBuilder glyphRegions = new();
+
+        foreach (var (glyphKey, glyph) in fontData.Glyphs)
+        {
+            glyphRegions.AppendLine($"Index: {glyphKey}\nGlyph:\n{glyph.ToString()}");
+        }
+
+        File.WriteAllText(debugFontTextPath, glyphRegions.ToString());
 
 #endif
 

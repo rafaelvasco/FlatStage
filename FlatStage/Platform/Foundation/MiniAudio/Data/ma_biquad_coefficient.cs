@@ -9,7 +9,7 @@ namespace FlatStage.Foundation.MiniAudio
         public float f32;
 
         [FieldOffset(0)]
-        [NativeTypeName("ma_int32")]
+        
         public int s32;
     }
 }

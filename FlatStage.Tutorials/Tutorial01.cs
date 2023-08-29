@@ -3,37 +3,23 @@ using FlatStage.Graphics;
 
 namespace FlatStage.Tutorials;
 
-public class Tutorial01 : Game
+public class Tutorial01 : BaseTutorial
 {
     private Texture? _texture = null!;
 
-    protected override void Preload()
+    public Tutorial01(string name) : base(name)
     {
-        _texture = Content.Get<Texture>("stagelogo2", embeddedAsset: true);
+    }
+
+    public override void Load()
+    {
+        _texture = Content.Get<Texture>("stagelogo", embeddedAsset: true);
 
         GraphicsContext.SetViewClear(0, Color.CornflowerBlue);
     }
 
-    protected override void Draw(Canvas2D canvas, float dt)
+    public override void Draw(Canvas2D canvas, float dt)
     {
-        canvas.Begin();
-
-        canvas.Draw(_texture!, new RectF(0, 0, 128, 128), null, Color.White * 0.1f);
-
-        canvas.Draw(_texture!, new RectF(128, 128, 128, 128), null, Color.White);
-
-        canvas.Draw(_texture!, new RectF(256, 256, 128, 128), null, Color.White * 0.1f);
-
-        canvas.Draw(_texture!, new RectF(384, 384, 128, 128), null, Color.White);
-
-        canvas.End();
-    }
-
-    protected override void FixedUpdate(float dt)
-    {
-    }
-
-    protected override void Update(float dt)
-    {
+        canvas.Draw(_texture!, new Vec2(Stage.WindowSize.Width / 2f, Stage.WindowSize.Height / 2f), new Vec2(0.5f, 0.5f), Color.White);
     }
 }

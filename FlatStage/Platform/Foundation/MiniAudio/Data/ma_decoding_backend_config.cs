@@ -4,7 +4,7 @@ namespace FlatStage.Foundation.MiniAudio
     {
         public ma_format preferredFormat;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint seekPointCount;
     }
 }

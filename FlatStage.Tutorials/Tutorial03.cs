@@ -5,12 +5,16 @@ using FlatStage.Sound;
 
 namespace FlatStage.Tutorials;
 
-public class Tutorial03 : Game
+public class Tutorial03 : BaseTutorial
 {
     private Audio _song1 = null!;
     private Audio _effect = null!;
 
-    protected override void Preload()
+    public Tutorial03(string name) : base(name)
+    {
+    }
+
+    public override void Load()
     {
         _song1 = Content.Get<Audio>("delphi_loop");
         _effect = Content.Get<Audio>("blip");
@@ -20,18 +24,11 @@ public class Tutorial03 : Game
         GraphicsContext.SetViewClear(0, Color.Black);
     }
 
-    protected override void Draw(Canvas2D canvas, float dt)
-    {
-        canvas.Begin();
-
-        canvas.End();
-    }
-
-    protected override void FixedUpdate(float dt)
+    public override void Draw(Canvas2D canvas, float dt)
     {
     }
 
-    protected override void Update(float dt)
+    public override void Update(float dt)
     {
         if (Control.Keyboard.KeyPressed(Key.Space))
         {
@@ -47,7 +44,7 @@ public class Tutorial03 : Game
 
         if (Control.Mouse.ButtonPressed(MouseButton.Left))
         {
-            _effect.PlayEx(0f, Random.Default.Next(1, 5) / 10f);
+            _effect.PlayWithPanPitch(0f, Random.Default.Next(1, 5) / 10f);
         }
     }
 }

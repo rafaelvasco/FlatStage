@@ -15,7 +15,6 @@ public enum FlipMode
 
 public class Canvas2D
 {
-
     public Canvas2D(int maxQuads = 2048)
     {
         if (!Calc.IsPowerOfTwo(maxQuads))

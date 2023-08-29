@@ -4,10 +4,10 @@ namespace FlatStage.Foundation.MiniAudio
     {
         public ma_delay_config config;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint cursor;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint bufferSizeInFrames;
 
         public float* pBuffer;

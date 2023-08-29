@@ -4,7 +4,7 @@ namespace FlatStage.Foundation.MiniAudio
     {
         public ma_format format;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint channels;
 
         public double b0;

@@ -1,18 +1,23 @@
-﻿using System;
-
-using FlatStage.ContentPipeline;
+﻿using FlatStage.ContentPipeline;
+using System;
 
 namespace FlatStage.Sound;
-
-public enum AudioType
-{
-    Song,
-    Effect
-}
 
 public enum AudioParameter
 {
     Pitch
+}
+
+public enum AudioType
+{
+    Effect,
+    Song
+}
+
+public enum AudioFormat
+{
+    Wav,
+    Ogg
 }
 
 public class Audio : Asset
@@ -21,22 +26,12 @@ public class Audio : Asset
 
     public bool IsPlaying => AudioContext.GetPlaying(this);
 
-    public AudioType Type { get; private set; }
+    public AudioType Type { get; }
 
     public float Volume
     {
         get => AudioContext.GetVolume(this);
         set => AudioContext.SetVolume(this, value);
-    }
-
-    public static AudioType ParseAudioTypeFromString(string value)
-    {
-        if (Enum.TryParse<AudioType>(value, ignoreCase: true, out var result))
-        {
-            return result;
-        }
-
-        throw new InvalidCastException($"$Could not parse AudioType of type: {value}");
     }
 
     internal Audio(string id, int handle, AudioType type) : base(id)
@@ -47,46 +42,46 @@ public class Audio : Asset
 
     public void Play()
     {
-        if (Type == AudioType.Song && IsPlaying)
-        {
-            return;
-        }
-
         AudioContext.Play(this);
     }
 
-    public void PlayEx(float pan, float pitch)
+    public void PlayWithPanPitch(float pan, float pitch)
     {
-        if (Type == AudioType.Song && IsPlaying)
-        {
-            return;
-        }
-
-        AudioContext.PlayEx(this, pan, pitch);
+        AudioContext.PlayWithPanPitch(this, pan, pitch);
     }
 
     public void Pause()
     {
-        if (!IsPlaying)
-        {
-            return;
-        }
-
-        AudioContext.Stop(this, false);
+        AudioContext.Stop(this, reset: false);
     }
 
     public void Stop()
     {
-        if (!IsPlaying)
-        {
-            return;
-        }
-
-        AudioContext.Stop(this, true);
+        AudioContext.Stop(this, reset: true);
     }
 
     protected override void Free()
     {
         AudioContext.DestroyAudio(this);
+    }
+
+    internal static AudioType ParseAudioTypeFromString(string audioType)
+    {
+        if (Enum.TryParse<AudioType>(audioType, ignoreCase: true, out var result))
+        {
+            return result;
+        }
+
+        throw new InvalidCastException($"$Could not parse AudioType of type: {audioType}");
+    }
+
+    internal static AudioFormat ParseAudioFormatFromString(string audioFormat)
+    {
+        if (Enum.TryParse<AudioFormat>(audioFormat, ignoreCase: true, out var result))
+        {
+            return result;
+        }
+
+        throw new InvalidCastException($"$Could not parse AudioFormat of type: {audioFormat}");
     }
 }

@@ -6,19 +6,19 @@ namespace FlatStage.Foundation.MiniAudio
 
         public ma_format format;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint channels;
 
-        [NativeTypeName("ma_uint32")]
+        
         public uint sampleRate;
 
-        [NativeTypeName("ma_uint64")]
+        
         public ulong cursor;
 
-        [NativeTypeName("ma_uint64")]
+        
         public ulong sizeInFrames;
 
-        [NativeTypeName("const void *")]
+        
         public void* pData;
     }
 }

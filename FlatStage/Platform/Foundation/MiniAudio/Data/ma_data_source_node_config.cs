@@ -4,7 +4,7 @@ namespace FlatStage.Foundation.MiniAudio
     {
         public ma_node_config nodeConfig;
 
-        [NativeTypeName("ma_data_source *")]
+        
         public void* pDataSource;
     }
 }

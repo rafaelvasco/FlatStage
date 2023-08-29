@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -12,8 +12,13 @@
         <OutputType>WinExe</OutputType>
     </PropertyGroup>
 
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+      <Message Text="Deleting Old Asset Files..." />
+      <Delete Files="$(OutDir)\Assets\**\*.fsb" />
+    </Target>
+
     <ItemGroup>
-        <ProjectReference Include="..\FlatStage\FlatStage.csproj"/>
+        <ProjectReference Include="..\FlatStage\FlatStage.csproj" />
     </ItemGroup>
 
     <ItemGroup>

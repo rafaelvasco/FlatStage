@@ -18,6 +18,7 @@ internal static class ContentProperties
     {
         { typeof(Texture), "Textures" },
         { typeof(ShaderProgram), "Shaders" },
+        { typeof(TextureFont), "Fonts" },
     };
 
     public static string GetEmbeddedFolderNameFromAssetType<T>() where T : Asset

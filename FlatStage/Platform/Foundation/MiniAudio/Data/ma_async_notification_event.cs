@@ -4,7 +4,7 @@ namespace FlatStage.Foundation.MiniAudio
     {
         public ma_async_notification_callbacks cb;
 
-        [NativeTypeName("ma_event")]
+        
         public void* e;
     }
 }

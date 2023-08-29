@@ -8,10 +8,10 @@ namespace FlatStage.Foundation.MiniAudio
 
         public ma_resource_manager_data_buffer_node* pRootDataBufferNode;
 
-        [NativeTypeName("ma_mutex")]
+        
         public void* dataBufferBSTLock;
 
-        [NativeTypeName("ma_thread[64]")]
+        
         public _jobThreads_e__FixedBuffer jobThreads;
 
         public ma_job_queue jobQueue;

@@ -10,10 +10,10 @@ namespace FlatStage.Foundation.MiniAudio
 
         public ma_atomic_vec3f velocity;
 
-        [NativeTypeName("ma_bool32")]
+        
         public uint isEnabled;
 
-        [NativeTypeName("ma_bool32")]
+        
         public uint _ownsHeap;
 
         public void* _pHeap;
