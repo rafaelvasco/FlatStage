@@ -28,41 +28,39 @@ public class Tutorial02 : BaseTutorial
         _bumpEffect = Content.Get<Audio>("blip");
 
         _bumpEffect.Volume = 0.1f;
-
-        GraphicsContext.SetViewClear(0, Color.DarkBlue);
     }
 
-    public override void Draw(Canvas2D canvas, float dt)
+    public override void Draw(Canvas canvas, float dt)
     {
         canvas.Draw(_texture!, _particlePos, new Rect(96, 64, 32, 32), Vec2.Zero, Color.Cyan);
     }
 
     private void Bump()
     {
-        var pan = (_particlePos.X - Stage.WindowSize.Width / 2f) / (Stage.WindowSize.Width / 2f);
-        var pitch = (_delta.X * _delta.X + _delta.Y * _delta.Y) * 0.0005f + 0.2f;
+        var pan = (_particlePos.X - (Canvas.Width / 2f)) / (Canvas.Width / 2f);
+        var pitch = (((_delta.X * _delta.X) + (_delta.Y * _delta.Y)) * 0.0005f) + 0.2f;
 
         _bumpEffect.PlayWithPanPitch(pan, pitch);
     }
 
     public override void Update(float dt)
     {
-        if (Control.Keyboard.KeyDown(Key.Left))
+        if (Keyboard.KeyDown(Key.Left))
         {
             _delta.X -= Speed * dt;
         }
 
-        if (Control.Keyboard.KeyDown(Key.Right))
+        if (Keyboard.KeyDown(Key.Right))
         {
             _delta.X += Speed * dt;
         }
 
-        if (Control.Keyboard.KeyDown(Key.Up))
+        if (Keyboard.KeyDown(Key.Up))
         {
             _delta.Y -= Speed * dt;
         }
 
-        if (Control.Keyboard.KeyDown(Key.Down))
+        if (Keyboard.KeyDown(Key.Down))
         {
             _delta.Y += Speed * dt;
         }
@@ -71,9 +69,9 @@ public class Tutorial02 : BaseTutorial
 
         _particlePos += _delta;
 
-        if (_particlePos.X > GraphicsContext.BackbufferWidth - 32)
+        if (_particlePos.X > Canvas.Width - 32)
         {
-            _particlePos.X = GraphicsContext.BackbufferWidth - 32;
+            _particlePos.X = Canvas.Width - 32;
             _delta.X = -_delta.X;
             Bump();
         }
@@ -84,9 +82,9 @@ public class Tutorial02 : BaseTutorial
             Bump();
         }
 
-        if (_particlePos.Y > GraphicsContext.BackbufferHeight - 32)
+        if (_particlePos.Y > Canvas.Height - 32)
         {
-            _particlePos.Y = GraphicsContext.BackbufferHeight - 32;
+            _particlePos.Y = Canvas.Height - 32;
             _delta.Y = -_delta.Y;
             Bump();
         }

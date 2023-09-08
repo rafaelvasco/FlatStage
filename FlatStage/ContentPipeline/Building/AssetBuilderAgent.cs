@@ -6,6 +6,8 @@ namespace FlatStage.ContentPipeline;
 internal interface IAssetBuilder
 {
     string Build(string rootPath, AssetInfo assetInfo);
+    AssetData BuildData(string rootPath, AssetInfo assetInfo);
+
 }
 
 internal abstract class AssetBuilderAgent<DataType, AssetInfoType> : IAssetBuilder
@@ -23,15 +25,20 @@ internal abstract class AssetBuilderAgent<DataType, AssetInfoType> : IAssetBuild
         return Build(rootPath, (AssetInfoType)assetInfo);
     }
 
+    public AssetData BuildData(string rootPath, AssetInfo assetInfo)
+    {
+        return BuildAssetData(rootPath, (AssetInfoType)assetInfo);
+    }
+
     protected virtual string Build(string rootPath, AssetInfoType assetInfoType)
     {
         IDefinitionData.ThrowIfInValid(assetInfoType, $"AssetBuilder::{Name}");
 
-        Console.WriteLine($"Building Asset: {assetInfoType.Id}");
+        Console.WriteLine($"\nBuilding Asset: {assetInfoType.Id}\n");
 
         var assetData = BuildAssetData(rootPath, assetInfoType);
 
-        var assetOutPutPath = BinaryIO.SaveAssetData(rootPath, ref assetData, assetInfoType);
+        var assetOutPutPath = AssetDataIO.SaveAssetData(rootPath, assetData, assetInfoType);
 
         Console.WriteLine($"Asset {assetInfoType.Id} built successfully on path {assetOutPutPath}");
 
@@ -39,4 +46,5 @@ internal abstract class AssetBuilderAgent<DataType, AssetInfoType> : IAssetBuild
     }
 
     protected abstract DataType BuildAssetData(string rootPath, AssetInfoType assetInfoType);
+
 }

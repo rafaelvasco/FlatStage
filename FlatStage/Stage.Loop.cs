@@ -1,6 +1,5 @@
 using System;
 using System.Threading;
-using FlatStage.Input;
 using FlatStage.Graphics;
 using FlatStage.Platform;
 
@@ -175,7 +174,7 @@ public partial class Stage
                 // and interleave it (so game state can always get animation frame it needs)
                 if (consumedDeltaTime > _desiredFrametime)
                 {
-                    Control.Update();
+                    UpdateInput();
                     game.InternalUpdate((float)_fixedDeltatime);
                     consumedDeltaTime -= _desiredFrametime;
                 }
@@ -183,12 +182,12 @@ public partial class Stage
                 _frameAccum -= _desiredFrametime;
             }
 
-            Control.Update();
+            UpdateInput();
             game.InternalUpdate((float)(consumedDeltaTime / PlatformContext.GetPerfFreq()));
 
             if (!_suppressDraw)
             {
-                game.InternalDraw((float)(_frameAccum / _desiredFrametime));
+                game.InternalDraw(_canvas, (float)(_frameAccum / _desiredFrametime));
                 GraphicsContext.Present();
             }
             else
@@ -203,7 +202,7 @@ public partial class Stage
             {
                 for (int i = 0; i < UpdateMult; ++i)
                 {
-                    Control.Update();
+                    UpdateInput();
                     game.InternalFixedUpdate((float)_fixedDeltatime);
                     game.InternalUpdate((float)_fixedDeltatime);
 
@@ -213,7 +212,7 @@ public partial class Stage
 
             if (!_suppressDraw)
             {
-                game.InternalDraw(1.0f);
+                game.InternalDraw(_canvas, 1.0f);
                 GraphicsContext.Present();
             }
             else

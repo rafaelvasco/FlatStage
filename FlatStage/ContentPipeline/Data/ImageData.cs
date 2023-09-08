@@ -1,6 +1,9 @@
+using MemoryPack;
+
 namespace FlatStage.ContentPipeline;
 
-public class ImageData : AssetData
+[MemoryPackable]
+internal partial class ImageData : AssetData
 {
     public required byte[] Data { get; init; }
 

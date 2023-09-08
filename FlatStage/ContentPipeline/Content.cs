@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using FlatStage.Graphics;
+using FlatStage.IO;
 using FlatStage.Sound;
 
 namespace FlatStage.ContentPipeline;
@@ -14,13 +15,13 @@ public static class Content
     private static readonly Dictionary<string, Asset> Assets = new();
     private static readonly Dictionary<string, AssetData> AssetDatas = new();
 
-    private static readonly Lazy<TextureLoader> _textureLoader = new();
-
-    private static readonly Lazy<ShaderLoader> _shaderLoader = new();
-
-    private static readonly Lazy<AudioLoader> _audioLoader = new();
-
-    private static readonly Lazy<FontLoader> _fontLoader = new();
+    private static readonly Dictionary<Type, IAssetLoader> _loaders = new()
+    {
+        { typeof(Texture), new TextureLoader() },
+        { typeof(TextureFont), new FontLoader() },
+        { typeof(ShaderProgram), new ShaderLoader() },
+        { typeof(Audio), new AudioLoader() },
+    };
 
     internal static void Init()
     {
@@ -33,7 +34,12 @@ public static class Content
 #endif
     }
 
-    public static T Get<T>(string assetId, bool embeddedAsset = false) where T : Asset
+    public static T Get<T>(string assetId) where T : Asset
+    {
+        return Get<T>(assetId, false);
+    }
+
+    internal static T Get<T>(string assetId, bool embeddedAsset = false) where T : Asset
     {
         if (Assets.TryGetValue(assetId, out var cachedAsset))
         {
@@ -48,6 +54,64 @@ public static class Content
         RegisterAsset(assetId, asset);
 
         return (T)asset;
+    }
+
+    public static void LoadPak(string id)
+    {
+        var pakPath = Path.Combine(ContentProperties.AssetsFolder, $"{id}{ContentProperties.BinaryExt}");
+
+        if (!File.Exists(pakPath))
+        {
+            throw new FileNotFoundException($"Could not find AssetPak: {id}");
+        }
+
+        using var stream = File.OpenRead(pakPath);
+
+        var assetPak = LoadAssetData<AssetPak>(id, stream);
+
+        if (assetPak.Images.Count > 0)
+        {
+            var loader = GetLoader<Texture>();
+
+            foreach (var (key, imageData) in assetPak.Images)
+            {
+                var texture = loader.LoadFromAssetData(imageData);
+                RegisterAsset(key, texture);
+            }
+        }
+
+        if (assetPak.Shaders.Count > 0)
+        {
+            var loader = GetLoader<ShaderProgram>();
+
+            foreach (var (key, shaderData) in assetPak.Shaders)
+            {
+                var shader = loader.LoadFromAssetData(shaderData);
+                RegisterAsset(key, shader);
+            }
+        }
+
+        if (assetPak.Fonts.Count > 0)
+        {
+            var loader = GetLoader<TextureFont>();
+
+            foreach (var (key, fontData) in assetPak.Fonts)
+            {
+                var font = loader.LoadFromAssetData(fontData);
+                RegisterAsset(key, font);
+            }
+        }
+
+        if (assetPak.Audios.Count > 0)
+        {
+            var loader = GetLoader<Audio>();
+
+            foreach (var (key, audioData) in assetPak.Audios)
+            {
+                var audio = loader.LoadFromAssetData(audioData);
+                RegisterAsset(key, audio);
+            }
+        }
     }
 
     public static void Free(string assetId)
@@ -109,9 +173,9 @@ public static class Content
         Assets.Clear();
     }
 
-    private static T Load<T>(string assetId) where T : Asset
+    private static AssetType Load<AssetType>(string assetId) where AssetType : Asset
     {
-        var assetLoader = GetLoader<T>();
+        var assetLoader = GetLoader<AssetType>();
 
         if (assetLoader == null) throw new ApplicationException("Could not get Loader for asset");
 
@@ -121,7 +185,7 @@ public static class Content
 
         var asset = assetLoader.Load(assetId, AssetsManifest!);
 
-        return asset;
+        return (AssetType)asset;
     }
 
     private static T LoadEmbedded<T>(string assetId) where T : Asset
@@ -136,32 +200,25 @@ public static class Content
 
         var asset = assetLoader.LoadEmbedded(assetId);
 
-        return asset;
+        return (T)asset;
     }
 
-    private static AssetLoader<T> GetLoader<T>() where T : Asset
+    private static IAssetLoader GetLoader<AssetType>() where AssetType : Asset
     {
-        if (typeof(T) == typeof(Texture))
+        if (_loaders.TryGetValue(typeof(AssetType), out var loader))
         {
-            return (_textureLoader.Value as AssetLoader<T>)!;
+            return loader;
         }
 
-        if (typeof(T) == typeof(ShaderProgram))
-        {
-            return (_shaderLoader.Value as AssetLoader<T>)!;
-        }
+        throw new ArgumentException($"Unsupported asset type: {typeof(AssetType).FullName}");
+    }
 
-        if (typeof(T) == typeof(Audio))
-        {
-            return (_audioLoader.Value as AssetLoader<T>)!;
-        }
+    internal static AssetDataType LoadAssetData<AssetDataType>(string assetId, Stream stream) where AssetDataType : AssetData
+    {
+        var data = AssetDataIO.LoadAssetData<AssetDataType>(stream);
 
-        if (typeof(T) == typeof(TextureFont))
-        {
-            return (_fontLoader.Value as AssetLoader<T>)!;
-        }
-
-        throw new ArgumentException($"Unsupported asset type: {typeof(T).FullName}");
+        RegisterAssetData(assetId, data);
+        return data;
     }
 
     internal static void RegisterAssetData(string id, AssetData data)

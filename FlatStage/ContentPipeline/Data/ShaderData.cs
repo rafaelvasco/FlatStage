@@ -1,6 +1,9 @@
+using MemoryPack;
+
 namespace FlatStage.ContentPipeline;
 
-public class ShaderData : AssetData
+[MemoryPackable]
+internal partial class ShaderData : AssetData
 {
     public required byte[] VertexShader { get; init; }
 

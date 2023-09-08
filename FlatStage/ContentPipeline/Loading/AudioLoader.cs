@@ -5,7 +5,7 @@ using FlatStage.Sound;
 
 namespace FlatStage.ContentPipeline;
 
-internal class AudioLoader : AssetLoader<Audio>
+internal class AudioLoader : AssetLoader<Audio, AudioData>
 {
     public override Audio Load(string id, AssetsManifest manifest)
     {
@@ -21,7 +21,9 @@ internal class AudioLoader : AssetLoader<Audio>
         {
             using var stream = File.OpenRead(assetFullBinPath);
 
-            return LoadFromStream(id, stream);
+            var audioData = Content.LoadAssetData<AudioData>(id, stream);
+
+            return LoadFromAssetData(audioData);
         }
         catch (Exception e)
         {
@@ -29,11 +31,9 @@ internal class AudioLoader : AssetLoader<Audio>
         }
     }
 
-    protected override Audio LoadFromStream(string id, Stream stream)
+    public override Audio LoadFromAssetData(AudioData assetData)
     {
-        var audioData = LoadAssetData<AudioData>(id, stream);
-
-        var audio = AudioContext.CreateAudio(audioData);
+        var audio = AudioContext.CreateAudio(assetData);
 
         return audio;
     }

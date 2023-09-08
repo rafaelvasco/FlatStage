@@ -34,7 +34,7 @@ internal class AudioBuilder : AssetBuilderAgent<AudioData, AudioAssetInfo>
             Id = assetInfoType.Id!,
             Data = fileData,
             Type = assetInfoType.Type,
-            Format = format
+            Format = format,
         };
 
         return result;

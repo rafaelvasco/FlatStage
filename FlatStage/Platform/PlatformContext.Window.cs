@@ -48,12 +48,17 @@ internal static partial class PlatformContext
             SDL_WindowFlags.SDL_WINDOW_INPUT_FOCUS |
             SDL_WindowFlags.SDL_WINDOW_MOUSE_FOCUS;
 
+        if (settings.Fullscreen)
+        {
+            windowFlags |= SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP;
+        }
+
         _windowHandle = SDL_CreateWindow(
             settings.AppTitle ?? "FlatStage",
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
-            settings.WindowWidth,
-            settings.WindowHeight,
+            settings.CanvasWidth,
+            settings.CanvasHeight,
             windowFlags
         );
 

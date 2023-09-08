@@ -5,12 +5,17 @@ using FlatStage.Input;
 using FlatStage.Graphics;
 using FlatStage.Platform;
 using FlatStage.Sound;
+using System.IO;
 
 namespace FlatStage;
 
 public partial class Stage : Disposable
 {
+    public static event FileDropEvent? OnFileDrop;
+
     public const string Version = "0.1";
+
+    public static StageSettings Settings { get; private set; } = null!;
 
     public static Size WindowSize
     {
@@ -82,15 +87,17 @@ public partial class Stage : Disposable
 
         Content.Init();
 
-        var settings = Content.LoadSettingsOrDefault();
+        Settings = Content.LoadSettingsOrDefault();
 
-        Console.WriteLine(settings);
+        Console.WriteLine(Settings);
 
-        PlatformContext.Init(settings);
+        PlatformContext.Init(Settings);
 
-        Control.Init(settings);
+        InitInput();
 
-        GraphicsContext.Init(settings);
+        GraphicsContext.Init();
+
+        _canvas = new Canvas();
 
         AudioContext.Init();
 
@@ -101,8 +108,10 @@ public partial class Stage : Disposable
         PlatformContext.OnQuit = Exit;
         PlatformContext.WindowMinimized = () => { IsActive = false; };
         PlatformContext.WindowRestored = () => { IsActive = true; };
+        PlatformContext.OnFileDrop = ProcessFileDrop;
 
         GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
+
     }
 
     public void Run(Game game)
@@ -111,6 +120,8 @@ public partial class Stage : Disposable
         {
             return;
         }
+
+        GameSaveIO.SetRootPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), game.Name));
 
         _runningGame = game;
 
@@ -171,6 +182,23 @@ public partial class Stage : Disposable
         PlatformContext.ShowRuntimeError("FlatStage", $"An Error Occurred: {ex.Message}");
     }
 
+    private static void InitInput()
+    {
+        Keyboard.Init();
+        Mouse.Init();
+        Gamepad.Init();
+    }
+
+    private static void UpdateInput()
+    {
+        Keyboard.UpdateState();
+        Mouse.UpdateState();
+        Gamepad.UpdateState();
+    }
+
+    private static void ProcessFileDrop(FileDropEventArgs fileDropArgs) => OnFileDrop?.Invoke(fileDropArgs);
+
     private static Stage _instance = null!;
+    private static Canvas _canvas = null!;
     private static Game? _runningGame;
 }

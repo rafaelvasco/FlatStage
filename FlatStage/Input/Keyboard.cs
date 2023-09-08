@@ -1003,20 +1003,20 @@ public struct KeyboardState
     }
 }
 
-public class Keyboard
+public static class Keyboard
 {
-    public event KeyEvent? OnKeyDown;
+    public static event KeyEvent? OnKeyDown;
 
-    public event KeyEvent? OnKeyUp;
+    public static event KeyEvent? OnKeyUp;
 
-    public event TextInputEvent? OnTextInput;
+    public static event TextInputEvent? OnTextInput;
 
-    public bool Enabled { get; set; } = true;
+    public static bool Enabled { get; set; } = true;
 
-    private KeyboardState _kbState;
-    private KeyboardState _lastKbState;
+    private static KeyboardState _kbState;
+    private static KeyboardState _lastKbState;
 
-    internal Keyboard()
+    internal static void Init()
     {
         _kbState = PlatformContext.GetKeyboardState();
         _lastKbState = _kbState;
@@ -1026,40 +1026,40 @@ public class Keyboard
         PlatformContext.TextInput = ev => ProcessTextInput(ev);
     }
 
-    internal void UpdateState()
+    internal static void UpdateState()
     {
         _lastKbState = _kbState;
         _kbState = PlatformContext.GetKeyboardState();
     }
 
-    public bool KeyDown(Key key) => _kbState[key];
+    public static bool KeyDown(Key key) => _kbState[key];
 
-    public bool KeyPressed(Key key)
+    public static bool KeyPressed(Key key)
     {
         return _kbState[key] && !_lastKbState[key];
     }
 
-    public bool KeyReleased(Key key)
+    public static bool KeyReleased(Key key)
     {
         return !_kbState[key] && _lastKbState[key];
     }
 
-    public bool SequencePressed(Key key1, Key key2)
+    public static bool SequencePressed(Key key1, Key key2)
     {
         return _kbState[key1] && !_lastKbState[key2] && _kbState[key2];
     }
 
-    public bool SequencePressed(Key key1, Key key2, Key key3)
+    public static bool SequencePressed(Key key1, Key key2, Key key3)
     {
         return _kbState[key1] && _kbState[key2] && !_lastKbState[key3] && _kbState[key3];
     }
 
-    public bool SequencePressed(Key key1, Key key2, Key key3, Key key4)
+    public static bool SequencePressed(Key key1, Key key2, Key key3, Key key4)
     {
         return _kbState[key1] && _kbState[key2] && _kbState[key3] && !_lastKbState[key4] && _kbState[key4];
     }
 
-    private void ProcessEvent(Key key, bool down)
+    private static void ProcessEvent(Key key, bool down)
     {
         if (down)
         {
@@ -1070,7 +1070,7 @@ public class Keyboard
         OnKeyUp?.Invoke(key);
     }
 
-    private void ProcessTextInput(TextInputEventArgs ev)
+    private static void ProcessTextInput(TextInputEventArgs ev)
     {
         OnTextInput?.Invoke(ev);
     }

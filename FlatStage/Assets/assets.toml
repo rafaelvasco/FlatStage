@@ -35,3 +35,8 @@ fontSize = "32"
 id = "sportyV2"
 path = "Fonts/Born2bSportyV2.ttf"
 fontSize = "32"
+
+[[fonts]]
+id = "chikareGo2"
+path = "Fonts/ChiKareGo2.ttf"
+fontSize = "32"

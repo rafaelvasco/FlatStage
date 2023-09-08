@@ -1,21 +1,42 @@
 using System;
-using System.IO;
 using System.Reflection;
 using System.Text;
 
 namespace FlatStage.ContentPipeline;
 
-internal abstract class AssetLoader<T> where T : Asset
+internal interface IAssetLoader
 {
-    public abstract T Load(string id, AssetsManifest manifest);
+    Asset Load(string id, AssetsManifest manifest);
+    Asset LoadEmbedded(string id);
+    Asset LoadFromAssetData(AssetData assetData);
+}
 
-    public virtual T LoadEmbedded(string id)
+internal abstract class AssetLoader<AssetType, AssetDataType> : IAssetLoader where AssetType : Asset where AssetDataType : AssetData
+{
+    Asset IAssetLoader.Load(string id, AssetsManifest manifest)
+    {
+        return Load(id, manifest);
+    }
+
+    Asset IAssetLoader.LoadEmbedded(string id)
+    {
+        return LoadEmbedded(id);
+    }
+
+    public Asset LoadFromAssetData(AssetData assetData)
+    {
+        return LoadFromAssetData((assetData as AssetDataType)!);
+    }
+
+    public abstract AssetType Load(string id, AssetsManifest manifest);
+
+    public virtual AssetType LoadEmbedded(string id)
     {
         var path = new StringBuilder();
 
         path.Append(ContentProperties.EmbeddedAssetsNamespace);
         path.Append('.');
-        path.Append(ContentProperties.GetEmbeddedFolderNameFromAssetType<T>());
+        path.Append(ContentProperties.GetEmbeddedFolderNameFromAssetType<AssetType>());
         path.Append('.');
         path.Append(id);
         path.Append(ContentProperties.BinaryExt);
@@ -28,15 +49,11 @@ internal abstract class AssetLoader<T> where T : Asset
             throw new ApplicationException($"Could not load embedded asset: {id}");
         }
 
-        return LoadFromStream(id, fileStream);
+        var assetData = Content.LoadAssetData<AssetDataType>(id, fileStream);
+
+        return LoadFromAssetData(assetData);
     }
 
-    protected abstract T LoadFromStream(string assetId, Stream stream);
+    public abstract AssetType LoadFromAssetData(AssetDataType assetData);
 
-    protected static T2 LoadAssetData<T2>(string assetId, Stream stream) where T2 : AssetData
-    {
-        var data = BinarySerializer.Deserialize<T2>(stream);
-        Content.RegisterAssetData(assetId, data);
-        return data;
-    }
 }

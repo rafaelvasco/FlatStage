@@ -5,7 +5,7 @@ using FlatStage.Graphics;
 
 namespace FlatStage.ContentPipeline;
 
-internal class TextureLoader : AssetLoader<Texture>
+internal class TextureLoader : AssetLoader<Texture, ImageData>
 {
     public override Texture Load(string id, AssetsManifest manifest)
     {
@@ -21,7 +21,9 @@ internal class TextureLoader : AssetLoader<Texture>
         {
             using var stream = File.OpenRead(assetFullBinPath);
 
-            return LoadFromStream(id, stream);
+            var imageData = Content.LoadAssetData<ImageData>(id, stream);
+
+            return LoadFromAssetData(imageData);
         }
         catch (Exception e)
         {
@@ -29,19 +31,17 @@ internal class TextureLoader : AssetLoader<Texture>
         }
     }
 
-    protected override Texture LoadFromStream(string assetId, Stream stream)
+    public override Texture LoadFromAssetData(ImageData assetData)
     {
-        var imageData = LoadAssetData<ImageData>(assetId, stream);
-
-        var decodedImageData = ImageIO.LoadPNGFromMem(imageData.Data);
+        var (Data, _, _) = ImageIO.LoadPNGFromMem(assetData.Data);
 
         var texture = GraphicsContext.CreateTexture(
-            imageData.Id!,
+            assetData.Id!,
             new TextureProps()
             {
-                Data = decodedImageData.Data,
-                Width = imageData.Width,
-                Height = imageData.Height
+                Data = Data,
+                Width = assetData.Width,
+                Height = assetData.Height
             }
         );
 

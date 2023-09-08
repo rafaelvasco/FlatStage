@@ -13,100 +13,118 @@ public enum FlipMode
     Vertical = 2,
 }
 
-public class Canvas2D
+public enum CanvasStretchMode
 {
-    public Canvas2D(int maxQuads = 2048)
+    PixelPerfect,
+    LetterBox,
+    Stretch
+}
+
+public class Canvas
+{
+
+    #region STATIC
+
+    private static Canvas _instance = null!;
+
+    public static CanvasStretchMode StretchMode
     {
+        get => _instance._stretchMode;
+        set => _instance._stretchMode = value;
+    }
+
+    public static int Width => _instance._width;
+
+    public static int Height => _instance._height;
+
+    public static void SetViewRegion(Rect rect)
+    {
+        _instance._mainViewport.SetSource(rect);
+    }
+    #endregion
+
+    internal Canvas(int maxQuads = 2048)
+    {
+        _instance = this;
+
         if (!Calc.IsPowerOfTwo(maxQuads))
         {
             maxQuads = Calc.NextPowerOfTwo(maxQuads);
         }
 
-        GraphicsContext.BackBufferSizeChanged = ApplyRenderViewArea;
+        GraphicsContext.BackBufferSizeChanged = CalculateSizeFromDisplaySize;
+
+        _width = Stage.Settings.CanvasWidth;
+        _height = Stage.Settings.CanvasHeight;
 
         _quadBatcher = new QuadBatcher(maxQuads);
 
-        _viewport = Rect.Empty;
-
         _defaultShader = Content.Get<ShaderProgram>("canvas2d", embeddedAsset: true);
 
-        _defaultTexture = Content.Get<Texture>("stagelogo", embeddedAsset: true);
+        _primitiveTexture = GraphicsContext.CreateTexture("primitiveTex", new TextureProps()
+        {
+            Width = 1,
+            Height = 1,
+            Data = new byte[4] { 255, 255, 255, 255 }
+
+        });
 
         _currentShader = _defaultShader;
 
-        _beginCalled = false;
-
         _blendState = BlendState.AlphaBlend;
 
-        _samplerState = SamplerState.PointClamp;
+        _samplerState = SamplerState.PointWrap;
 
         _rasterizerState = RasterizerState.CullCounterClockWise;
 
-        ApplyRenderViewArea(new Size(GraphicsContext.BackbufferWidth, GraphicsContext.BackbufferHeight));
+        _mainViewport = new CanvasViewport(Width, Height);
+
+        _currentViewport = _mainViewport;
+
+        _transformMatrix = Matrix.Identity;
+
+        CalculateSizeFromDisplaySize(Stage.WindowSize.Width, Stage.WindowSize.Height);
     }
 
-    public void Begin(
-        BlendState? blendState = null,
-        SamplerState? samplerState = null,
-        RasterizerState? rasterizerState = null,
-        Matrix? transformMatrix = null,
-        ShaderProgram? shader = null
-    )
+    #region SET_STATE
+    public void SetShader(ShaderProgram? shader = null)
     {
-        if (_beginCalled)
-        {
-            throw new InvalidOperationException("Begin cannot be called again until End has been successfully called.");
-        }
+        Submit();
 
-        _beginCalled = true;
-
-        _blendState = blendState ?? BlendState.AlphaBlend;
-        _samplerState = samplerState ?? SamplerState.PointWrap;
-        _rasterizerState = rasterizerState ?? RasterizerState.CullCounterClockWise;
         _currentShader = shader ?? _defaultShader;
-        _transformMatrix = transformMatrix ?? Matrix.Identity;
+
+        _renderPass++;
     }
 
-    public void End()
+    public void SetViewport(CanvasViewport? viewport = null)
     {
-        if (!_beginCalled)
+        Submit();
+
+        _renderPass++;
+
+        if (viewport != null)
         {
-            throw new InvalidOperationException("End was called, but Begin has not yet been called.");
+            _currentViewport = viewport;
+        }
+        else
+        {
+            _currentViewport = _mainViewport;
         }
 
-        Flush();
-
-        _drawCalls = 0;
-
-        _beginCalled = false;
+        GraphicsContext.Touch(_renderPass);
+        GraphicsContext.SetViewClear(_renderPass, _currentViewport.BackgroundColor);
+        GraphicsContext.SetRenderTarget(_renderPass, _currentViewport.RenderTarget);
+        GraphicsContext.SetViewRect(_renderPass, 0, 0, _currentViewport.Width, _currentViewport.Height);
+        GraphicsContext.SetViewTransform(_renderPass, _transformMatrix, _currentViewport.ProjectionMatrix);
     }
+    #endregion
 
-    void CheckValid(Texture texture)
-    {
-        if (texture == null)
-            throw new ArgumentNullException("texture");
-        if (!_beginCalled)
-            throw new InvalidOperationException("Draw was called, but Begin has not yet been called. Begin must be called successfully before you can call Draw.");
-    }
-
-    void CheckValid(TextureFont font, in CharSource? text)
-    {
-        if (font == null)
-            throw new ArgumentNullException("font");
-        if (text == null)
-            throw new ArgumentNullException("text");
-        if (!_beginCalled)
-            throw new InvalidOperationException("DrawText was called, but Begin has not yet been called. Begin must be called successfully before you can call DrawText.");
-    }
-
+    #region TEXTURE_DRAW
     public void Draw(Texture texture, Vec2 position, Color color)
     {
         CheckValid(texture);
 
-        var quad = new Quad();
-
-        PopulateQuad(
-           ref quad,
+        var quad = BuildQuad(
            position.X,
            position.Y,
            texture.Width,
@@ -124,13 +142,10 @@ public class Canvas2D
     {
         CheckValid(texture);
 
-        var quad = new Quad();
-
         float dx = -texture.Width * origin.X;
         float dy = -texture.Height * origin.Y;
 
-        PopulateQuad(
-            ref quad,
+        var quad = BuildQuad(
             position.X + dx,
             position.Y + dy,
             texture.Width,
@@ -174,10 +189,7 @@ public class Canvas2D
         dx = -w * origin.X;
         dy = -h * origin.Y;
 
-        var quad = new Quad();
-
-        PopulateQuad(
-            ref quad,
+        var quad = BuildQuad(
             position.X + dx,
             position.Y + dy,
             w,
@@ -211,10 +223,7 @@ public class Canvas2D
             _texCoordBR = Vec2.One;
         }
 
-        var quad = new Quad();
-
-        PopulateQuad(
-            ref quad,
+        var quad = BuildQuad(
             destination.X,
             destination.Y,
             destination.Width,
@@ -283,12 +292,9 @@ public class Canvas2D
         float dx = (-w * origin.X);
         float dy = (-h * origin.Y);
 
-        var quad = new Quad();
-
         if (rotation == 0f)
         {
-            PopulateQuad(
-                ref quad,
+            var quad = BuildQuad(
                 position.X + dx,
                 position.Y + dy,
                 w,
@@ -298,11 +304,12 @@ public class Canvas2D
                 _texCoordBR,
                 layerDepth
             );
+            PushQuad(texture, ref quad);
+            return;
         }
         else
         {
-            PopulateQuad(
-                ref quad,
+            var quad = BuildQuad(
                 position.X,
                 position.Y,
                 dx,
@@ -316,11 +323,13 @@ public class Canvas2D
                 _texCoordBR,
                 layerDepth
             );
+            PushQuad(texture, ref quad);
+            return;
         }
-
-        PushQuad(texture, ref quad);
     }
+    #endregion
 
+    #region TEXT_DRAW
     public void DrawText(TextureFont font, string text, Vec2 position, Color color)
     {
         var charSource = new CharSource(text);
@@ -399,10 +408,7 @@ public class Canvas2D
                 _texCoordBR.X = (currentGlyphPtr->BoundsInTexture.X + currentGlyphPtr->BoundsInTexture.Width) * font.Texture.TexelWidth;
                 _texCoordBR.Y = (currentGlyphPtr->BoundsInTexture.Y + currentGlyphPtr->BoundsInTexture.Height) * font.Texture.TexelHeight;
 
-                var quad = new Quad();
-
-                PopulateQuad(
-                    ref quad,
+                var quad = BuildQuad(
                     p.X,
                     p.Y,
                     currentGlyphPtr->BoundsInTexture.Width,
@@ -483,10 +489,7 @@ public class Canvas2D
 
                 Vec2.Transform(ref p, ref transformation, out p);
 
-                var quad = new Quad();
-
-                PopulateQuad(
-                    ref quad,
+                var quad = BuildQuad(
                     p.X,
                     p.Y,
                     currentGlyphPtr->BoundsInTexture.Width * scale.X,
@@ -504,6 +507,90 @@ public class Canvas2D
         }
 
     }
+    #endregion
+
+    #region PRIMITIVE_DRAW
+
+    public unsafe void DrawRect(float x, float y, float width, float height, int lineSize, Color color)
+    {
+        var quads = stackalloc Quad[4];
+
+        quads[0] = BuildQuad(x, y + lineSize, lineSize, height - lineSize, color, Vec2.Zero, Vec2.Zero, 0.0f);
+        quads[1] = BuildQuad(x + width - lineSize, y + lineSize, lineSize, height - lineSize, color, Vec2.Zero, Vec2.Zero, 0.0f);
+        quads[2] = BuildQuad(x, y, width, lineSize, color, Vec2.Zero, Vec2.Zero, 0.0f);
+        quads[3] = BuildQuad(x + lineSize, y + height - lineSize, width - lineSize, lineSize, color, Vec2.Zero, Vec2.Zero, 0.0f);
+
+        PushQuads(_primitiveTexture, new Span<Quad>(quads, 4));
+    }
+
+    public void FillRect(float x, float y, float width, float height, Color color)
+    {
+        var quad = BuildQuad(x, y, width, height, color, Vec2.Zero, Vec2.Zero, 0.0f);
+
+        PushQuad(_primitiveTexture, ref quad);
+    }
+
+    #endregion
+
+    #region PRIVATE_INTERNAL
+    internal void BeginRendering()
+    {
+        _renderPass = 0;
+
+        _drawCalls = 0;
+
+        SetViewport();
+    }
+
+    internal void EndRendering()
+    {
+        Submit();
+
+        _renderPass++;
+
+        RenderMainViewport();
+    }
+
+    private void RenderMainViewport()
+    {
+        GraphicsContext.SetViewClear(_renderPass, Color.Black);
+        GraphicsContext.SetRenderTarget(_renderPass);
+        GraphicsContext.SetViewRect(_renderPass, 0, 0, Stage.WindowSize.Width, Stage.WindowSize.Height);
+        GraphicsContext.SetViewTransform(_renderPass, Matrix.Identity, _mainProjectionMatrix);
+
+        var quad = BuildQuad(
+            _mainViewportDestinationRect.X,
+            _mainViewportDestinationRect.Y,
+            _mainViewportDestinationRect.Width,
+            _mainViewportDestinationRect.Height,
+            Color.White,
+            Vec2.Zero,
+            Vec2.One,
+            0.0f
+        );
+
+        _currentTexture = _mainViewport.Texture;
+
+        _currentShader = _defaultShader;
+
+        _quadBatcher.PushQuad(ref quad);
+
+        Submit();
+    }
+
+    private static void CheckValid(Texture texture)
+    {
+        if (texture == null)
+            throw new ArgumentNullException("texture");
+    }
+
+    private static void CheckValid(TextureFont font, in CharSource? text)
+    {
+        if (font == null)
+            throw new ArgumentNullException("font");
+        if (text == null)
+            throw new ArgumentNullException("text");
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void PushQuad(Texture texture, ref Quad quad)
@@ -514,20 +601,39 @@ public class Canvas2D
         }
         else if (!_currentTexture.Equals(texture))
         {
-            Flush();
+            Submit();
             _currentTexture = texture;
         }
 
         if (_quadBatcher.VertexCount + 4 > _quadBatcher.MaxVertices)
         {
-            Flush();
+            Submit();
         }
 
         _quadBatcher.PushQuad(ref quad);
     }
 
-    private static void PopulateQuad(
-        ref Quad quad,
+    private void PushQuads(Texture texture, Span<Quad> quads)
+    {
+        if (_currentTexture == null)
+        {
+            _currentTexture = texture;
+        }
+        else if (!_currentTexture.Equals(texture))
+        {
+            Submit();
+            _currentTexture = texture;
+        }
+
+        if (_quadBatcher.VertexCount + (quads.Length * 4) > _quadBatcher.MaxVertices)
+        {
+            Submit();
+        }
+
+        _quadBatcher.PushQuads(quads);
+    }
+
+    private static Quad BuildQuad(
         float x,
         float y,
         float w,
@@ -537,6 +643,8 @@ public class Canvas2D
         Vec2 texCoordBR, float depth
     )
     {
+
+        var quad = new Quad();
 
         quad.TopLeft.X = x;
         quad.TopLeft.Y = y;
@@ -566,10 +674,11 @@ public class Canvas2D
         quad.TopRight.Color = color;
         quad.BottomRight.Color = color;
         quad.BottomLeft.Color = color;
+
+        return quad;
     }
 
-    private static void PopulateQuad(
-        ref Quad quad,
+    private static Quad BuildQuad(
         float x,
         float y,
         float dx,
@@ -585,6 +694,8 @@ public class Canvas2D
 
     )
     {
+        var quad = new Quad();
+
         quad.TopLeft.X = x + (dx * cos) - (dy * sin);
         quad.TopLeft.Y = y + (dx * sin) + (dy * cos);
         quad.TopLeft.U = texCoordTL.X;
@@ -618,42 +729,18 @@ public class Canvas2D
         quad.TopRight.Color = color;
         quad.BottomRight.Color = color;
         quad.BottomLeft.Color = color;
+
+        return quad;
     }
 
-    private void CheckBegin(string method)
+    private void Submit()
     {
-        if (!_beginCalled)
-        {
-            throw new InvalidOperationException(
-                method + " was called, but Begin has" +
-                " not yet been called. Begin must be" +
-                " called successfully before you can" +
-                " call " + method + "."
-            );
-        }
-    }
-
-    private void ApplyRenderViewArea(Size size)
-    {
-        _viewport.Width = size.Width;
-        _viewport.Height = size.Height;
-
-        GraphicsContext.SetViewRect(_renderPass, _viewport.X, _viewport.Y, _viewport.Width, _viewport.Height);
-
-        _projectionMatrix = Matrix.CreateOrthographicOffCenter(0f, _viewport.Width, _viewport.Height, 0f,
-            -1.0f, 1.0f);
-    }
-
-    private void Flush()
-    {
-        GraphicsContext.Touch(_renderPass);
-
-        ApplyRenderState();
-
         if (_quadBatcher.VertexCount == 0)
         {
             return;
         }
+
+        ApplyRenderState();
 
         _quadBatcher.Submit();
 
@@ -676,39 +763,147 @@ public class Canvas2D
         GraphicsContext.SetState(_blendState, _rasterizerState);
         GraphicsContext.SetSampleState(0, _samplerState);
 
-        GraphicsContext.SetViewTransform(_renderPass, _transformMatrix, _projectionMatrix);
-        _currentShader.SetTexture(_renderPass, _currentTexture ?? _defaultTexture);
+        _currentShader.SetTexture(0, _currentTexture ?? _primitiveTexture);
     }
+
+    private void CalculateSizeFromDisplaySize(int displayWidth, int displayHeight)
+    {
+        _mainProjectionMatrix = Matrix.CreateOrthographicOffCenter(0f, displayWidth, displayHeight, 0f,
+           -1.0f, 1.0f);
+
+        switch (StretchMode)
+        {
+            case CanvasStretchMode.PixelPerfect:
+
+                if (displayWidth > Width || displayHeight > Height)
+                {
+                    float aspectRatioCanvas = (float)Width / Height;
+                    float aspectRatioDisplay = (float)displayWidth / displayHeight;
+
+                    int scaleW = (int)Calc.Round((float)displayWidth / Width);
+                    int scaleH = (int)Calc.Round((float)displayHeight / Height);
+
+                    if (aspectRatioDisplay > aspectRatioCanvas)
+                    {
+                        scaleW = scaleH;
+                    }
+                    else
+                    {
+                        scaleH = scaleW;
+                    }
+
+                    if ((Width * scaleW) > displayWidth || (Height * scaleH) > displayHeight)
+                    {
+                        scaleW = 1;
+                        scaleH = 1;
+                    }
+
+                    int marginX = (displayWidth - (Width * scaleW)) / 2;
+                    int marginY = (displayHeight - (Height * scaleH)) / 2;
+
+                    _mainViewportDestinationRect = new Rect(marginX, marginY, Width * scaleW, Height * scaleH);
+
+                    Console.WriteLine($"Display Size: {displayWidth}, {displayHeight}");
+                    Console.WriteLine($"Canvas Size: {Width}, {Height}");
+                    Console.WriteLine($"AR Canvas: {aspectRatioCanvas}");
+                    Console.WriteLine($"AR Display: {aspectRatioDisplay}");
+
+                    Console.WriteLine($"ScaleW: {scaleW}");
+                    Console.WriteLine($"ScaleH: {scaleH}");
+
+                    Console.WriteLine($"MarginX: {marginX}");
+                    Console.WriteLine($"MarginY: {marginY}");
+
+                }
+                else
+                {
+                    _mainViewportDestinationRect = new Rect(0, 0, Width, Height);
+                }
+
+                break;
+
+            case CanvasStretchMode.LetterBox:
+
+                if (displayWidth > Width || displayHeight > Height)
+                {
+                    float aspectRatioCanvas = (float)Width / Height;
+                    float aspectRatioDisplay = (float)displayWidth / displayHeight;
+
+                    float scaleW = (float)displayWidth / Width;
+                    float scaleH = (float)displayHeight / Height;
+
+                    if (aspectRatioDisplay > aspectRatioCanvas)
+                    {
+                        scaleW = scaleH;
+                    }
+                    else
+                    {
+                        scaleH = scaleW;
+                    }
+
+                    int marginX = (int)((displayWidth - Width * scaleW) / 2);
+                    int marginY = (int)((displayHeight - Height * scaleH) / 2);
+
+                    _mainViewportDestinationRect = new Rect(marginX, marginY, (int)(Width * scaleW), (int)(Height * scaleH));
+
+                    Console.WriteLine($"Display Size: {displayWidth}, {displayHeight}");
+                    Console.WriteLine($"Canvas Size: {Width}, {Height}");
+                    Console.WriteLine($"AR Canvas: {aspectRatioCanvas}");
+                    Console.WriteLine($"AR Display: {aspectRatioDisplay}");
+
+                    Console.WriteLine($"ScaleW: {scaleW}");
+                    Console.WriteLine($"ScaleH: {scaleH}");
+
+                    Console.WriteLine($"MarginX: {marginX}");
+                    Console.WriteLine($"MarginY: {marginY}");
+
+                }
+                else
+                {
+                    _mainViewportDestinationRect = new Rect(0, 0, Width, Height);
+                }
+
+                break;
+
+            case CanvasStretchMode.Stretch:
+
+                _mainViewportDestinationRect = new Rect(0, 0, displayWidth, displayHeight);
+
+                break;
+        }
+    }
+    #endregion
+
+    #region MEMBERS
+    private int _width;
+    private int _height;
+
+    private ushort _renderPass = 0;
 
     private Vec2 _texCoordTL = new();
     private Vec2 _texCoordBR = new();
 
     private readonly QuadBatcher _quadBatcher;
-
-    private bool _beginCalled;
+    private readonly ShaderProgram _defaultShader;
 
     private Texture? _currentTexture;
+    private Texture _primitiveTexture;
 
-    private readonly Texture _defaultTexture;
-
-    private readonly ShaderProgram _defaultShader;
     private ShaderProgram _currentShader;
 
     private BlendState _blendState;
     private SamplerState _samplerState;
     private RasterizerState _rasterizerState;
 
-    // How many draw calls in current batch
     private int _drawCalls;
-
-    // Max reached draw calls
     private int _maxDrawCalls;
 
-    private ushort _renderPass = 0;
-
+    private readonly CanvasViewport _mainViewport;
+    private CanvasViewport _currentViewport;
+    private Matrix _mainProjectionMatrix;
+    private Rect _mainViewportDestinationRect;
     private Matrix _transformMatrix;
 
-    private Matrix _projectionMatrix;
-
-    private Rect _viewport;
+    private CanvasStretchMode _stretchMode = CanvasStretchMode.PixelPerfect;
+    #endregion
 }

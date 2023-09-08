@@ -37,11 +37,11 @@ public class TetrisView
         _gridWidth = _controller.GameGrid.Columns * CellSize;
         _gridHeight = _controller.GameGrid.Rows * CellSize;
 
-        _gridOffsetX = (Stage.WindowSize.Width / 2f) - (_gridWidth / 2f);
-        _gridOffsetY = (Stage.WindowSize.Height / 2f) - (_gridHeight / 2f);
+        _gridOffsetX = (Canvas.Width / 2f) - (_gridWidth / 2f);
+        _gridOffsetY = (Canvas.Height / 2f) - (_gridHeight / 2f);
 
         _heldIndicatorOffsetX = _gridOffsetX - TetraminoDisplaySize - BlockIndicatorsDistanceFromGrid;
-        _heldIndicatorOffsetY = (Stage.WindowSize.Height / 2f) - (TetraminoDisplaySize / 2f);
+        _heldIndicatorOffsetY = (Canvas.Height / 2f) - (TetraminoDisplaySize / 2f);
 
         _nextIndicatorOffsetX = _gridOffsetX + _gridWidth + BlockIndicatorsDistanceFromGrid;
         _nextIndicatorOffsetY = _heldIndicatorOffsetY;
@@ -51,20 +51,24 @@ public class TetrisView
 
         _menuSpacing = 80;
 
-        _menuYOffset = Stage.WindowSize.Height - (_controller.MenuItems.Length * _menuSpacing) - 100;
+        _menuYOffset = Canvas.Height - (_controller.MenuItems.Length * _menuSpacing) - 100;
 
         for (int i = 0; i < _controller.MenuItems.Length; ++i)
         {
             var label = _controller.MenuItems[i].Label;
             float textW = GameContent.FntMenu.MeasureString(label, TextScale).X;
 
-            _controller.MenuItems[i].Rect = new Rect((int)((Stage.WindowSize.Width / 2f) - (textW / 2f)), (int)(_menuYOffset + (i * _menuSpacing)), (int)textW, (int)_menuSpacing);
+            _controller.MenuItems[i].Rect = new Rect((int)((Canvas.Width / 2f) - (textW / 2f)), (int)(_menuYOffset + (i * _menuSpacing)), (int)textW, (int)_menuSpacing);
         }
 
         var gameTitleTextW = GameContent.FntGameTitle.MeasureString(GameTitle, GameTitleScale).X;
 
-        _gameTitleXOffset = Stage.WindowSize.Width / 2f - gameTitleTextW / 2f;
+        _gameTitleXOffset = (Canvas.Width / 2f) - (gameTitleTextW / 2f);
         _gameTitleYOffset = 100.0f;
+
+        _scoreTextsOffsetX = 20;
+        _scoreTextsOffsetY = 20.0f;
+
     }
 
     public void Update()
@@ -83,7 +87,7 @@ public class TetrisView
         }
     }
 
-    public void Draw(Canvas2D canvas, float dt)
+    public void Draw(Canvas canvas, float dt)
     {
         DrawBackground(canvas, dt);
 
@@ -117,14 +121,14 @@ public class TetrisView
         }
     }
 
-    private void DrawGameTitle(Canvas2D canvas)
+    private void DrawGameTitle(Canvas canvas)
     {
         canvas.DrawText(GameContent.FntGameTitle, GameTitle, new Vec2(_gameTitleXOffset, _gameTitleYOffset + 16), new Vec2(GameTitleScale, GameTitleScale), Color.Red);
         canvas.DrawText(GameContent.FntGameTitle, GameTitle, new Vec2(_gameTitleXOffset, _gameTitleYOffset + 8), new Vec2(GameTitleScale, GameTitleScale), Color.Cyan);
         canvas.DrawText(GameContent.FntGameTitle, GameTitle, new Vec2(_gameTitleXOffset, _gameTitleYOffset), new Vec2(GameTitleScale, GameTitleScale), Color.White);
     }
 
-    private void DrawMenu(Canvas2D canvas)
+    private void DrawMenu(Canvas canvas)
     {
         var menuItems = _controller.MenuItems;
 
@@ -156,19 +160,19 @@ public class TetrisView
         }
     }
 
-    private void DrawBackground(Canvas2D canvas, float dt)
+    private void DrawBackground(Canvas canvas, float dt)
     {
         canvas.Draw(GameContent.TexBackground,
             new RectF(0, 0,
-                Stage.WindowSize.Width,
-                Stage.WindowSize.Height),
+                Canvas.Width,
+                Canvas.Height),
             new
             ((int)(dt * _bgOffset.X * 0.25f),
-            (int)(dt * _bgOffset.Y * 0.25f), Stage.WindowSize.Width, Stage.WindowSize.Height),
+            (int)(dt * _bgOffset.Y * 0.25f), Canvas.Width, Canvas.Height),
             Color.White);
     }
 
-    private void DrawGrid(Canvas2D canvas, float offsetX, float offsetY)
+    private void DrawGrid(Canvas canvas, float offsetX, float offsetY)
     {
         var grid = _controller.GameGrid;
 
@@ -190,7 +194,7 @@ public class TetrisView
         }
     }
 
-    private void DrawBlock(Canvas2D canvas, Block block, float offsetX, float offsetY)
+    private void DrawBlock(Canvas canvas, Block block, float offsetX, float offsetY)
     {
         foreach (var position in block.TilePositions())
         {
@@ -204,7 +208,7 @@ public class TetrisView
         }
     }
 
-    private void DrawGhostBlock(Canvas2D canvas, Block block, float offsetX, float offsetY)
+    private void DrawGhostBlock(Canvas canvas, Block block, float offsetX, float offsetY)
     {
         var dropDistance = _controller.BlockDropDistance();
 
@@ -221,19 +225,19 @@ public class TetrisView
         }
     }
 
-    private void DrawGameOver(Canvas2D canvas)
+    private void DrawGameOver(Canvas canvas)
     {
-        canvas.Draw(GameContent.TexObjects, new Vec2(Stage.WindowSize.Width / 2f, Stage.WindowSize.Height / 2f), _objectsRegions[GameOverRegionIndex], Color.White, 0f, new Vec2(0.5f, 0.5f), new Vec2(0.5f, 0.5f), FlipMode.None, 0f);
+        canvas.Draw(GameContent.TexObjects, new Vec2(Canvas.Width / 2f, Canvas.Height / 2f), _objectsRegions[GameOverRegionIndex], Color.White, 0f, new Vec2(0.5f, 0.5f), new Vec2(0.5f, 0.5f), FlipMode.None, 0f);
     }
 
-    private void DrawNextBlock(Canvas2D canvas, BlockQueue blockQueue, float offsetX, float offsetY)
+    private void DrawNextBlock(Canvas canvas, BlockQueue blockQueue, float offsetX, float offsetY)
     {
         var next = blockQueue.NextBlock;
         var destination = new RectF(offsetX, offsetY, TetraminoDisplaySize, TetraminoDisplaySize);
         canvas.Draw(GameContent.TexObjects, destination, _tetraminosImages[next.Id], Color.Wheat);
     }
 
-    private void DrawHeldBlock(Canvas2D canvas, Block? heldBlock, float offsetX, float offsetY)
+    private void DrawHeldBlock(Canvas canvas, Block? heldBlock, float offsetX, float offsetY)
     {
         Rect src;
 
@@ -244,15 +248,18 @@ public class TetrisView
         canvas.Draw(GameContent.TexObjects, destination, src, Color.Wheat);
     }
 
-    private void DrawTexts(Canvas2D canvas)
+    private void DrawTexts(Canvas canvas)
     {
         _scoreString.Clear();
         _scoreString.Append("SCORE: ");
-        _scoreString.Append(_controller.Score);
+        _scoreString.Append(_controller.Score.ToString("D4"));
 
-        var textSize = GameContent.FntDefault.MeasureString(_scoreString);
+        _maxScoreString.Clear();
+        _maxScoreString.Append("MAX: ");
+        _maxScoreString.Append(_controller.MaxScore.ToString("D4"));
 
-        canvas.DrawText(GameContent.FntDefault, _scoreString, new Vec2((Stage.WindowSize.Width / 8f) - (textSize.X / 2f), 50f), new Vec2(TextScale, TextScale), Color.Cyan);
+        canvas.DrawText(GameContent.FntDefault, _scoreString, new Vec2(_scoreTextsOffsetX, _scoreTextsOffsetY), new Vec2(TextScale, TextScale), Color.Cyan);
+        canvas.DrawText(GameContent.FntDefault, _maxScoreString, new Vec2(_scoreTextsOffsetX, _scoreTextsOffsetY + 30), new Vec2(TextScale, TextScale), Color.Cyan);
 
         canvas.DrawText(GameContent.FntDefault, HeldIndicatorLabel, new Vec2(_heldIndicatorOffsetX + _heldIndicatorLabelOffsetDelta, _heldIndicatorOffsetY + TetraminoDisplaySize + 10f), new Vec2(TextScale, TextScale), Color.Cyan);
         canvas.DrawText(GameContent.FntDefault, NextIndicatorLabel, new Vec2(_nextIndicatorOffsetX + _nextIndicatorLabelOffsetDelta, _nextIndicatorOffsetY + TetraminoDisplaySize + 10f), new Vec2(TextScale, TextScale), Color.Cyan);
@@ -271,7 +278,8 @@ public class TetrisView
     private const int MenuActiveYOffset = 4;
     private const int CellSize = 32;
 
-    private readonly StringBuilder _scoreString = new("SCORE: ");
+    private readonly StringBuilder _scoreString = new();
+    private readonly StringBuilder _maxScoreString = new();
     private readonly Rect[] _objectsRegions = new Rect[9];
     private readonly Rect[] _tetraminosImages = new Rect[8];
     private readonly TetrisController _controller;
@@ -288,6 +296,8 @@ public class TetrisView
     private float _menuSpacing;
     private float _gameTitleXOffset;
     private float _gameTitleYOffset;
+    private float _scoreTextsOffsetX;
+    private float _scoreTextsOffsetY;
 
     private int _gridWidth;
     private int _gridHeight;

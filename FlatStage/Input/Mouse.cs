@@ -169,36 +169,36 @@ public readonly struct MouseState
     }
 }
 
-public class Mouse
+public static class Mouse
 {
-    public event MouseButtonEvent? OnMouseDown;
-    public event MouseButtonEvent? OnMouseUp;
-    public event MouseEvent? OnMouseMove;
+    public static event MouseButtonEvent? OnMouseDown;
+    public static event MouseButtonEvent? OnMouseUp;
+    public static event MouseEvent? OnMouseMove;
 
     public static bool EnableMouse { get; set; } = true;
 
-    public int X => _msState.X;
-    public int Y => _msState.Y;
+    public static int X => _msState.X;
+    public static int Y => _msState.Y;
 
-    public int DeltaX => _msState.X - _prevMsState.X;
-    public int DeltaY => _msState.Y - _prevMsState.Y;
+    public static int DeltaX => _msState.X - _prevMsState.X;
+    public static int DeltaY => _msState.Y - _prevMsState.Y;
 
-    public bool ButtonDown(MouseButton button)
+    public static bool ButtonDown(MouseButton button)
     {
         return _msState[button];
     }
 
-    public bool ButtonPressed(MouseButton button)
+    public static bool ButtonPressed(MouseButton button)
     {
         return _msState[button] && !_prevMsState[button];
     }
 
-    public bool ButtonReleased(MouseButton button)
+    public static bool ButtonReleased(MouseButton button)
     {
         return !_msState[button] && _prevMsState[button];
     }
 
-    internal Mouse()
+    internal static void Init()
     {
         _msState = PlatformContext.GetMouseState();
 
@@ -209,12 +209,12 @@ public class Mouse
         PlatformContext.MouseMove = (x, y) => { OnMouseMove?.Invoke(x, y); };
     }
 
-    internal void UpdateState()
+    internal static void UpdateState()
     {
         _prevMsState = _msState;
         _msState = PlatformContext.GetMouseState();
     }
 
-    private MouseState _msState;
-    private MouseState _prevMsState;
+    private static MouseState _msState;
+    private static MouseState _prevMsState;
 }

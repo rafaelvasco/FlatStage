@@ -15,11 +15,11 @@ internal class ShaderBuilder : AssetBuilderAgent<ShaderData, ShaderAssetInfo>
     {
         IDefinitionData.ThrowIfInValid(assetInfoType, $"AssetBuilder::{Name}");
 
-        Console.WriteLine($"Building Asset {assetInfoType.Id} for Graphics Api: {GraphicsContext.GraphicsBackend}...");
+        Console.WriteLine($"\nBuilding Asset {assetInfoType.Id} for Graphics Api: {GraphicsContext.GraphicsBackend}...\n");
 
         var shaderData = BuildAssetData(rootPath, assetInfoType);
 
-        var assetOutPutPath = BinaryIO.SaveAssetData(rootPath, ref shaderData, assetInfoType, fileNameAppend: ContentProperties.ShaderAppendStrings[GraphicsContext.GraphicsBackend]);
+        var assetOutPutPath = AssetDataIO.SaveAssetData(rootPath, shaderData, assetInfoType, fileNameAppend: ContentProperties.ShaderAppendStrings[GraphicsContext.GraphicsBackend]);
 
         Console.WriteLine($"Shader {assetInfoType.Id} for Graphics Api {GraphicsContext.GraphicsBackend} built successfully on path {assetOutPutPath}");
 

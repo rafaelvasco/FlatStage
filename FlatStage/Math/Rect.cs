@@ -121,10 +121,6 @@ public struct Rect : IEquatable<Rect>
         Height = height;
     }
 
-    public Rect(float v1, int v2, int textW, int menuSpacing) : this()
-    {
-    }
-
     #endregion
 
     #region Public Methods

@@ -1,8 +1,10 @@
 ﻿using FlatStage.Sound;
+using MemoryPack;
 
 namespace FlatStage.ContentPipeline;
 
-internal class AudioData : AssetData
+[MemoryPackable]
+internal partial class AudioData : AssetData
 {
     public required byte[] Data { get; init; }
 

@@ -13,6 +13,7 @@ internal static class ContentProperties
     public const string BinaryExt = ".fsb";
     public const string SerializationMagicString = "FLATB";
     public const string EmbeddedAssetsNamespace = "FlatStage.Assets";
+    public const string DefaultAssetsPackName = "MainAssets";
 
     private static readonly Dictionary<Type, string> EmbeddedFolders = new()
     {

@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 
 namespace FlatStage.ContentPipeline;
-internal class FontLoader : AssetLoader<TextureFont>
+internal class FontLoader : AssetLoader<TextureFont, FontData>
 {
     public override TextureFont Load(string id, AssetsManifest manifest)
     {
@@ -21,7 +21,9 @@ internal class FontLoader : AssetLoader<TextureFont>
         {
             using var stream = File.OpenRead(assetFullBinPath);
 
-            return LoadFromStream(id, stream);
+            var fontData = Content.LoadAssetData<FontData>(id, stream);
+
+            return LoadFromAssetData(fontData);
         }
         catch (Exception e)
         {
@@ -29,19 +31,17 @@ internal class FontLoader : AssetLoader<TextureFont>
         }
     }
 
-    protected override TextureFont LoadFromStream(string assetId, Stream stream)
+    public override TextureFont LoadFromAssetData(FontData assetData)
     {
-        var fontData = LoadAssetData<FontData>(assetId, stream);
-
-        var decodedImageData = ImageIO.LoadPNGFromMem(fontData.ImageData.Data);
+        var decodedImageData = ImageIO.LoadPNGFromMem(assetData.ImageData.Data);
 
         var texture = GraphicsContext.CreateTexture(
-            assetId + "_Texture",
+            assetData.Id + "_Texture",
             new TextureProps()
             {
                 Data = decodedImageData.Data,
-                Width = fontData.Width,
-                Height = fontData.Height
+                Width = assetData.Width,
+                Height = assetData.Height
             }
         );
 
@@ -50,11 +50,11 @@ internal class FontLoader : AssetLoader<TextureFont>
         var chars = new List<char>();
         var kerning = new List<Vec3>();
 
-        var orderedKeys = fontData.Glyphs.Keys.OrderBy(a => a);
+        var orderedKeys = assetData.Glyphs.Keys.OrderBy(a => a);
 
         foreach (var key in orderedKeys)
         {
-            var character = fontData.Glyphs[key];
+            var character = assetData.Glyphs[key];
 
             var bounds = new Rect(character.X, character.Y,
                 character.Width,
@@ -69,7 +69,7 @@ internal class FontLoader : AssetLoader<TextureFont>
         }
 
         var textureFont = new TextureFont(
-            assetId,
+            assetData.Id,
             texture,
             glyphBounds,
             cropping,
@@ -82,4 +82,6 @@ internal class FontLoader : AssetLoader<TextureFont>
 
         return textureFont;
     }
+
+
 }

@@ -9,25 +9,59 @@ namespace FlatStage.Platform;
 public abstract class Executor
 {
     public abstract void Execute(Span<string> parameters);
+
+    protected static bool ParamExists(string key, Span<string> parameters)
+    {
+        for (int i = 0; i < parameters.Length; ++i)
+        {
+            if (parameters[i] == key)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected static string GetParamValue(string key, Span<string> parameters)
+    {
+        for (int i = 0; i < parameters.Length; ++i)
+        {
+            if (parameters[i] == key)
+            {
+                if (i < parameters.Length - 1)
+                {
+                    if (!parameters[i + 1].StartsWith("-"))
+                    {
+                        return parameters[i + 1];
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        throw new Exception($"Could not get value for parameter {key}");
+    }
 }
 
 public class BuildExecutor : Executor
 {
     public override void Execute(Span<string> parameters)
     {
-        if (parameters.Length != 1)
+        if (parameters.Length != 2)
         {
-            throw new ArgumentException("Invalid Build Usage: Example: Build [GameProjectPath]");
+            throw new ArgumentException("Invalid Build Usage: Example: Build -p [GameProjectPath]");
         }
 
-        var gameFolderPath = parameters[0];
+        var path = GetParamValue("-p", parameters);
 
-        if (!Directory.Exists(gameFolderPath))
+        if (!Directory.Exists(path))
         {
             throw new ApplicationException("Informed Path doesn't exist!");
         }
 
-        AssetBuilder.BuildAssets(gameFolderPath);
+        AssetBuilder.BuildAssets(path);
     }
 }
 
@@ -35,22 +69,21 @@ public class BuildSingleAssetExecutor : Executor
 {
     public override void Execute(Span<string> parameters)
     {
-        if (parameters.Length != 2)
+        if (parameters.Length != 4)
         {
-            throw new ArgumentException("Invalid Build Usage: Example: BuildAsset [GameProjectPath] [AssetId]");
+            throw new ArgumentException("Invalid Build Usage: Example: BuildAsset -p [GameProjectPath] -id [AssetId]");
         }
 
-        var gameFolderPath = parameters[0];
+        var path = GetParamValue("-p", parameters);
 
-        if (!Directory.Exists(gameFolderPath))
+        if (!Directory.Exists(path))
         {
             throw new ApplicationException("Informed Path doesn't exist!");
         }
 
-        var assetId = parameters[1];
+        var assetId = GetParamValue("-id", parameters);
 
-        AssetBuilder.BuildAsset(gameFolderPath, assetId);
-
+        AssetBuilder.BuildAsset(path, assetId);
     }
 }
 

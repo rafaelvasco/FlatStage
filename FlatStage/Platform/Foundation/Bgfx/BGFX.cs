@@ -5,12 +5,6 @@
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
-/*
- *
- * AUTO GENERATED! DO NOT EDIT!
- *
- */
-
 using System;
 using System.Runtime.InteropServices;
 
@@ -19,6 +13,8 @@ namespace FlatStage.Foundation.BGFX;
 internal static class Bgfx
 {
     const string DllName = "BGFX.dll";
+
+    public const ushort InvalidHandle = ushort.MaxValue;
 
     [Flags]
     public enum StateFlags : ulong
@@ -2270,75 +2266,76 @@ internal static class Bgfx
     public struct DynamicIndexBufferHandle
     {
         public ushort idx;
-        public bool Valid => idx != UInt16.MaxValue;
+        public bool Valid => idx != ushort.MaxValue;
     }
 
     public struct DynamicVertexBufferHandle
     {
         public ushort idx;
-        public bool Valid => idx != UInt16.MaxValue;
+        public bool Valid => idx != ushort.MaxValue;
     }
 
     public struct FrameBufferHandle
     {
+        public static FrameBufferHandle Invalid = new() { idx = ushort.MaxValue };
+
         public ushort idx;
-        public bool Valid => idx != UInt16.MaxValue;
+        public bool Valid => idx != ushort.MaxValue;
     }
 
     public struct IndexBufferHandle
     {
         public ushort idx;
-        public bool Valid => idx != UInt16.MaxValue;
+        public bool Valid => idx != ushort.MaxValue;
     }
 
     public struct IndirectBufferHandle
     {
         public ushort idx;
-        public bool Valid => idx != UInt16.MaxValue;
+        public bool Valid => idx != ushort.MaxValue;
     }
 
     public struct OcclusionQueryHandle
     {
         public ushort idx;
-        public bool Valid => idx != UInt16.MaxValue;
+        public bool Valid => idx != ushort.MaxValue;
     }
 
     public struct ProgramHandle
     {
         public ushort idx;
-        public bool Valid => idx != UInt16.MaxValue;
+        public bool Valid => idx != ushort.MaxValue;
     }
 
     public struct ShaderHandle
     {
         public ushort idx;
-        public bool Valid => idx != UInt16.MaxValue;
+        public bool Valid => idx != ushort.MaxValue;
     }
 
     public struct TextureHandle
     {
         public ushort idx;
-        public bool Valid => idx != UInt16.MaxValue;
+        public bool Valid => idx != ushort.MaxValue;
     }
 
     public struct UniformHandle
     {
         public ushort idx;
-        public bool Valid => idx != UInt16.MaxValue;
+        public bool Valid => idx != ushort.MaxValue;
     }
 
     public struct VertexBufferHandle
     {
         public ushort idx;
-        public bool Valid => idx != UInt16.MaxValue;
+        public bool Valid => idx != ushort.MaxValue;
     }
 
     public struct VertexLayoutHandle
     {
         public ushort idx;
-        public bool Valid => idx != UInt16.MaxValue;
+        public bool Valid => idx != ushort.MaxValue;
     }
-
 
     /// <summary>
     /// Init attachment.

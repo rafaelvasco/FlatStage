@@ -3,6 +3,7 @@
 namespace FlatStage.Tutorials;
 public abstract class BaseTutorial
 {
+
     public string Name { get; set; }
 
     protected BaseTutorial(string name)
@@ -16,5 +17,5 @@ public abstract class BaseTutorial
 
     public virtual void Update(float dt) { }
 
-    public abstract void Draw(Canvas2D canvas, float dt);
+    public abstract void Draw(Canvas canvas, float dt);
 }

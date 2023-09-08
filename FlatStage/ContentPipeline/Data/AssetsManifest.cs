@@ -144,6 +144,8 @@ public abstract class AssetInfo : IDefinitionData
 {
     public required string Id { get; init; }
 
+    public string? TargetAssetPack { get; init; }
+
     public abstract string PrimaryPath { get; }
 
     public abstract bool IsValid();

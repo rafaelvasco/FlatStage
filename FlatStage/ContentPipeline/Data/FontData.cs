@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using MemoryPack;
+using System.Collections.Generic;
 namespace FlatStage.ContentPipeline;
-internal class FontData : AssetData
+
+[MemoryPackable]
+internal partial class FontData : AssetData
 {
     public required ImageData ImageData { get; init; }
 

@@ -5,6 +5,7 @@ path = "tetris_sheet.png"
 [[images]]
 id = "bg"
 path = "bg.png"
+targetPack = "Images"
 
 [[audios]]
 id = "rotate_sfx"

@@ -20,14 +20,18 @@
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
             <TargetPath>miniaudio.dll</TargetPath>
         </ContentWithTargetPath>
-		<ContentWithTargetPath Include=".\Runtime\win-x64\freetype.dll">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-			<TargetPath>freetype.dll</TargetPath>
-		</ContentWithTargetPath>
+        <ContentWithTargetPath Include=".\Runtime\win-x64\freetype.dll">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+          <TargetPath>freetype.dll</TargetPath>
+        </ContentWithTargetPath>
     </ItemGroup>
 
     <ItemGroup>
         <EmbeddedResource Include="Assets\**\*.fsb" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MemoryPack" Version="1.9.16" />
     </ItemGroup>
 
 </Project>

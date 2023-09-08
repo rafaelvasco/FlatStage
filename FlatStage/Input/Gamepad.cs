@@ -1,9 +1,9 @@
-namespace FlatStage.Input;
 
 using System;
 using FlatStage.Platform;
-using Graphics;
+using FlatStage.Graphics;
 
+namespace FlatStage.Input;
 /// <summary>
 /// Defines the buttons on gamepad.
 /// </summary>
@@ -702,10 +702,10 @@ public struct GamePadState
     }
 }
 
-public class Gamepad
+public static class Gamepad
 {
-    private readonly GamePadState[] _gpState;
-    private readonly GamePadState[] _lastGpState;
+    private static GamePadState[] _gpState = null!;
+    private static GamePadState[] _lastGpState = null!;
 
     /* Based on the XInput constants */
     internal const float LeftDeadZone = 7849.0f / 32768.0f;
@@ -716,9 +716,9 @@ public class Gamepad
 
     public static readonly int MaxCount = 4;
 
-    public bool EnableGamepad { get; set; } = true;
+    public static bool EnableGamepad { get; set; } = true;
 
-    internal Gamepad()
+    internal static void Init()
     {
         _gpState = new GamePadState[MaxCount];
         _lastGpState = new GamePadState[MaxCount];
@@ -741,7 +741,7 @@ public class Gamepad
         }
     }
 
-    internal void UpdateState()
+    internal static void UpdateState()
     {
         if (ConnectedGamePads == 1)
         {
@@ -758,45 +758,45 @@ public class Gamepad
         }
     }
 
-    public GamePadCapabilities GetInfo(GamePadIndex gamepadIndex)
+    public static GamePadCapabilities GetInfo(GamePadIndex gamepadIndex)
     {
         return PlatformContext.GetGamePadCapabilities((int)gamepadIndex);
     }
 
-    public bool ButtonPressed(GamePadButtons button, GamePadIndex gamePadIndex = GamePadIndex.One)
+    public static bool ButtonPressed(GamePadButtons button, GamePadIndex gamePadIndex = GamePadIndex.One)
     {
         int index = (int)gamePadIndex;
         return (_gpState[index].Buttons & button) != 0 && (_lastGpState[index].Buttons & button) == 0;
     }
 
-    public bool ButtonDown(GamePadButtons button, GamePadIndex gamePadIndex = GamePadIndex.One)
+    public static bool ButtonDown(GamePadButtons button, GamePadIndex gamePadIndex = GamePadIndex.One)
     {
         return (_gpState[(int)gamePadIndex].Buttons & button) != 0;
     }
 
-    public bool ButtonReleased(GamePadButtons button, GamePadIndex gamePadIndex = GamePadIndex.One)
+    public static bool ButtonReleased(GamePadButtons button, GamePadIndex gamePadIndex = GamePadIndex.One)
     {
         int index = (int)gamePadIndex;
 
         return (_gpState[index].Buttons & button) == 0 && (_lastGpState[index].Buttons & button) != 0;
     }
 
-    public GamePadTriggers Triggers(GamePadIndex gamePadIndex = GamePadIndex.One)
+    public static GamePadTriggers Triggers(GamePadIndex gamePadIndex = GamePadIndex.One)
     {
         return _gpState[(int)gamePadIndex].Triggers;
     }
 
-    public GamePadThumbSticks Thumbsticks(GamePadIndex gamePadIndex = GamePadIndex.One)
+    public static GamePadThumbSticks Thumbsticks(GamePadIndex gamePadIndex = GamePadIndex.One)
     {
         return _gpState[(int)gamePadIndex].ThumbSticks;
     }
 
-    public bool IsConnected(GamePadIndex gamePadIndex = GamePadIndex.One)
+    public static bool IsConnected(GamePadIndex gamePadIndex = GamePadIndex.One)
     {
         return _gpState[(int)gamePadIndex].IsConnected;
     }
 
-    public GamePadState GetState(GamePadIndex gamepadIndex = GamePadIndex.One)
+    public static GamePadState GetState(GamePadIndex gamepadIndex = GamePadIndex.One)
     {
         return PlatformContext.GetGamePadState(
             (int)gamepadIndex,
@@ -804,13 +804,13 @@ public class Gamepad
         );
     }
 
-    public bool ChangedState(GamePadIndex gamePadIndex = GamePadIndex.One)
+    public static bool ChangedState(GamePadIndex gamePadIndex = GamePadIndex.One)
     {
         int index = (int)gamePadIndex;
         return _gpState[index] != _lastGpState[index];
     }
 
-    public GamePadState GetState(GamePadIndex gamepadIndex, GamePadDeadZone deadZoneMode)
+    public static GamePadState GetState(GamePadIndex gamepadIndex, GamePadDeadZone deadZoneMode)
     {
         return PlatformContext.GetGamePadState(
             (int)gamepadIndex,
@@ -818,7 +818,7 @@ public class Gamepad
         );
     }
 
-    public bool SetVibration(GamePadIndex gamepadIndex, float leftMotor, float rightMotor)
+    public static bool SetVibration(GamePadIndex gamepadIndex, float leftMotor, float rightMotor)
     {
         return PlatformContext.SetGamePadVibration(
             (int)gamepadIndex,
@@ -827,12 +827,12 @@ public class Gamepad
         );
     }
 
-    public string GetGuid(GamePadIndex gamepadIndex)
+    public static string GetGuid(GamePadIndex gamepadIndex)
     {
         return PlatformContext.GetGamePadGuid((int)gamepadIndex);
     }
 
-    public void SetLightbar(GamePadIndex gamepadIndex, Color color)
+    public static void SetLightbar(GamePadIndex gamepadIndex, Color color)
     {
         PlatformContext.SetGamePadLightBar((int)gamepadIndex, color);
     }

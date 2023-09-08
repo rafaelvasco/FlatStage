@@ -160,7 +160,7 @@ public class TextureFont : Asset
         }
 
         var width = 0.0f;
-        var finalLineHeight = (float)LineSpacing;
+        var finalLineHeight = 0f;
 
         var offset = Vector2.Zero;
         var firstGlyphOfLine = true;

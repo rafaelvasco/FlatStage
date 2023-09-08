@@ -15,12 +15,14 @@ public static partial class DefinitionSerializer
         var title = table["AppTitle"].AsString;
         var windowWidth = table["WindowWidth"].AsInteger;
         var windowHeight = table["WindowHeight"].AsInteger;
+        var isFullscreen = table["Fullscreen"];
 
         var stageSettings = new StageSettings()
         {
             AppTitle = title,
-            WindowWidth = windowWidth,
-            WindowHeight = windowHeight
+            CanvasWidth = windowWidth,
+            CanvasHeight = windowHeight,
+            Fullscreen = isFullscreen.HasValue ? isFullscreen : false,
         };
 
         IDefinitionData.ThrowIfInValid(stageSettings, "DefinitionSerializer::DeSerializeStageSettings");
@@ -36,8 +38,9 @@ public static partial class DefinitionSerializer
         TomlTable toml = new()
         {
             ["AppTitle"] = settings.AppTitle!,
-            ["WindowWidth"] = settings.WindowWidth,
-            ["WindowHeight"] = settings.WindowHeight,
+            ["WindowWidth"] = settings.CanvasWidth,
+            ["WindowHeight"] = settings.CanvasHeight,
+            ["Fullscreen"] = settings.Fullscreen
         };
 
         using var file = File.CreateText(filePath);

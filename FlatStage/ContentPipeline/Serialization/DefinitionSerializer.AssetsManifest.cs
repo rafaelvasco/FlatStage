@@ -30,12 +30,14 @@ public static partial class DefinitionSerializer
                 var id = item["id"];
                 var vsPath = item["vsPath"];
                 var fsPath = item["fsPath"];
+                var targetAssetPack = item["targetAssetPack"].AsString;
 
                 var shaderAssetInfo = new ShaderAssetInfo()
                 {
                     Id = id,
                     VsPath = vsPath,
-                    FsPath = fsPath
+                    FsPath = fsPath,
+                    TargetAssetPack = targetAssetPack,
                 };
 
                 IDefinitionData.ThrowIfInValid(shaderAssetInfo,
@@ -53,11 +55,13 @@ public static partial class DefinitionSerializer
             {
                 var id = item["id"];
                 var path = item["path"];
+                var targetAssetPack = item["targetAssetPack"].AsString;
 
                 var imageAssetInfo = new ImageAssetInfo()
                 {
                     Id = id,
-                    Path = path
+                    Path = path,
+                    TargetAssetPack = targetAssetPack,
                 };
 
                 IDefinitionData.ThrowIfInValid(imageAssetInfo,
@@ -76,12 +80,14 @@ public static partial class DefinitionSerializer
                 var id = item["id"];
                 var path = item["path"];
                 var type = item["type"];
+                var targetAssetPack = item["targetAssetPack"].AsString;
 
                 var audioAsssetInfo = new AudioAssetInfo()
                 {
                     Id = id,
                     Path = path,
-                    Type = Audio.ParseAudioTypeFromString(type)
+                    Type = Audio.ParseAudioTypeFromString(type),
+                    TargetAssetPack = targetAssetPack,
                 };
 
                 IDefinitionData.ThrowIfInValid(audioAsssetInfo,
@@ -101,13 +107,15 @@ public static partial class DefinitionSerializer
                 var path = item["path"];
                 var fontSize = item["fontSize"];
                 string charRange = item["charRange"].AsString;
+                var targetAssetPack = item["targetAssetPack"].AsString;
 
                 var fontAssetInfo = new FontAssetInfo()
                 {
                     Id = id,
                     FontSize = fontSize.IsInteger ? fontSize : int.Parse(fontSize),
                     Path = path,
-                    CharRange = charRange!
+                    CharRange = charRange!,
+                    TargetAssetPack = targetAssetPack,
                 };
 
                 IDefinitionData.ThrowIfInValid(fontAssetInfo,
@@ -155,12 +163,19 @@ public static partial class DefinitionSerializer
             {
                 IDefinitionData.ThrowIfInValid(shader, "DefinitionSerializer::SerializeAssetsManifest::Shader");
 
-                shadersNode!.Add(new TomlTable()
+                var table = new TomlTable()
                 {
                     ["id"] = shader.Id!,
                     ["vsPath"] = shader.VsPath!,
-                    ["fsPath"] = shader.FsPath!
-                });
+                    ["fsPath"] = shader.FsPath!,
+                };
+
+                if (!string.IsNullOrEmpty(shader.TargetAssetPack))
+                {
+                    table.Add("targetAssetPack", shader.TargetAssetPack);
+                }
+
+                shadersNode!.Add(table);
             }
         }
 
@@ -172,11 +187,18 @@ public static partial class DefinitionSerializer
             {
                 IDefinitionData.ThrowIfInValid(image, "DefinitionSerializer::SerializeAssetsManifest::Image");
 
-                imagesNode!.Add(new TomlTable()
+                var table = new TomlTable()
                 {
                     ["id"] = image.Id!,
                     ["path"] = image.Path!,
-                });
+                };
+
+                if (!string.IsNullOrEmpty(image.TargetAssetPack))
+                {
+                    table.Add("targetAssetPack", image.TargetAssetPack);
+                }
+
+                imagesNode!.Add(table);
             }
         }
 
@@ -188,12 +210,19 @@ public static partial class DefinitionSerializer
             {
                 IDefinitionData.ThrowIfInValid(audio, "DefinitionSerializer::SerializeAssetsManifest::Audio");
 
-                audiosNode!.Add(new TomlTable()
+                var table = new TomlTable()
                 {
                     ["id"] = audio.Id!,
                     ["path"] = audio.Path!,
                     ["type"] = audio.Type.ToString()
-                });
+                };
+
+                if (!string.IsNullOrEmpty(audio.TargetAssetPack))
+                {
+                    table.Add("targetAssetPack", audio.TargetAssetPack);
+                }
+
+                audiosNode!.Add(table);
             }
         }
 
@@ -205,7 +234,7 @@ public static partial class DefinitionSerializer
             {
                 IDefinitionData.ThrowIfInValid(font, "DefinitionSerializer::SerializeAssetsManifest:Font");
 
-                var fontNode = new TomlTable()
+                var table = new TomlTable()
                 {
                     ["id"] = font.Id!,
                     ["path"] = font.Path!,
@@ -214,10 +243,15 @@ public static partial class DefinitionSerializer
 
                 if (font.CharRange != null)
                 {
-                    fontNode.Add("charRange", font.CharRange);
+                    table.Add("charRange", font.CharRange);
                 }
 
-                fontsNode!.Add(fontNode);
+                if (!string.IsNullOrEmpty(font.TargetAssetPack))
+                {
+                    table.Add("targetAssetPack", font.TargetAssetPack);
+                }
+
+                fontsNode!.Add(table);
             }
         }
 

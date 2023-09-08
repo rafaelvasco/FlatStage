@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System;
 using FlatStage.IO;
-using System.Text;
 
 namespace FlatStage.ContentPipeline;
 internal class FontBuilder : AssetBuilderAgent<FontData, FontAssetInfo>
@@ -25,25 +24,25 @@ internal class FontBuilder : AssetBuilderAgent<FontData, FontAssetInfo>
 
         var fontData = BuildAssetData(rootPath, assetInfoType);
 
-        var assetOutPutPath = BinaryIO.SaveAssetData(rootPath, ref fontData, assetInfoType);
+        var assetOutPutPath = AssetDataIO.SaveAssetData(rootPath, fontData, assetInfoType);
 
-#if DEBUG
+        //#if DEBUG
 
-        var debugFontImagePath = Path.Combine(Path.GetDirectoryName(assetOutPutPath)!, Path.GetFileNameWithoutExtension(assetOutPutPath) + ".png");
-        var debugFontTextPath = Path.Combine(Path.GetDirectoryName(assetOutPutPath)!, Path.GetFileNameWithoutExtension(assetOutPutPath) + ".txt");
+        //        var debugFontImagePath = Path.Combine(Path.GetDirectoryName(assetOutPutPath)!, Path.GetFileNameWithoutExtension(assetOutPutPath) + ".png");
+        //        var debugFontTextPath = Path.Combine(Path.GetDirectoryName(assetOutPutPath)!, Path.GetFileNameWithoutExtension(assetOutPutPath) + ".txt");
 
-        File.WriteAllBytes(debugFontImagePath, fontData.ImageData.Data);
+        //        File.WriteAllBytes(debugFontImagePath, fontData.ImageData.Data);
 
-        StringBuilder glyphRegions = new();
+        //        StringBuilder glyphRegions = new();
 
-        foreach (var (glyphKey, glyph) in fontData.Glyphs)
-        {
-            glyphRegions.AppendLine($"Index: {glyphKey}\nGlyph:\n{glyph.ToString()}");
-        }
+        //        foreach (var (glyphKey, glyph) in fontData.Glyphs)
+        //        {
+        //            glyphRegions.AppendLine($"Index: {glyphKey}\nGlyph:\n{glyph.ToString()}");
+        //        }
 
-        File.WriteAllText(debugFontTextPath, glyphRegions.ToString());
+        //        File.WriteAllText(debugFontTextPath, glyphRegions.ToString());
 
-#endif
+        //#endif
 
         Console.WriteLine($"Asset {assetInfoType.Id} built successfully on path {assetOutPutPath}");
 

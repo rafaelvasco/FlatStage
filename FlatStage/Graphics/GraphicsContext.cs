@@ -18,6 +18,8 @@ public enum GraphicsBackend
 
 public static unsafe partial class GraphicsContext
 {
+    internal static Action<int, int> BackBufferSizeChanged = null!;
+
     public static int BackbufferWidth
     {
         get => _backbufferWidth;
@@ -40,8 +42,6 @@ public static unsafe partial class GraphicsContext
 
     private static Bgfx.ResetFlags ResetFlags { get; set; } = Bgfx.ResetFlags.Vsync;
 
-    internal static Action<Size> BackBufferSizeChanged = null!;
-
     private const int MaxTextureSamplers = 16;
 
     static GraphicsContext()
@@ -49,11 +49,11 @@ public static unsafe partial class GraphicsContext
         SampleFlags = new Bgfx.SamplerFlags[MaxTextureSamplers];
     }
 
-    internal static void Init(StageSettings settings)
+    internal static void Init()
     {
-        InitGraphicsContext(settings);
+        InitGraphicsContext();
 
-        InitGraphicsState(settings);
+        InitGraphicsState();
 
         PlatformContext.WindowResized = OnPlatformWindowResized;
     }
@@ -236,6 +236,11 @@ public static unsafe partial class GraphicsContext
         Bgfx.submit((ushort)renderPass, shader.Handle, 0, (byte)Bgfx.DiscardFlags.All);
     }
 
+    public static void TakeScreenshot(string filePath)
+    {
+        Bgfx.request_screen_shot(Bgfx.FrameBufferHandle.Invalid, filePath);
+    }
+
     private static void SubmitShaderProgram(ShaderProgram shader)
     {
         static void SetTexture(int slot, ShaderSampler sampler)
@@ -301,7 +306,7 @@ public static unsafe partial class GraphicsContext
         Bgfx.shutdown();
     }
 
-    private static void InitGraphicsContext(StageSettings settings)
+    private static void InitGraphicsContext()
     {
         var nativeDisplayHandles = PlatformContext.GetDisplayNativeHandles();
 
@@ -338,8 +343,15 @@ public static unsafe partial class GraphicsContext
 
         init->vendorId = (ushort)Bgfx.PciIdFlags.None;
         init->type = rendererType;
-        init->resolution.width = (uint)settings.WindowWidth;
-        init->resolution.height = (uint)settings.WindowHeight;
+
+        var displaySize = Stage.WindowSize;
+
+        init->resolution.width = (uint)displaySize.Width;
+        init->resolution.height = (uint)displaySize.Height;
+
+        BackbufferWidth = displaySize.Width;
+        BackbufferHeight = displaySize.Height;
+
         init->resolution.format = Bgfx.TextureFormat.BGRA8;
         init->resolution.reset = (uint)Bgfx.ResetFlags.Vsync;
         init->platformData = platformInfo;
@@ -354,16 +366,11 @@ public static unsafe partial class GraphicsContext
         Console.WriteLine($"Graphics Backend: {Bgfx.get_renderer_type()}");
     }
 
-    private static void InitGraphicsState(StageSettings settings)
+    private static void InitGraphicsState()
     {
-        BackbufferWidth = settings.WindowWidth;
-        BackbufferHeight = settings.WindowHeight;
-
         _baseState = Bgfx.StateFlags.WriteRgb | Bgfx.StateFlags.WriteA | Bgfx.StateFlags.WriteZ;
 
-        SetViewClear(0, Color.DodgerBlue);
-
-        Bgfx.set_view_mode(0, Bgfx.ViewMode.Sequential);
+        SetViewClear(0, Color.Black);
 
 #if DEBUG
         Bgfx.set_debug((uint)Bgfx.DebugFlags.Text);
@@ -421,7 +428,7 @@ public static unsafe partial class GraphicsContext
 
         ApplyGraphicsChanges(graphicsChanges);
 
-        BackBufferSizeChanged(new Size(size.Width, size.Height));
+        BackBufferSizeChanged(size.Width, size.Height);
     }
 
     private static int _backbufferWidth;

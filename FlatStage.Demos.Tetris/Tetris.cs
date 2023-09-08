@@ -4,14 +4,15 @@ namespace FlatStage.Tetris;
 
 public class Tetris : Game
 {
-
-    private TetrisView _tetrisView = null!;
-    private TetrisController _tetrisController = null!;
+    public override string Name => "Vetris";
 
     public Tetris()
     {
         _tetrisController = new TetrisController();
         _tetrisView = new TetrisView(_tetrisController);
+
+        F11ToggleFullscreen = true;
+        EscapeQuits = true;
     }
 
     protected override void Preload()
@@ -19,8 +20,6 @@ public class Tetris : Game
         GameContent.Load();
 
         _tetrisView.UpdateLayout();
-
-        GraphicsContext.SetViewClear(0, Color.Black);
 
         _tetrisController.OnClearLines = OnClearLines;
         _tetrisController.OnPlaceBlock = OnPlaceBlock;
@@ -30,7 +29,37 @@ public class Tetris : Game
         _tetrisController.OnExitTriggered = () => Stage.Exit();
         _tetrisController.OnMenuHovered = () => GameContent.SfxMenuHover.Play();
 
+        LoadSaveFile();
+
         GameContent.SngTitle.Play();
+    }
+
+    protected override void Unload()
+    {
+        WriteSaveFile();
+    }
+
+    private void LoadSaveFile()
+    {
+        if (GameSaveIO.LoadSave(SaveGameId))
+        {
+            var maxScore = GameSaveIO.GetInteger("MaxScore");
+
+            _tetrisController.MaxScore = maxScore;
+        }
+        else
+        {
+            _tetrisController.MaxScore = 0;
+        }
+    }
+
+    private void WriteSaveFile()
+    {
+        GameSaveIO.BeginWrite(SaveGameId);
+
+        GameSaveIO.Set(MaxScoreSaveId, _tetrisController.MaxScore);
+
+        GameSaveIO.EndWrite();
     }
 
     private void OnGameStateChanged(GameStateId id)
@@ -92,12 +121,14 @@ public class Tetris : Game
         _tetrisController.Tick();
     }
 
-    protected override void Draw(Canvas2D canvas, float dt)
+    protected override void Draw(Canvas canvas, float dt)
     {
-        canvas.Begin();
-
         _tetrisView.Draw(canvas, dt);
-
-        canvas.End();
     }
+
+    private const string SaveGameId = "VetrisSave";
+    private const string MaxScoreSaveId = "MaxScore";
+
+    private TetrisView _tetrisView = null!;
+    private TetrisController _tetrisController = null!;
 }

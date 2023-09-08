@@ -7,7 +7,7 @@ using FlatStage.Graphics;
 
 namespace FlatStage.ContentPipeline;
 
-internal class ShaderLoader : AssetLoader<ShaderProgram>
+internal class ShaderLoader : AssetLoader<ShaderProgram, ShaderData>
 {
     public override ShaderProgram LoadEmbedded(string id)
     {
@@ -29,7 +29,9 @@ internal class ShaderLoader : AssetLoader<ShaderProgram>
             throw new ApplicationException($"Could not load embedded asset: {id}");
         }
 
-        return LoadFromStream(id, fileStream);
+        var shaderData = Content.LoadAssetData<ShaderData>(id, fileStream);
+
+        return LoadFromAssetData(shaderData);
     }
 
     public override ShaderProgram Load(string id, AssetsManifest manifest)
@@ -47,7 +49,9 @@ internal class ShaderLoader : AssetLoader<ShaderProgram>
         {
             using var stream = File.OpenRead(assetFullBinPath);
 
-            return LoadFromStream(id, stream);
+            var shaderData = Content.LoadAssetData<ShaderData>(id, stream);
+
+            return LoadFromAssetData(shaderData);
         }
         catch (Exception e)
         {
@@ -55,16 +59,14 @@ internal class ShaderLoader : AssetLoader<ShaderProgram>
         }
     }
 
-    protected override ShaderProgram LoadFromStream(string id, Stream stream)
+    public override ShaderProgram LoadFromAssetData(ShaderData assetData)
     {
-        var shaderData = LoadAssetData<ShaderData>(id, stream);
-
-        var shader = GraphicsContext.CreateShader(shaderData.Id!, new ShaderProgramProps()
+        var shader = GraphicsContext.CreateShader(assetData.Id!, new ShaderProgramProps()
         {
-            VertexShader = shaderData.VertexShader,
-            FragmentShader = shaderData.FragmentShader,
-            Parameters = shaderData.Params,
-            Samplers = shaderData.Samplers
+            VertexShader = assetData.VertexShader,
+            FragmentShader = assetData.FragmentShader,
+            Parameters = assetData.Params,
+            Samplers = assetData.Samplers
         });
 
         return shader;

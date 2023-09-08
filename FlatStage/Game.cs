@@ -5,44 +5,30 @@ namespace FlatStage;
 
 public abstract class Game
 {
+    public abstract string Name { get; }
+
     public bool EscapeQuits { get; set; } = false;
+
+    public bool F11ToggleFullscreen { get; set; } = false;
 
     public Game()
     {
-        _canvas = new Canvas2D();
 
-#if DEBUG
-        _drawDebugInfo = true;
-#endif
     }
 
     internal void InternalFixedUpdate(float dt)
     {
-#if DEBUG
-        _timeDeltaFixed = dt;
-#endif
-
         FixedUpdate(dt);
     }
 
     internal void InternalUpdate(float dt)
     {
-#if DEBUG
-
-        _timeDelta = dt;
-
-        if (Control.Keyboard.KeyPressed(Key.F11))
+        if (F11ToggleFullscreen && Keyboard.KeyPressed(Key.F11))
         {
             Stage.Fullscreen = !Stage.Fullscreen;
         }
-        else if (Control.Keyboard.KeyPressed(Key.F2))
-        {
-            _drawDebugInfo = !_drawDebugInfo;
-        }
 
-#endif
-
-        if (EscapeQuits && Control.Keyboard.KeyPressed(Key.Escape))
+        if (EscapeQuits && Keyboard.KeyPressed(Key.Escape))
         {
             Stage.Exit();
         }
@@ -50,20 +36,13 @@ public abstract class Game
         Update(dt);
     }
 
-    internal void InternalDraw(float dt)
+    internal void InternalDraw(Canvas canvas, float dt)
     {
-#if DEBUG
-        GraphicsContext.ClearDebugText();
-        if (_drawDebugInfo)
-        {
-            GraphicsContext.DebugTextWrite(2, 2, DebugColor.White, DebugColor.Black, $"FLATSTAGE ENGINE {Stage.Version}");
-            GraphicsContext.DebugTextWrite(2, 3, DebugColor.White, DebugColor.Black,
-                $"Variable Dt: {_timeDelta}, Fixed Dt: {_timeDeltaFixed}, Draw Dt: {dt}");
-        }
+        canvas.BeginRendering();
 
-#endif
+        Draw(canvas, dt);
 
-        Draw(_canvas, dt);
+        canvas.EndRendering();
     }
 
     internal void InternalPreload()
@@ -90,15 +69,6 @@ public abstract class Game
 
     protected abstract void Update(float dt);
 
-    protected abstract void Draw(Canvas2D canvas, float dt);
+    protected abstract void Draw(Canvas canvas, float dt);
 
-    private readonly Canvas2D _canvas;
-
-#if DEBUG
-
-    protected bool _drawDebugInfo;
-    private float _timeDelta;
-    private float _timeDeltaFixed;
-
-#endif
 }

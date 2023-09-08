@@ -20,17 +20,15 @@ public class Tutorial03 : BaseTutorial
         _effect = Content.Get<Audio>("blip");
 
         _effect.Volume = 0.1f;
-
-        GraphicsContext.SetViewClear(0, Color.Black);
     }
 
-    public override void Draw(Canvas2D canvas, float dt)
+    public override void Draw(Canvas canvas, float dt)
     {
     }
 
     public override void Update(float dt)
     {
-        if (Control.Keyboard.KeyPressed(Key.Space))
+        if (Keyboard.KeyPressed(Key.Space))
         {
             if (!_song1.IsPlaying)
             {
@@ -42,7 +40,7 @@ public class Tutorial03 : BaseTutorial
             }
         }
 
-        if (Control.Mouse.ButtonPressed(MouseButton.Left))
+        if (Mouse.ButtonPressed(MouseButton.Left))
         {
             _effect.PlayWithPanPitch(0f, Random.Default.Next(1, 5) / 10f);
         }

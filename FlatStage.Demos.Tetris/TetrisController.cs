@@ -49,7 +49,7 @@ public class TetrisController
         }
     }
 
-    public MenuAction[] MenuItems => _menuItems;
+    public MenuAction[] MenuItems => _mainMenuItems;
 
     public int CurrentHoveredMenuIndex => _currentHoveredMenuIndex;
 
@@ -61,6 +61,9 @@ public class TetrisController
     public GameStateId GameStateId { get; private set; } = GameStateId.Menu;
 
     public int Score { get; internal set; }
+
+    public int MaxScore { get; internal set; }
+
     public Block? HeldBlock { get; private set; }
     public bool CanHold { get; private set; }
 
@@ -70,8 +73,8 @@ public class TetrisController
         BlockQueue = new BlockQueue();
         CurrentBlock = BlockQueue.GetAndUpdate();
 
-        Control.Keyboard.OnKeyDown += Keyboard_OnKeyDown;
-        Control.Keyboard.OnKeyUp += Keyboard_OnKeyUp;
+        Keyboard.OnKeyDown += Keyboard_OnKeyDown;
+        Keyboard.OnKeyUp += Keyboard_OnKeyUp;
     }
 
     public void SetState(GameStateId state)
@@ -127,7 +130,7 @@ public class TetrisController
             HandleMoveInput(MoveBlockDown);
         }
 
-        if ((!Control.Keyboard.KeyDown(Key.A) && !Control.Keyboard.KeyDown(Key.D)))
+        if ((!Keyboard.KeyDown(Key.A) && !Keyboard.KeyDown(Key.D)))
         {
             _pressingMoveHorizontal = false;
             _currentHorizontalDirection = 0;
@@ -163,7 +166,7 @@ public class TetrisController
                 }
         }
 
-        index = Calc.Clamp(index, 0, _menuItems.Length - 1);
+        index = Calc.Clamp(index, 0, _mainMenuItems.Length - 1);
 
         _lastHoveredMenuIndex = _currentHoveredMenuIndex;
 
@@ -244,12 +247,17 @@ public class TetrisController
                     SetState(GameStateId.Game);
                     break;
                 }
+            case Key.Escape when down:
+                {
+                    SetState(GameStateId.Menu);
+                    break;
+                }
         }
     }
 
     private void TriggerMenuItem(int index)
     {
-        switch (_menuItems[index].ActionId)
+        switch (_mainMenuItems[index].ActionId)
         {
             case MenuActionId.Start: SetState(GameStateId.Game); break;
             case MenuActionId.Options: break;
@@ -451,6 +459,7 @@ public class TetrisController
 
         if (CheckGameOver())
         {
+            SetScoringState();
             SetState(GameStateId.GameOver);
         }
         else
@@ -466,6 +475,14 @@ public class TetrisController
 
             CurrentBlock = BlockQueue.GetAndUpdate();
             CanHold = true;
+        }
+    }
+
+    private void SetScoringState()
+    {
+        if (Score > MaxScore)
+        {
+            MaxScore = Score;
         }
     }
 
@@ -568,8 +585,15 @@ public class TetrisController
     private int _currentHoveredMenuIndex = 0;
     private int _currentActiveMenuIndex = -1;
 
-    private readonly MenuAction[] _menuItems = new[]
-   {
+    private readonly MenuAction[] _mainMenuItems = new[]
+    {
+        new MenuAction { ActionId = MenuActionId.Start, Label = "Start", Rect = new Rect() },
+        new MenuAction { ActionId = MenuActionId.Options, Label = "Options", Rect = new Rect() },
+        new MenuAction { ActionId = MenuActionId.Exit, Label = "Exit", Rect = new Rect() }
+    };
+
+    private readonly MenuAction[] _optionsMenuItems = new[]
+    {
         new MenuAction { ActionId = MenuActionId.Start, Label = "Start", Rect = new Rect() },
         new MenuAction { ActionId = MenuActionId.Options, Label = "Options", Rect = new Rect() },
         new MenuAction { ActionId = MenuActionId.Exit, Label = "Exit", Rect = new Rect() }

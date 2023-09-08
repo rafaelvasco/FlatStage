@@ -46,6 +46,28 @@ public class QuadBatcher
         }
     }
 
+    public unsafe void PushQuads(Span<Quad> quads)
+    {
+        fixed (Vertex2D* p = &_vertices[0])
+        {
+            for (int i = 0, index = _vertexIndex; i < quads.Length; ++i, index += 4)
+            {
+                ref var quad = ref quads[i];
+
+                *(p + index) = quad.TopLeft;
+                *(p + index + 1) = quad.TopRight;
+                *(p + index + 2) = quad.BottomRight;
+                *(p + index + 3) = quad.BottomLeft;
+            }
+        }
+
+        unchecked
+        {
+            _vertexIndex += 4 * quads.Length;
+            _indiceIndex += 6 * quads.Length;
+        }
+    }
+
     public void Submit()
     {
         Submit(0, _vertexIndex, 0, _indiceIndex);
