@@ -22,9 +22,15 @@ Current implemented features are always being improved. New features added only 
     dotnet build
     dotnet run
 
-## Fancy Gfx:
+## Images:
 
-**::::::: Gui 001 :::::::**
+**::::::: Tetris Clone Demo :::::::**
+
+![Gui1](./Media/game_demo_01.gif)
+
+**::::::: Gui 001 :::::::::::::::::**
 
 ![Gui1](./Media/gui1.gif)
+
+
 
