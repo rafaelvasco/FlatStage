@@ -3,7 +3,7 @@
 FlatStage is a Game Engine made in C# and latest .NET. Right now it has the following features:
 
  - Platform Abstraction with SDL2: Windowing and Input;
- - Useful custom common abstractions such as Math functions, Color, Rect, Matrix, Random
+ - Useful custom common abstractions such as Math functions, Color, Rect, Matrix, Random;
  - Input methods supported: Keyboard, Mouse and Gamepad;
  - Optimized batched 2D shader based rendering using BGFX;
  - Font support by building bitmap fonts from TTF files using Freetype;
@@ -23,4 +23,8 @@ Current implemented features are always being improved. New features added only 
     dotnet run
 
 ## Fancy Gfx:
+
+**::::::: Gui 001 :::::::**
+
+![Gui1](./Media/gui1.gif)
 
