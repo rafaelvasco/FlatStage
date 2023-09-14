@@ -83,5 +83,4 @@ internal class FontLoader : AssetLoader<TextureFont, FontData>
         return textureFont;
     }
 
-
 }

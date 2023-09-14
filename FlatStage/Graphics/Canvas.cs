@@ -41,6 +41,15 @@ public class Canvas
     {
         _instance._mainViewport.SetSource(rect);
     }
+
+    internal static (float X, float Y) TransformPointToViewportTransform(float x, float y)
+    {
+        return (
+            (x / _instance._viewportScaleX) - (_instance._mainViewportDestinationRect.X / _instance._viewportScaleX),
+            (y / _instance._viewportScaleY) - (_instance._mainViewportDestinationRect.Y / _instance._viewportScaleY)
+        );
+    }
+
     #endregion
 
     internal Canvas(int maxQuads = 2048)
@@ -117,6 +126,12 @@ public class Canvas
         GraphicsContext.SetViewRect(_renderPass, 0, 0, _currentViewport.Width, _currentViewport.Height);
         GraphicsContext.SetViewTransform(_renderPass, _transformMatrix, _currentViewport.ProjectionMatrix);
     }
+
+    public void SetClip(int x = 0, int y = 0, int width = 0, int height = 0)
+    {
+        GraphicsContext.SetViewScissor((byte)_renderPass, x, y, width, height);
+    }
+
     #endregion
 
     #region TEXTURE_DRAW
@@ -803,6 +818,9 @@ public class Canvas
 
                     _mainViewportDestinationRect = new Rect(marginX, marginY, Width * scaleW, Height * scaleH);
 
+                    _viewportScaleX = scaleW;
+                    _viewportScaleY = scaleH;
+
                     Console.WriteLine($"Display Size: {displayWidth}, {displayHeight}");
                     Console.WriteLine($"Canvas Size: {Width}, {Height}");
                     Console.WriteLine($"AR Canvas: {aspectRatioCanvas}");
@@ -846,6 +864,9 @@ public class Canvas
 
                     _mainViewportDestinationRect = new Rect(marginX, marginY, (int)(Width * scaleW), (int)(Height * scaleH));
 
+                    _viewportScaleX = scaleW;
+                    _viewportScaleY = scaleH;
+
                     Console.WriteLine($"Display Size: {displayWidth}, {displayHeight}");
                     Console.WriteLine($"Canvas Size: {Width}, {Height}");
                     Console.WriteLine($"AR Canvas: {aspectRatioCanvas}");
@@ -869,6 +890,9 @@ public class Canvas
 
                 _mainViewportDestinationRect = new Rect(0, 0, displayWidth, displayHeight);
 
+                _viewportScaleX = (float)displayWidth / Width;
+                _viewportScaleY = (float)displayHeight / Height;
+
                 break;
         }
     }
@@ -877,6 +901,9 @@ public class Canvas
     #region MEMBERS
     private int _width;
     private int _height;
+
+    private float _viewportScaleX = 1.0f;
+    private float _viewportScaleY = 1.0f;
 
     private ushort _renderPass = 0;
 

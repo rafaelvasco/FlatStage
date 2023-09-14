@@ -1,3 +1,4 @@
+using FlatStage.Graphics;
 using FlatStage.Platform;
 using System;
 using System.Text;
@@ -177,8 +178,15 @@ public static class Mouse
 
     public static bool EnableMouse { get; set; } = true;
 
-    public static int X => _msState.X;
-    public static int Y => _msState.Y;
+    public static Point MousePos
+    {
+        get
+        {
+            (float transformedX, float transformedY) = Canvas.TransformPointToViewportTransform(_msState.X, _msState.Y);
+
+            return new Point((int)transformedX, (int)transformedY);
+        }
+    }
 
     public static int DeltaX => _msState.X - _prevMsState.X;
     public static int DeltaY => _msState.Y - _prevMsState.Y;
@@ -206,7 +214,13 @@ public static class Mouse
 
         PlatformContext.MouseUp = button => { OnMouseUp?.Invoke(button); };
 
-        PlatformContext.MouseMove = (x, y) => { OnMouseMove?.Invoke(x, y); };
+        PlatformContext.MouseMove = (x, y) =>
+        {
+
+            (float transformedX, float transformedY) = Canvas.TransformPointToViewportTransform(x, y);
+
+            OnMouseMove?.Invoke((int)transformedX, (int)transformedY);
+        };
     }
 
     internal static void UpdateState()

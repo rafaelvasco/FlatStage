@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Numerics;
 using System.Text;
 
 namespace FlatStage.Graphics;
@@ -133,7 +132,21 @@ public class TextureFont : Asset
     public Vec2 MeasureString(string text, float scaleX = 1.0f, float scaleY = 1.0f)
     {
         var charSource = new CharSource(text);
-        MeasureString(in charSource, scaleX, scaleY, out var size);
+        MeasureString(in charSource, text.Length, 0, scaleX, scaleY, out var size);
+        return size;
+    }
+
+    /// <summary>
+    /// Returns the size of the contents of a string when
+    /// rendered in this font.
+    /// </summary>
+    /// <param name="text">The text to measure.</param>
+    /// <returns>The size, in pixels, of 'text' when rendered in
+    /// this font.</returns>
+    public Vec2 MeasureString(string text, int length, int startIndex, float scaleX = 1.0f, float scaleY = 1.0f)
+    {
+        var charSource = new CharSource(text);
+        MeasureString(in charSource, length, startIndex, scaleX, scaleY, out var size);
         return size;
     }
 
@@ -147,27 +160,46 @@ public class TextureFont : Asset
     public Vec2 MeasureString(StringBuilder text, float scaleX = 1.0f, float scaleY = 1.0f)
     {
         var charSource = new CharSource(text);
-        MeasureString(in charSource, scaleX, scaleY, out var size);
+        MeasureString(in charSource, text.Length, 0, scaleX, scaleY, out var size);
         return size;
     }
 
-    internal unsafe void MeasureString(in CharSource text, float scaleX, float scaleY, out Vec2 size)
+    /// <summary>
+    /// Returns the size of the contents of a StringBuilder when
+    /// rendered in this font.
+    /// </summary>
+    /// <param name="text">The text to measure.</param>
+    /// <returns>The size, in pixels, of 'text' when rendered in
+    /// this font.</returns>
+    public Vec2 MeasureString(StringBuilder text, int length, int startIndex = 0, float scaleX = 1.0f, float scaleY = 1.0f)
     {
-        if (text.Length == 0)
+        var charSource = new CharSource(text);
+        MeasureString(in charSource, length, startIndex, scaleX, scaleY, out var size);
+        return size;
+    }
+
+    internal unsafe void MeasureString(in CharSource text, int length, int startIndex, float scaleX, float scaleY, out Vec2 size)
+    {
+        if (text.Length == 0 || length == 0)
         {
             size = Vec2.Zero;
             return;
         }
 
-        var width = 0.0f;
-        var finalLineHeight = 0f;
+        if (length > text.Length)
+        {
+            length = text.Length;
+        }
 
-        var offset = Vector2.Zero;
+        var width = 0.0f;
+        var height = 0.0f;
+
+        var xOffset = 0.0f;
         var firstGlyphOfLine = true;
 
         fixed (Glyph* glyphsPtr = Glyphs)
         {
-            for (var i = 0; i < text.Length; ++i)
+            for (var i = startIndex; i < startIndex + length; ++i)
             {
                 var c = text[i];
 
@@ -176,10 +208,8 @@ public class TextureFont : Asset
 
                 if (c == '\n')
                 {
-                    finalLineHeight = LineSpacing;
-
-                    offset.X = 0;
-                    offset.Y += LineSpacing;
+                    xOffset = 0;
+                    height += LineSpacing;
                     firstGlyphOfLine = true;
                     continue;
                 }
@@ -193,29 +223,27 @@ public class TextureFont : Asset
                 //  so that text does not hang off the left side of its rectangle.
                 if (firstGlyphOfLine)
                 {
-                    offset.X = Math.Max(pCurrentGlyph->LeftSideBearing, 0);
+                    xOffset = Math.Max(pCurrentGlyph->LeftSideBearing, 0);
                     firstGlyphOfLine = false;
                 }
                 else
                 {
-                    offset.X += Spacing + pCurrentGlyph->LeftSideBearing;
+                    xOffset += Spacing + pCurrentGlyph->LeftSideBearing;
                 }
 
-                offset.X += pCurrentGlyph->Width;
+                xOffset += pCurrentGlyph->Width + pCurrentGlyph->RightSideBearing;
 
-                var proposedWidth = offset.X + Math.Max(pCurrentGlyph->RightSideBearing, 0);
+                var proposedWidth = xOffset;
                 if (proposedWidth > width)
                     width = proposedWidth;
 
-                offset.X += pCurrentGlyph->RightSideBearing;
-
-                if (pCurrentGlyph->Cropping.Height > finalLineHeight)
-                    finalLineHeight = pCurrentGlyph->Cropping.Height;
+                if (pCurrentGlyph->Cropping.Height > height)
+                    height = (pCurrentGlyph->Cropping.Height);
             }
         }
 
         size.X = width * scaleX;
-        size.Y = (offset.Y + finalLineHeight) * scaleY;
+        size.Y = height * scaleY;
     }
 
     internal unsafe bool TryGetGlyphIndex(char c, out int index)

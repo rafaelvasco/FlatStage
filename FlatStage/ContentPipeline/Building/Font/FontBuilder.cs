@@ -71,7 +71,7 @@ internal class FontBuilder : AssetBuilderAgent<FontData, FontAssetInfo>
             range = _defaultCharRange;
         }
 
-        var fontData = _fontCompiler.Build(assetInfoType.Id, fontFileData, DEFAULT_BITMAP_FONT_IMAGE_SIZE, assetInfoType.FontSize, range);
+        var fontData = _fontCompiler.Build(assetInfoType.Id, fontFileData, DEFAULT_BITMAP_FONT_IMAGE_SIZE, assetInfoType.FontSize, range, padding: 1);
 
         return fontData;
     }

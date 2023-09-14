@@ -9,7 +9,6 @@ namespace FlatStage.ContentPipeline;
 internal unsafe class FontCompiler : IDisposable
 {
     private const int MAX_BITMAP_SIZE = 4096;
-    private const int PADDING = 1;
 
     private RectPacker _rectPacker = null!;
     private readonly FT_LibraryRec* _ftLibrary;
@@ -27,7 +26,7 @@ internal unsafe class FontCompiler : IDisposable
         _ftLibrary = lib;
     }
 
-    public FontData Build(string id, byte[] fontData, int initialBitmapSize, int fontSize, CharRange charRange)
+    public FontData Build(string id, byte[] fontData, int initialBitmapSize, int fontSize, CharRange charRange, int padding)
     {
 
         var glyphTargetRegionsOnBitmap = new List<PackerRect>();
@@ -78,7 +77,7 @@ internal unsafe class FontCompiler : IDisposable
                 glyphH = face->glyph->metrics.vertBearingY / 64;
             }
 
-            var packerRect = _rectPacker.PackRect(glyphW + (PADDING * 2), glyphH + (PADDING * 2), i);
+            var packerRect = _rectPacker.PackRect(glyphW + (padding * 2), glyphH + (padding * 2), i);
 
             while (packerRect == null)
             {
@@ -98,7 +97,7 @@ internal unsafe class FontCompiler : IDisposable
 
                 _rectPacker = newPacker;
 
-                packerRect = _rectPacker.PackRect(glyphW + (PADDING * 2), glyphH + (PADDING * 2), i);
+                packerRect = _rectPacker.PackRect(glyphW + (padding * 2), glyphH + (padding * 2), i);
             }
 
             glyphTargetRegionsOnBitmap.Add(packerRect.Value);
@@ -145,7 +144,7 @@ internal unsafe class FontCompiler : IDisposable
                 {
                     var glyphColorOnXY = glyphBmp.buffer[(y * glyphBmp.pitch) + x];
 
-                    var targetIndex = ((rect.X + x + PADDING) + ((rect.Y + y + PADDING) * finalBitmapSize)) * 4;
+                    var targetIndex = (rect.X + x + padding + ((rect.Y + y + padding) * finalBitmapSize)) * 4;
 
                     fontBitmapData[targetIndex + 0] = glyphColorOnXY;
                     fontBitmapData[targetIndex + 1] = glyphColorOnXY;
@@ -157,10 +156,10 @@ internal unsafe class FontCompiler : IDisposable
             // Save Glyph Info on Glyphs Dictionary
             var glyphInfo = new GlyphInfo()
             {
-                X = rect.X + (PADDING),
-                Y = rect.Y + (PADDING),
-                Width = rect.Width - (PADDING * 2),
-                Height = rect.Height - (PADDING * 2),
+                X = rect.X + padding,
+                Y = rect.Y + padding,
+                Width = rect.Width - (padding * 2),
+                Height = rect.Height - (padding * 2),
                 XAdvance = advance,
                 XOffset = xOffset,
                 YOffset = yOffset,

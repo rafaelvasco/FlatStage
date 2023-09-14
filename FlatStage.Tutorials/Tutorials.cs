@@ -10,7 +10,7 @@ public class Tutorials : Game
     private readonly StringBuilder _currentTutorialLabel = new();
     private List<BaseTutorial> _tutorials = new();
     private BaseTutorial _currentTutorial = null!;
-    private int _index = 0;
+    private int _index = 4;
 
     public override string Name => "Tutorials";
 

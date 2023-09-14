@@ -1032,6 +1032,11 @@ public static class Keyboard
         _kbState = PlatformContext.GetKeyboardState();
     }
 
+    public static void ActivateTextInputEvents(bool active)
+    {
+        PlatformContext.ActivateTextInput(active);
+    }
+
     public static bool KeyDown(Key key) => _kbState[key];
 
     public static bool KeyPressed(Key key)

@@ -229,6 +229,11 @@ public static unsafe partial class GraphicsContext
         Bgfx.set_view_frame_buffer((ushort)renderPass, target?.Handle ?? BgfxUtils.FrameBufferNone);
     }
 
+    public static void SetViewScissor(byte view, int x, int y, int w, int h)
+    {
+        Bgfx.set_view_scissor((ushort)view, (ushort)x, (ushort)y, (ushort)w, (ushort)h);
+    }
+
     public static void Render(int renderPass, ShaderProgram shader)
     {
         SubmitShaderProgram(shader);

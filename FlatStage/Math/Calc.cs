@@ -431,19 +431,6 @@ public static class Calc
         return Round(value / increment) * increment;
     }
 
-    /// <summary>
-    /// Restricts a value to be multiple of increment.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="increment"></param>
-    /// <param name="digits"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Snap(float value, float increment, int digits)
-    {
-        return MathF.Round(value / increment * increment, digits);
-    }
-
     public static float CeilSnap(float value, float increment)
     {
         return (Ceil(value / increment) * increment);

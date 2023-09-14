@@ -166,6 +166,18 @@ internal static partial class PlatformContext
         return new KeyboardState(KeyPressBuffer);
     }
 
+    internal static void ActivateTextInput(bool active)
+    {
+        if (active)
+        {
+            SDL_StartTextInput();
+        }
+        else
+        {
+            SDL_StopTextInput();
+        }
+    }
+
     private static void ProcessTextInputEvent(SDL_Event evt)
     {
         if (evt.type == SDL_EventType.SDL_TEXTINPUT)
@@ -201,7 +213,7 @@ internal static partial class PlatformContext
     {
         switch (evt.type)
         {
-            case SDL_EventType.SDL_KEYDOWN when evt.key.repeat == 0:
+            case SDL_EventType.SDL_KEYDOWN:
                 {
                     Key key = ConvertKey((int)evt.key.keysym.sym);
 
