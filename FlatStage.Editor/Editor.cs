@@ -1,16 +1,56 @@
-﻿using FlatStage.Graphics;
+﻿using FlatStage.Toolkit;
 
 namespace FlatStage.Editor;
 
-public class Editor : Game
+public class Editor : Stage
 {
-    public override string Name => "FlatStage Editor";
-
-    protected override void Update(float dt)
+    protected override void OnReady()
     {
+        if (Gui != null)
+        {
+            var menuBar = Gui.Get<GuiMenuBar>("menuBar");
+
+            menuBar.SetEventHandler("newProject", OnNewProjectClicked);
+            menuBar.SetEventHandler("quit", OnQuitClicked);
+            menuBar.SetEventHandler("about", OnAboutClicked);
+        }
     }
 
-    protected override void Draw(Canvas canvas, float dt)
+    private void OnNewProjectClicked(GuiMenuItem menuItem)
     {
+        NewProject();
     }
+
+    private void OnAboutClicked(GuiMenuItem menuItem)
+    {
+        Gui?.Open("aboutWindow");
+    }
+
+    private void OnQuitClicked(GuiMenuItem item)
+    {
+        Exit();
+    }
+
+    private void NewProject()
+    {
+        _currentProject = new GameDef()
+        {
+            GameSettings = new GameSettings()
+            {
+                AppTitle = "New Project",
+                CanvasWidth = 800,
+                CanvasHeight = 600,
+            },
+            Scenes = new GameObjectDef[]
+            {
+                new GameObjectDef()
+                {
+                    Name = "Scene1",
+                }
+            },
+            StartingScene = "Scene1"
+        };
+    }
+
+    private GameDef? _currentProject;
 }

@@ -1,9 +1,8 @@
-﻿using FlatStage.ContentPipeline;
+﻿using FlatStage.Content;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Text;
 
 namespace FlatStage.Graphics;
 
@@ -129,10 +128,9 @@ public class TextureFont : Asset
     /// <param name="text">The text to measure.</param>
     /// <returns>The size, in pixels, of 'text' when rendered in
     /// this font.</returns>
-    public Vec2 MeasureString(string text, float scaleX = 1.0f, float scaleY = 1.0f)
+    public Vec2 MeasureString(ReadOnlySpan<char> text)
     {
-        var charSource = new CharSource(text);
-        MeasureString(in charSource, text.Length, 0, scaleX, scaleY, out var size);
+        MeasureString(text, text.Length, 0, out var size);
         return size;
     }
 
@@ -143,42 +141,13 @@ public class TextureFont : Asset
     /// <param name="text">The text to measure.</param>
     /// <returns>The size, in pixels, of 'text' when rendered in
     /// this font.</returns>
-    public Vec2 MeasureString(string text, int length, int startIndex, float scaleX = 1.0f, float scaleY = 1.0f)
+    public Vec2 MeasureString(ReadOnlySpan<char> text, int length, int startIndex)
     {
-        var charSource = new CharSource(text);
-        MeasureString(in charSource, length, startIndex, scaleX, scaleY, out var size);
+        MeasureString(text, length, startIndex, out var size);
         return size;
     }
 
-    /// <summary>
-    /// Returns the size of the contents of a StringBuilder when
-    /// rendered in this font.
-    /// </summary>
-    /// <param name="text">The text to measure.</param>
-    /// <returns>The size, in pixels, of 'text' when rendered in
-    /// this font.</returns>
-    public Vec2 MeasureString(StringBuilder text, float scaleX = 1.0f, float scaleY = 1.0f)
-    {
-        var charSource = new CharSource(text);
-        MeasureString(in charSource, text.Length, 0, scaleX, scaleY, out var size);
-        return size;
-    }
-
-    /// <summary>
-    /// Returns the size of the contents of a StringBuilder when
-    /// rendered in this font.
-    /// </summary>
-    /// <param name="text">The text to measure.</param>
-    /// <returns>The size, in pixels, of 'text' when rendered in
-    /// this font.</returns>
-    public Vec2 MeasureString(StringBuilder text, int length, int startIndex = 0, float scaleX = 1.0f, float scaleY = 1.0f)
-    {
-        var charSource = new CharSource(text);
-        MeasureString(in charSource, length, startIndex, scaleX, scaleY, out var size);
-        return size;
-    }
-
-    internal unsafe void MeasureString(in CharSource text, int length, int startIndex, float scaleX, float scaleY, out Vec2 size)
+    internal unsafe void MeasureString(ReadOnlySpan<char> text, int length, int startIndex, out Vec2 size)
     {
         if (text.Length == 0 || length == 0)
         {
@@ -242,8 +211,8 @@ public class TextureFont : Asset
             }
         }
 
-        size.X = width * scaleX;
-        size.Y = height * scaleY;
+        size.X = width;
+        size.Y = height;
     }
 
     internal unsafe bool TryGetGlyphIndex(char c, out int index)

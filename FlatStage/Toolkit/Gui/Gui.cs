@@ -1,9 +1,9 @@
-﻿using FlatStage.ContentPipeline;
+﻿using FlatStage.Content;
+using FlatStage.Engine.Toolkit.Definitions.Gui;
 using FlatStage.Graphics;
 using FlatStage.Input;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FlatStage.Toolkit;
 
@@ -27,35 +27,23 @@ public class GuiMouseState
     public bool Moved => MouseX != LastMouseX || MouseY != LastMouseY;
 }
 
-public enum GuiOrientation
-{
-    Horizontal,
-    Vertical
-}
-
-public enum GuiDocking
-{
-    None,
-    Top,
-    Center,
-    Bottom,
-    Left,
-    Right
-}
-
-internal class ControlDepthComparer : IComparer<GuiControl>
+internal class ControlZIndexComparer : IComparer<GuiControl>
 {
     public int Compare(GuiControl? x, GuiControl? y)
     {
         if (ReferenceEquals(x, y)) return 0;
         if (y is null) return 1;
         if (x is null) return -1;
-        return y.Depth.CompareTo(x.Depth);
+        return y.ZIndex.CompareTo(x.ZIndex);
     }
 }
 
 public class Gui
 {
+    internal const string DefaultScene = "Default";
+
+    internal const string MainContainerId = "Main";
+
     public int Width => _guiViewport.Width;
 
     public int Height => _guiViewport.Height;
@@ -73,6 +61,8 @@ public class Gui
         }
     }
 
+    public GuiContainer Desktop => _desktop;
+
     public TextureFont Font
     {
         get => _font;
@@ -88,11 +78,11 @@ public class Gui
 
     public Gui()
     {
-        _controls = new List<GuiControl>();
-
         _font = BuiltinContent.Fonts.Monogram;
 
-        _controlsById = new Dictionary<string, int>();
+        _controlsById = new FastDictionary<string, GuiControl>();
+
+        _controlList = new FastList<GuiControl>();
 
         _guiViewport = new CanvasViewport(Canvas.Width, Canvas.Height)
         {
@@ -125,21 +115,90 @@ public class Gui
 
         Keyboard.OnTextInput += ProcessTextInputEvent;
 
-        _skin = new GuiSkinFlat(this);
+        _skin = new DefaultGuiSkin(this);
 
-        _controlDepthComparer = new ControlDepthComparer();
+        _controlZIndexComparer = new ControlZIndexComparer();
 
-        _debugText = new StringBuilder();
+        _desktop = new GuiContainer(MainContainerId, this)
+        {
+            Width = Canvas.Width,
+            Height = Canvas.Height,
+        };
     }
 
-    internal void Invalidate()
+    public void Invalidate()
     {
         _visualInvalidated = true;
+    }
+
+    public void SendToTop(GuiControl control)
+    {
+        if (control.ZIndex <= _maxZIndex)
+        {
+            control.ZIndex = ++_maxZIndex;
+        }
+    }
+
+    public void SendToBottom(GuiControl control)
+    {
+        if (control.ZIndex >= _minZIndex)
+        {
+            control.ZIndex = --_minZIndex;
+        }
+    }
+
+    public void Open(string windowId)
+    {
+        var window = Get<GuiWindow>(windowId);
+
+        window.Hidden = false;
+        SendToTop(window);
+        Center(window);
+
+        Invalidate();
+    }
+
+    public void Center(GuiControl control)
+    {
+        if (control.Parent != null)
+        {
+            control.X = (control.Parent.Width / 2) - (control.Width / 2);
+            control.Y = (control.Parent.Height / 2) - (control.Height / 2);
+        }
+        else
+        {
+            control.X = (this.Width / 2) - (control.Width / 2);
+            control.Y = (this.Height / 2) - (control.Height / 2);
+        }
+
     }
 
     internal void InvalidateLayout()
     {
         _layoutInvalidated = true;
+    }
+
+    internal void InvalidateZIndexes()
+    {
+        _zIndexesInvalidated = true;
+    }
+
+    internal void NormalizeZIndexes()
+    {
+        for (int i = _controlList.Count - 1; i >= 0; --i)
+        {
+            var control = _controlList[i];
+
+            if (control.Parent != null && control.ZIndex <= control.Parent.ZIndex)
+            {
+                control.ZIndex = control.Parent.ZIndex + 1;
+            }
+        }
+    }
+
+    internal void ReorderControlList()
+    {
+        _controlList.Sort(_controlZIndexComparer);
     }
 
     public T Get<T>(string id) where T : GuiControl
@@ -152,16 +211,42 @@ public class Gui
         throw new Exception($"Could not find control with Id: {id}");
     }
 
+    internal void CreateOrSet<T>(GuiControlDef definition, GuiContainer? parent = null) where T : GuiControl
+    {
+        if (_controlsById.TryGetValue(definition.Id, out var controlValue))
+        {
+            var control = (controlValue as T)!;
+            control.InitFromDefinition(definition);
+            return;
+        }
+
+        var newControl = (Activator.CreateInstance(typeof(T), definition.Id, this, parent) as T)!;
+        newControl.InitFromDefinition(definition);
+        return;
+    }
+
     public void Update(float dt)
     {
-        foreach (var control in _controls)
+        var children = _controlList.ReadOnlySpan;
+
+        if (_zIndexesInvalidated)
         {
-            if (!control.ProcessUpdate)
+            Console.WriteLine("Processing ZIndexes");
+
+            NormalizeZIndexes();
+            ReorderControlList();
+
+            _zIndexesInvalidated = false;
+        }
+
+        foreach (var child in children)
+        {
+            if (!child.ProcessUpdate)
             {
                 continue;
             }
 
-            if (control.InternalProcessUpdate(dt))
+            if (child.Update(dt))
             {
                 Invalidate();
             }
@@ -170,6 +255,11 @@ public class Gui
 
     public void Draw(Canvas canvas)
     {
+        if (_desktop == null)
+        {
+            return;
+        }
+
         if (_layoutInvalidated)
         {
             _layoutInvalidated = false;
@@ -181,29 +271,32 @@ public class Gui
 
         if (_visualInvalidated)
         {
-            //Console.WriteLine("Redraw GUI");
+            Console.WriteLine("Redraw GUI");
 
             canvas.SetViewport(_guiViewport);
 
-            for (var i = _controls.Count - 1; i >= 0; --i)
-            {
-                var control = _controls[i];
-
-                control.InternalProcessDraw(canvas, Skin);
-            }
+            _desktop.Draw(canvas, Skin);
 
             _visualInvalidated = false;
-        }
 
-        canvas.SetViewport();
+            canvas.SetViewport();
+        }
 
         canvas.Draw(_guiViewport.Texture, Vec2.Zero, Color.White);
 
         _debugText.Clear();
-        _debugText.Append("Current Hover: ");
-        _debugText.Append(_hoveredControl?.Id ?? "None");
+        _debugText.Append("Hovered: ");
+        _debugText.AppendLine(_hoveredControl?.Id ?? "None");
+        _debugText.Append("Active: ");
+        _debugText.AppendLine(_activeControl?.Id ?? "None");
+        _debugText.Append("Mouse Exclusive: ");
+        _debugText.AppendLine(_mouseFocusControl?.Id ?? "None");
+        _debugText.Append("MousePos: ");
+        _debugText.Append(_mouseState.MouseX);
+        _debugText.Append(",");
+        _debugText.AppendLine(_mouseState.MouseY);
 
-        canvas.DrawText(BuiltinContent.Fonts.Monogram, _debugText, new Vec2(20, 20), Color.Red);
+        canvas.DrawText(BuiltinContent.Fonts.Monogram, _debugText.ReadOnlySpan, new Vec2(20, Height - 100), Color.Cyan);
     }
 
     public void Focus(GuiControl? control)
@@ -211,13 +304,94 @@ public class Gui
         ProcessFocused(control);
     }
 
-    internal void Register(GuiControl control)
+    public void MouseFocus(GuiControl? control)
     {
-        _controls.Add(control);
+        if (_mouseFocusControl != control)
+        {
+            _mouseFocusControl?.InternalProcessMouseFocusChanged(false);
 
-        _controlsById[control.Id] = _controls.Count - 1;
+            _mouseFocusControl = control;
 
-        _controls.Sort(_controlDepthComparer);
+            _mouseFocusControl?.InternalProcessMouseFocusChanged(true);
+        }
+    }
+
+    internal static void CreateFromDefinition(Gui gui, GuiControlDef definition, GuiContainer? parent = null)
+    {
+        if (definition is GuiButtonDef buttonDef)
+        {
+            gui.CreateOrSet<GuiButton>(buttonDef, parent);
+        }
+        else if (definition is GuiCheckBoxDef checkDef)
+        {
+            gui.CreateOrSet<GuiCheckbox>(checkDef, parent);
+        }
+        else if (definition is GuiSliderDef sliderDef)
+        {
+            gui.CreateOrSet<GuiSlider>(sliderDef, parent);
+        }
+        else if (definition is GuiTextboxDef textBoxDef)
+        {
+            gui.CreateOrSet<GuiTextbox>(textBoxDef, parent);
+        }
+        else if (definition is GuiMenuBarDef menuBarDef)
+        {
+            gui.CreateOrSet<GuiMenuBar>(menuBarDef, parent);
+        }
+        else if (definition is GuiWindowDef windowDef)
+        {
+            gui.CreateOrSet<GuiWindow>(windowDef, parent);
+        }
+        else if (definition is GuiTextDef textDef)
+        {
+            gui.CreateOrSet<GuiText>(textDef, parent);
+        }
+        else if (definition is GuiLayoutDef layoutDef)
+        {
+            switch (layoutDef.Direction)
+            {
+                case GuiLayoutDirection.Vertical:
+                    gui.CreateOrSet<GuiVerticalLayout>(layoutDef, parent);
+                    break;
+                case GuiLayoutDirection.Horizontal:
+                    gui.CreateOrSet<GuiHorizontalLayout>(layoutDef, parent);
+                    break;
+            }
+        }
+        else if (definition is GuiPanelDef panelDef)
+        {
+            gui.CreateOrSet<GuiPanel>(panelDef, parent);
+        }
+        else if (definition is GuiContainerDef containerDef)
+        {
+            gui.CreateOrSet<GuiContainer>(containerDef, parent);
+        }
+        else
+        {
+            FlatException.Throw("Invalid GuiControl Definition");
+        }
+
+        return;
+    }
+
+    internal void InitFromDefinition(GuiDef definition)
+    {
+        CreateFromDefinition(this, definition.Main, parent: null);
+
+        ProcessLayout();
+    }
+
+    internal void RegisterControl(GuiControl control)
+    {
+        if (!_controlsById.ContainsKey(control.Id))
+        {
+            _controlList.Add(control);
+            _controlsById.Add(control.Id, control);
+
+            ReorderControlList();
+
+            _maxZIndex = MathUtils.Max(_maxZIndex, control.ZIndex);
+        }
     }
 
     private void ProcessMouseButtonEvent(MouseButton button, bool down)
@@ -227,6 +401,11 @@ public class Gui
 
         if (down && _hoveredControl != null)
         {
+            if (_mouseFocusControl != null && _hoveredControl != _mouseFocusControl)
+            {
+                MouseFocus(null);
+            }
+
             ProcessActive(_hoveredControl);
         }
         else
@@ -239,40 +418,60 @@ public class Gui
     {
         _mouseState.UpdatePosition(x, y);
 
-        if (_activeControl == null)
-        {
-            for (int i = 0; i < _controls.Count; ++i)
-            {
-                var control = _controls[i];
+        bool changed = false;
 
-                if (control.ContainsPoint(x, y) && _hoveredControl != control)
+        if (_mouseFocusControl == null)
+        {
+            for (int i = 0; i < _controlList.Count; ++i)
+            {
+                var control = _controlList[i];
+
+                if (control.Interactive && !control.GlobalHidden && control.ContainsPoint(x, y))
                 {
-                    if (_hoveredControl == null || _hoveredControl.Depth <= control.Depth)
+                    if (_hoveredControl == null || control.ZIndex >= _hoveredControl.ZIndex)
                     {
                         ProcessHover(control);
                     }
 
+                    switch (control.MouseMoveEventBehavior)
+                    {
+                        case GuiMouseMoveEventBehavior.MouseDown:
+
+                            if (control == _activeControl)
+                            {
+                                changed |= control.InternalProcessMouseMove(_mouseState);
+                            }
+
+                            break;
+
+                        case GuiMouseMoveEventBehavior.MouseOver:
+
+                            changed |= control.InternalProcessMouseMove(_mouseState);
+
+                            break;
+                    }
+
                     break;
                 }
-                else if (control == _hoveredControl && !control.ContainsPoint(x, y))
+                else if (control == _hoveredControl)
                 {
+                    if (_activeControl == _hoveredControl)
+                    {
+                        ProcessActive(null);
+                    }
+
                     ProcessHover(null);
                 }
             }
         }
         else
         {
-            bool changed = _activeControl.InternalProcessMouseMove(_mouseState);
+            changed |= _mouseFocusControl.InternalProcessMouseMove(_mouseState);
+        }
 
-            if (!_activeControl.TrackInputOutsideArea && !_activeControl.ContainsPoint(x, y))
-            {
-                ProcessActive(null);
-            }
-
-            if (changed)
-            {
-                Invalidate();
-            }
+        if (changed)
+        {
+            Invalidate();
         }
 
     }
@@ -307,12 +506,14 @@ public class Gui
         {
             if (_lastHoveredControl != null)
             {
+                _lastHoveredControl.InternalProcessMouseExited();
                 _lastHoveredControl.Hovered = false;
             }
 
             if (_hoveredControl != null)
             {
                 _hoveredControl.Hovered = true;
+                _hoveredControl.InternalProcessMouseEntered();
             }
 
             Invalidate();
@@ -323,25 +524,27 @@ public class Gui
     {
         _lastActiveControl = _activeControl;
 
-        _activeControl = control;
-
-        if (_activeControl != null)
+        if (control != null)
         {
-            _activeControl.Active = true;
-            _activeControl.InternalProcessMouseButton(_mouseState);
+            control.Active = true;
+            control.InternalProcessMouseButton(_mouseState);
 
-            ProcessFocused(_activeControl);
+            ProcessFocused(control);
+
+            _activeControl = control;
 
         }
         else if (_lastActiveControl != null)
         {
-            _lastActiveControl.Active = false;
             _lastActiveControl.InternalProcessMouseButton(_mouseState);
+            _lastActiveControl.Active = false;
 
             if (!_lastActiveControl.ContainsPoint(_mouseState.MouseX, _mouseState.MouseY))
             {
                 ProcessHover(null);
             }
+
+            _activeControl = null;
         }
 
         Invalidate();
@@ -351,9 +554,9 @@ public class Gui
     {
         if (control?.CanGetFocus == true)
         {
-            if (control != _focusedControl)
+            if (_focusedControl != null && control != _focusedControl)
             {
-                _focusedControl?.InternalProcessFocusChanged(false);
+                _focusedControl.InternalProcessFocusChanged(false);
             }
 
             if (control?.ReceiveTextInputEvents == true)
@@ -370,17 +573,19 @@ public class Gui
             _focusedControl = null;
             Keyboard.ActivateTextInputEvents(false);
         }
+
+        Invalidate();
     }
 
     private void ProcessLayout()
     {
-        for (int i = 0; i < _controls.Count; ++i)
+        for (int i = _controlList.Count - 1; i >= 0; --i)
         {
-            var control = _controls[i];
+            var control = _controlList[i];
 
-            if ((control is GuiLayout layout))
+            if (control is GuiContainer container)
             {
-                layout.ProcessLayout();
+                container.ProcessLayout();
             }
         }
     }
@@ -389,8 +594,9 @@ public class Gui
 
     private TextureFont _font;
 
-    private readonly List<GuiControl> _controls;
-    private readonly Dictionary<string, int> _controlsById;
+    private readonly GuiContainer _desktop = null!;
+    private readonly FastList<GuiControl> _controlList;
+    private readonly FastDictionary<string, GuiControl> _controlsById;
     private readonly CanvasViewport _guiViewport;
     private readonly GuiMouseState _mouseState;
     private GuiControl? _hoveredControl;
@@ -398,10 +604,15 @@ public class Gui
     private GuiControl? _activeControl;
     private GuiControl? _lastActiveControl;
     private GuiControl? _focusedControl;
+    private GuiControl? _mouseFocusControl;
     private bool _layoutInvalidated = true;
     private bool _visualInvalidated = true;
+    private bool _zIndexesInvalidated = false;
+    private int _maxZIndex = 0;
+    private int _minZIndex = 0;
 
-    private readonly ControlDepthComparer _controlDepthComparer;
-    private readonly StringBuilder _debugText;
+    private readonly ControlZIndexComparer _controlZIndexComparer;
+
+    private readonly StringBuffer _debugText = new();
 
 }

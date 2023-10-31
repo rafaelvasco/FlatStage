@@ -3,7 +3,7 @@ public class CanvasViewport
 {
     public RenderTarget RenderTarget { get; private set; }
 
-    public Color BackgroundColor { get; set; } = Color.Blue;
+    public Color BackgroundColor { get; set; } = Color.Black;
 
     public Texture Texture => RenderTarget.Texture;
 

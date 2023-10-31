@@ -1,6 +1,4 @@
-﻿using FlatStage;
-using FlatStage.Tutorials;
+﻿using FlatStage.Tutorials;
 
-using var stage = new Stage();
-
-stage.Run(new Tutorials());
+using var game = new Tutorials();
+game.Run();

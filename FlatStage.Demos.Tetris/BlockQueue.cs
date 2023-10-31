@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FlatStage.Tetris;
+﻿namespace FlatStage.Tetris;
 
 public class BlockQueue
 {
@@ -24,7 +22,7 @@ public class BlockQueue
 
     private Block RandomBlock()
     {
-        var index = Random.Default.Next(0, blocks.Length - 1);
+        var index = PRNG.Next(0, blocks.Length);
 
         return blocks[index];
     }

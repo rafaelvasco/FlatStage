@@ -1,5 +1,4 @@
 ﻿using FlatStage.Graphics;
-using System.Text;
 
 namespace FlatStage.Tetris;
 
@@ -46,8 +45,8 @@ public class TetrisView
         _nextIndicatorOffsetX = _gridOffsetX + _gridWidth + BlockIndicatorsDistanceFromGrid;
         _nextIndicatorOffsetY = _heldIndicatorOffsetY;
 
-        _heldIndicatorLabelOffsetDelta = (TetraminoDisplaySize / 2.0f) - (GameContent.FntDefault.MeasureString(HeldIndicatorLabel, TextScale, TextScale).X / 2.0f);
-        _nextIndicatorLabelOffsetDelta = (TetraminoDisplaySize / 2.0f) - (GameContent.FntDefault.MeasureString(NextIndicatorLabel, TextScale, TextScale).X / 2.0f);
+        _heldIndicatorLabelOffsetDelta = (TetraminoDisplaySize / 2.0f) - (GameContent.FntDefault.MeasureString(HeldIndicatorLabel).X * TextScale / 2.0f);
+        _nextIndicatorLabelOffsetDelta = (TetraminoDisplaySize / 2.0f) - (GameContent.FntDefault.MeasureString(NextIndicatorLabel).X * TextScale / 2.0f);
 
         _menuSpacing = 80;
 
@@ -56,12 +55,12 @@ public class TetrisView
         for (int i = 0; i < _controller.MenuItems.Length; ++i)
         {
             var label = _controller.MenuItems[i].Label;
-            float textW = GameContent.FntMenu.MeasureString(label, TextScale).X;
+            float textW = GameContent.FntMenu.MeasureString(label).X * TextScale;
 
             _controller.MenuItems[i].Rect = new Rect((int)((Canvas.Width / 2f) - (textW / 2f)), (int)(_menuYOffset + (i * _menuSpacing)), (int)textW, (int)_menuSpacing);
         }
 
-        var gameTitleTextW = GameContent.FntGameTitle.MeasureString(GameTitle, GameTitleScale).X;
+        var gameTitleTextW = GameContent.FntGameTitle.MeasureString(GameTitle).X * GameTitleScale;
 
         _gameTitleXOffset = (Canvas.Width / 2f) - (gameTitleTextW / 2f);
         _gameTitleYOffset = 100.0f;
@@ -258,8 +257,8 @@ public class TetrisView
         _maxScoreString.Append("MAX: ");
         _maxScoreString.Append(_controller.MaxScore.ToString("D4"));
 
-        canvas.DrawText(GameContent.FntDefault, _scoreString, new Vec2(_scoreTextsOffsetX, _scoreTextsOffsetY), new Vec2(TextScale, TextScale), Color.Cyan);
-        canvas.DrawText(GameContent.FntDefault, _maxScoreString, new Vec2(_scoreTextsOffsetX, _scoreTextsOffsetY + 30), new Vec2(TextScale, TextScale), Color.Cyan);
+        canvas.DrawText(GameContent.FntDefault, _scoreString.ReadOnlySpan, new Vec2(_scoreTextsOffsetX, _scoreTextsOffsetY), new Vec2(TextScale, TextScale), Color.Cyan);
+        canvas.DrawText(GameContent.FntDefault, _maxScoreString.ReadOnlySpan, new Vec2(_scoreTextsOffsetX, _scoreTextsOffsetY + 30), new Vec2(TextScale, TextScale), Color.Cyan);
 
         canvas.DrawText(GameContent.FntDefault, HeldIndicatorLabel, new Vec2(_heldIndicatorOffsetX + _heldIndicatorLabelOffsetDelta, _heldIndicatorOffsetY + TetraminoDisplaySize + 10f), new Vec2(TextScale, TextScale), Color.Cyan);
         canvas.DrawText(GameContent.FntDefault, NextIndicatorLabel, new Vec2(_nextIndicatorOffsetX + _nextIndicatorLabelOffsetDelta, _nextIndicatorOffsetY + TetraminoDisplaySize + 10f), new Vec2(TextScale, TextScale), Color.Cyan);
@@ -270,7 +269,7 @@ public class TetrisView
     private const string NextIndicatorLabel = "NEXT";
 
     private const float TextScale = 2.0f;
-    private const float GameTitleScale = 8.0f;
+    private const float GameTitleScale = 10f;
     private const float BlockIndicatorsDistanceFromGrid = 50;
 
     private const int TetraminoDisplaySize = 128;
@@ -278,8 +277,8 @@ public class TetrisView
     private const int MenuActiveYOffset = 4;
     private const int CellSize = 32;
 
-    private readonly StringBuilder _scoreString = new();
-    private readonly StringBuilder _maxScoreString = new();
+    private readonly StringBuffer _scoreString = new();
+    private readonly StringBuffer _maxScoreString = new();
     private readonly Rect[] _objectsRegions = new Rect[9];
     private readonly Rect[] _tetraminosImages = new Rect[8];
     private readonly TetrisController _controller;

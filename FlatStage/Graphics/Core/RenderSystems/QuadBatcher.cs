@@ -9,9 +9,9 @@ public class QuadBatcher
 
     public QuadBatcher(int maxQuads = 2048)
     {
-        if (!Calc.IsPowerOfTwo(maxQuads))
+        if (!MathUtils.IsPowerOfTwo(maxQuads))
         {
-            maxQuads = Calc.NextPowerOfTwo(maxQuads);
+            maxQuads = MathUtils.NextPowerOfTwo(maxQuads);
         }
 
         MaxVertices = maxQuads * 4;

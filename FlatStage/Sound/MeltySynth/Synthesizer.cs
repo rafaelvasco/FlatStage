@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace FlatStage.Sound.MeltySynth;
@@ -25,7 +24,7 @@ public sealed class Synthesizer : IAudioRenderer
 
     private readonly int minimumVoiceDuration;
 
-    private readonly Dictionary<int, Preset> presetLookup;
+    private readonly FastDictionary<int, Preset> presetLookup;
     private readonly Preset defaultPreset;
 
     private readonly Channel[] channels;
@@ -101,7 +100,7 @@ public sealed class Synthesizer : IAudioRenderer
 
         minimumVoiceDuration = sampleRate / 500;
 
-        presetLookup = new Dictionary<int, Preset>();
+        presetLookup = new FastDictionary<int, Preset>();
 
         var minPresetId = int.MaxValue;
         foreach (var preset in soundFont.PresetArray)
@@ -111,7 +110,7 @@ public sealed class Synthesizer : IAudioRenderer
             // This ID is used to search for presets by the combination of bank number
             // and patch number.
             var presetId = (preset.BankNumber << 16) | preset.PatchNumber;
-            presetLookup.TryAdd(presetId, preset);
+            presetLookup.Add(presetId, preset);
 
             // The preset with the minimum ID number will be default.
             // If the SoundFont is GM compatible, the piano will be chosen.

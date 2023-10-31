@@ -19,7 +19,20 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FlatStage\FlatStage.csproj" />
+        <ProjectReference Include="..\FlatStage\FlatStage.Engine.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Assets\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Assets\assets.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="project.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

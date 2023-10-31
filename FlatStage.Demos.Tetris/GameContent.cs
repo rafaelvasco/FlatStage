@@ -1,4 +1,4 @@
-﻿using FlatStage.ContentPipeline;
+﻿using FlatStage.Content;
 using FlatStage.Graphics;
 using FlatStage.Sound;
 
@@ -20,19 +20,19 @@ public static class GameContent
 
     public static void Load()
     {
-        TexBackground = Content.Get<Texture>("bg");
-        TexObjects = Content.Get<Texture>("tetris_sheet");
-        FntDefault = BuiltinContent.Fonts.RobotY;
+        TexBackground = Assets.Get<Texture>("bg");
+        TexObjects = Assets.Get<Texture>("tetris_sheet");
+        FntDefault = BuiltinContent.Fonts.Koubit001;
         FntMenu = BuiltinContent.Fonts.Koubit001;
-        FntGameTitle = BuiltinContent.Fonts.ImpactBits;
+        FntGameTitle = BuiltinContent.Fonts.Koubit001;
 
-        SfxRotate = Content.Get<Audio>("rotate_sfx");
-        SfxLineClear = Content.Get<Audio>("lineclear_sfx");
-        SfxGameOver = Content.Get<Audio>("gameover_sfx");
-        SfxPlaceBlock = Content.Get<Audio>("placeblock_sfx");
-        SfxFullLinesClear = Content.Get<Audio>("clear_max");
-        SfxMenuHover = Content.Get<Audio>("menu_hover");
-        SngTitle = Content.Get<Audio>("title_song");
+        SfxRotate = Assets.Get<Audio>("rotate_sfx");
+        SfxLineClear = Assets.Get<Audio>("lineclear_sfx");
+        SfxGameOver = Assets.Get<Audio>("gameover_sfx");
+        SfxPlaceBlock = Assets.Get<Audio>("placeblock_sfx");
+        SfxFullLinesClear = Assets.Get<Audio>("clear_max");
+        SfxMenuHover = Assets.Get<Audio>("menu_hover");
+        SngTitle = Assets.Get<Audio>("title_song");
 
         AudioContext.SetVolume(AudioContext.DefaultSongsGroup, 0.05f);
         AudioContext.SetVolume(AudioContext.DefaultEffectsGroup, 0.05f);

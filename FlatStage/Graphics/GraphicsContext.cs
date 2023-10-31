@@ -84,6 +84,11 @@ public static unsafe partial class GraphicsContext
             1.0f, 0);
     }
 
+    public static void SetViewModeSequential(int renderPass)
+    {
+        Bgfx.set_view_mode((ushort)renderPass, Bgfx.ViewMode.Sequential);
+    }
+
     public static void SetState(
         BlendState blendState,
         RasterizerState rasterizerState
@@ -349,7 +354,7 @@ public static unsafe partial class GraphicsContext
         init->vendorId = (ushort)Bgfx.PciIdFlags.None;
         init->type = rendererType;
 
-        var displaySize = Stage.WindowSize;
+        var displaySize = Game.WindowSize;
 
         init->resolution.width = (uint)displaySize.Width;
         init->resolution.height = (uint)displaySize.Height;
@@ -422,7 +427,7 @@ public static unsafe partial class GraphicsContext
 
     private static void OnPlatformWindowResized(Size size)
     {
-        Stage.SuppressDraw();
+        Game.GameLoop.SuppressDraw();
 
         var graphicsChanges = new GraphicsChanges
         {

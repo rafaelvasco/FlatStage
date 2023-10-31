@@ -2,7 +2,6 @@
   "profiles": {
     "FlatStage.Editor": {
       "commandName": "Project",
-      "commandLineArgs": "Build -p G:\\DotNet\\FlatStage\\FlatStage",
       "hotReloadEnabled": false
     }
   }

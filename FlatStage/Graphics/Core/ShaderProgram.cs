@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
-
-using FlatStage.ContentPipeline;
+using FlatStage.Content;
 using FlatStage.Foundation.BGFX;
 
 namespace FlatStage.Graphics;
@@ -107,7 +105,7 @@ public sealed class ShaderProgram : Asset
         Samplers = samples;
         Parameters = parameters;
 
-        _paramsMap = new Dictionary<string, int>();
+        _paramsMap = new FastDictionary<string, int>();
 
         for (int i = 0; i < parameters.Length; ++i)
         {
@@ -117,11 +115,11 @@ public sealed class ShaderProgram : Asset
 
     public void SetTexture(int slot, Texture texture)
     {
-        slot = Calc.Max(slot, 0);
+        slot = MathUtils.Max(slot, 0);
 
         Samplers[slot].Texture = texture;
 
-        TextureSlotIndex = Calc.Max(TextureSlotIndex, slot);
+        TextureSlotIndex = MathUtils.Max(TextureSlotIndex, slot);
     }
 
     public ShaderParameter? GetParam(string name)
@@ -148,5 +146,5 @@ public sealed class ShaderProgram : Asset
 
     internal int TextureSlotIndex { get; private set; }
 
-    private readonly Dictionary<string, int> _paramsMap;
+    private readonly FastDictionary<string, int> _paramsMap;
 }

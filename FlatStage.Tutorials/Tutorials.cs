@@ -1,23 +1,24 @@
-﻿using FlatStage.ContentPipeline;
+﻿using FlatStage.Content;
 using FlatStage.Graphics;
 using FlatStage.Input;
 using System.Collections.Generic;
-using System.Text;
 
 namespace FlatStage.Tutorials;
 public class Tutorials : Game
 {
-    private readonly StringBuilder _currentTutorialLabel = new();
+    private readonly StringBuffer _currentTutorialLabel = new();
     private List<BaseTutorial> _tutorials = new();
     private BaseTutorial _currentTutorial = null!;
-    private int _index = 4;
-
-    public override string Name => "Tutorials";
+    private int _index = 0;
 
     public Tutorials()
     {
-        EscapeQuits = true;
-        F11ToggleFullscreen = true;
+        Settings = new GameSettings()
+        {
+            AppTitle = "FlatStage Core Tutorials",
+            CanvasWidth = 800,
+            CanvasHeight = 600,
+        };
 
         _tutorials.Add(new Tutorial01("Hello World"));
         _tutorials.Add(new Tutorial02("Bouncy Ball"));
@@ -28,7 +29,7 @@ public class Tutorials : Game
         _currentTutorial = _tutorials[_index];
     }
 
-    protected override void Preload()
+    protected override void Load()
     {
         foreach (var tutorial in _tutorials)
         {
@@ -38,13 +39,13 @@ public class Tutorials : Game
 
     protected override void Draw(Canvas canvas, float dt)
     {
-        _currentTutorial.Draw(canvas, dt);
+        _currentTutorial.Draw(canvas);
 
         _currentTutorialLabel.Clear();
         _currentTutorialLabel.Append("Current: ");
         _currentTutorialLabel.Append(_currentTutorial.Name);
 
-        canvas.DrawText(BuiltinContent.Fonts.Monogram, _currentTutorialLabel, new Vec2(50, Canvas.Height - 50), Color.Cyan);
+        canvas.DrawText(BuiltinContent.Fonts.Monogram, _currentTutorialLabel.ReadOnlySpan, new Vec2(50, Canvas.Height - 50), Color.Cyan);
     }
 
     protected override void FixedUpdate(float dt)

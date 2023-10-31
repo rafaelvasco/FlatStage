@@ -1,6 +1,6 @@
 using System;
 
-using FlatStage.ContentPipeline;
+using FlatStage.Content;
 using FlatStage.Foundation.BGFX;
 
 namespace FlatStage.Graphics;

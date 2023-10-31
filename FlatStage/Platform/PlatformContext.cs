@@ -35,7 +35,7 @@ internal static partial class PlatformContext
 
     public static PlatformId PlatformId { get; private set; }
 
-    public static void Init(StageSettings settings)
+    public static void Init(GameSettings settings)
     {
         Ensure64BitArch();
 
@@ -55,7 +55,7 @@ internal static partial class PlatformContext
         SDL_SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
         SDL_SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
-        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER | SDL_INIT_HAPTIC) < 0)
+        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
         {
             SDL_Quit();
             throw new ApplicationException("Failed to initialize SDL");

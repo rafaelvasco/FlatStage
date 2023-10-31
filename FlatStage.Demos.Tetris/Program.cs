@@ -1,6 +1,4 @@
-﻿using FlatStage;
-using FlatStage.Tetris;
+﻿using FlatStage.Tetris;
 
-using var stage = new Stage();
-
-stage.Run(new Tetris());
+using var game = new Tetris();
+game.Run();

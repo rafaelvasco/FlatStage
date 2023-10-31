@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using FlatStage.ContentPipeline;
+using FlatStage.Content;
 using FlatStage.Foundation.MiniAudio;
 
 namespace FlatStage.Sound;
@@ -26,8 +25,8 @@ internal unsafe class AudioEngine
     private int _customSoundGroupIndex;
     private int _maxSoundsIndex = SOUNDS_ARRAY_SIZE - 1;
 
-    private readonly Dictionary<int, int> _audioSoundMap = new();
-    private readonly Dictionary<string, int> _customSoundGroupsMap = new();
+    private readonly FastDictionary<int, int> _audioSoundMap = new();
+    private readonly FastDictionary<string, int> _customSoundGroupsMap = new();
 
     public AudioEngine()
     {
@@ -79,7 +78,7 @@ internal unsafe class AudioEngine
 
     public void SetGlobalVolume(float volume)
     {
-        volume = Calc.Clamp(volume, 0f, 1f);
+        volume = MathUtils.Clamp(volume, 0f, 1f);
 
         MiniAudio.ma_engine_set_volume(_audioEngine, volume);
     }
@@ -396,7 +395,7 @@ internal unsafe class AudioEngine
 
     public void SetVolume(Audio audio, float value)
     {
-        value = Calc.Clamp(value, 0f, 1f);
+        value = MathUtils.Clamp(value, 0f, 1f);
 
         if (_audioSoundMap.TryGetValue(audio.Handle, out var index))
         {
@@ -406,7 +405,7 @@ internal unsafe class AudioEngine
 
     public void SetVolume(string soundGroup, float value)
     {
-        value = Calc.Clamp(value, 0f, 1f);
+        value = MathUtils.Clamp(value, 0f, 1f);
 
         if (_customSoundGroupsMap.TryGetValue(soundGroup, out var index))
         {

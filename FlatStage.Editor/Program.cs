@@ -1,5 +1,4 @@
-﻿using FlatStage;
-using FlatStage.Editor;
+﻿using FlatStage.Editor;
 using FlatStage.Platform;
 
 if (args.Length > 0)
@@ -8,6 +7,6 @@ if (args.Length > 0)
 }
 else
 {
-    using var stage = new Stage();
-    stage.Run(new Editor());
+    using var editor = new Editor();
+    editor.Run();
 }

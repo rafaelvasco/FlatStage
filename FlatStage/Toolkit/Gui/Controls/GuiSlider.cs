@@ -4,6 +4,17 @@ using System;
 namespace FlatStage.Toolkit;
 public class GuiSlider : GuiControl
 {
+    internal static readonly int STypeId;
+
+    static GuiSlider()
+    {
+        STypeId = ++SBTypeId;
+    }
+
+    internal override int TypeId => STypeId;
+
+    public const string ThumbCustomElementId = "Thumb";
+
     public float Value
     {
         get => _value;
@@ -13,9 +24,9 @@ public class GuiSlider : GuiControl
             {
                 _value = value;
 
-                _value = Calc.Clamp(_value, _minValue, _maxValue);
+                _value = MathUtils.Clamp(_value, _minValue, _maxValue);
 
-                _value = Calc.Snap(_value, _step);
+                _value = MathUtils.Snap(_value, _step);
 
                 UpdateThumbRect();
             }
@@ -120,16 +131,38 @@ public class GuiSlider : GuiControl
 
     private int TrackStartOffset => ThumbWidth / 2;
 
-    public GuiSlider(string id, Gui gui, GuiControl? parent = null) : base(id, gui, parent)
+    public GuiSlider(string id, Gui gui, GuiContainer? parent = null) : base(id, gui, parent)
     {
-        TrackInputOutsideArea = true;
         UpdateThumbRect();
+    }
+
+    internal override void InitFromDefinition(GuiControlDef definition)
+    {
+        base.InitFromDefinition(definition);
+
+        if (definition is GuiSliderDef sliderDef)
+        {
+            Value = sliderDef.Value;
+            MinValue = sliderDef.MinValue;
+            MaxValue = sliderDef.MaxValue;
+            Step = sliderDef.Step;
+            ThumbWidth = sliderDef.ThumbWidth;
+        }
     }
 
     public override Size SizeHint => new(250, 40);
 
     protected override bool ProcessMouseButton(GuiMouseState mouseState)
     {
+        if (mouseState.MouseButtonDown)
+        {
+            Gui.MouseFocus(this);
+        }
+        else
+        {
+            Gui.MouseFocus(null);
+        }
+
         if (mouseState.LastMouseButton == Input.MouseButton.Left && mouseState.MouseButtonDown)
         {
             var (localX, _) = ToLocalPos(mouseState.MouseX, mouseState.MouseY);
@@ -173,9 +206,9 @@ public class GuiSlider : GuiControl
 
         float newValue = _minValue + ((_maxValue - _minValue) * factor);
 
-        newValue = Calc.Clamp(newValue, _minValue, _maxValue);
+        newValue = MathUtils.Clamp(newValue, _minValue, _maxValue);
 
-        newValue = Calc.Snap(newValue, _step);
+        newValue = MathUtils.Snap(newValue, _step);
 
         if (newValue != _value)
         {
@@ -198,12 +231,12 @@ public class GuiSlider : GuiControl
 
         float xPos = (TotalTrackWidth * factor) - (ThumbWidth / 2) + TrackStartOffset;
 
-        xPos = Calc.Clamp(xPos, 0, Width - ThumbWidth);
+        xPos = MathUtils.Clamp(xPos, 0, Width - ThumbWidth);
 
         _thumbRect = new Rect((int)(xPos), 0, ThumbWidth, Height);
     }
 
-    protected override void Draw(Canvas canvas, GuiSkin skin)
+    internal override void Draw(Canvas canvas, GuiSkin skin)
     {
         skin.DrawSlider(canvas, this);
     }

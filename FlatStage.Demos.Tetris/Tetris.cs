@@ -1,21 +1,24 @@
-﻿using FlatStage.Graphics;
+﻿using FlatStage.Content;
+using FlatStage.Graphics;
 
 namespace FlatStage.Tetris;
 
 public class Tetris : Game
 {
-    public override string Name => "Vetris";
-
     public Tetris()
     {
+        Settings = new GameSettings()
+        {
+            AppTitle = "Vetris",
+            CanvasWidth = 1024,
+            CanvasHeight = 768
+        };
+
         _tetrisController = new TetrisController();
         _tetrisView = new TetrisView(_tetrisController);
-
-        F11ToggleFullscreen = true;
-        EscapeQuits = true;
     }
 
-    protected override void Preload()
+    protected override void Load()
     {
         GameContent.Load();
 
@@ -26,12 +29,14 @@ public class Tetris : Game
         _tetrisController.OnRotateBlock = OnRotateBlock;
         _tetrisController.OnGameStateChanged = OnGameStateChanged;
 
-        _tetrisController.OnExitTriggered = () => Stage.Exit();
+        _tetrisController.OnExitTriggered = () => Exit();
         _tetrisController.OnMenuHovered = () => GameContent.SfxMenuHover.Play();
 
         LoadSaveFile();
 
         GameContent.SngTitle.Play();
+
+        Canvas.StretchMode = CanvasStretchMode.LetterBox;
     }
 
     protected override void Unload()

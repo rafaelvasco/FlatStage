@@ -1,4 +1,4 @@
-﻿using FlatStage.ContentPipeline;
+﻿using FlatStage.Content;
 using FlatStage.Input;
 using FlatStage.Graphics;
 using FlatStage.Sound;
@@ -23,14 +23,14 @@ public class Tutorial02 : BaseTutorial
 
     public override void Load()
     {
-        _texture = Content.Get<Texture>("particles");
+        _texture = Assets.Get<Texture>("particles");
 
-        _bumpEffect = Content.Get<Audio>("blip");
+        _bumpEffect = Assets.Get<Audio>("blip");
 
         _bumpEffect.Volume = 0.1f;
     }
 
-    public override void Draw(Canvas canvas, float dt)
+    public override void Draw(Canvas canvas)
     {
         canvas.Draw(_texture!, _particlePos, new Rect(96, 64, 32, 32), Vec2.Zero, Color.Cyan);
     }

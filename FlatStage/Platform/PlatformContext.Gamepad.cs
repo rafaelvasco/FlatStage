@@ -38,7 +38,7 @@ internal static partial class PlatformContext
 
     public static string GetGamePadName(int index)
     {
-        index = Calc.Clamp(index, 0, GamepadDevices.Length - 1);
+        index = MathUtils.Clamp(index, 0, GamepadDevices.Length - 1);
 
         return SDL_GameControllerName(GamepadDevices[index]);
     }
@@ -217,8 +217,8 @@ internal static partial class PlatformContext
 
         return SDL_GameControllerRumble(
             device,
-            (ushort)(Calc.Clamp(leftMotor, 0.0f, 1.0f) * 0xFFFF),
-            (ushort)(Calc.Clamp(rightMotor, 0.0f, 1.0f) * 0xFFFF),
+            (ushort)(MathUtils.Clamp(leftMotor, 0.0f, 1.0f) * 0xFFFF),
+            (ushort)(MathUtils.Clamp(rightMotor, 0.0f, 1.0f) * 0xFFFF),
             0
         ) == 0;
     }

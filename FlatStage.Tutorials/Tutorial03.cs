@@ -1,4 +1,4 @@
-﻿using FlatStage.ContentPipeline;
+﻿using FlatStage.Content;
 using FlatStage.Input;
 using FlatStage.Graphics;
 using FlatStage.Sound;
@@ -16,13 +16,13 @@ public class Tutorial03 : BaseTutorial
 
     public override void Load()
     {
-        _song1 = Content.Get<Audio>("delphi_loop");
-        _effect = Content.Get<Audio>("blip");
+        _song1 = Assets.Get<Audio>("delphi_loop");
+        _effect = Assets.Get<Audio>("blip");
 
         _effect.Volume = 0.1f;
     }
 
-    public override void Draw(Canvas canvas, float dt)
+    public override void Draw(Canvas canvas)
     {
     }
 
@@ -42,7 +42,7 @@ public class Tutorial03 : BaseTutorial
 
         if (Mouse.ButtonPressed(MouseButton.Left))
         {
-            _effect.PlayWithPanPitch(0f, Random.Default.Next(1, 5) / 10f);
+            _effect.PlayWithPanPitch(0f, PRNG.NextFloat(1f, 5f) / 10f);
         }
     }
 }

@@ -1,24 +1,35 @@
 ﻿namespace FlatStage.Toolkit;
 public class GuiVerticalLayout : GuiLayout
 {
-    public GuiVerticalLayout(string id, Gui gui, GuiControl? parent = null) : base(id, gui, parent)
+    internal static new readonly int STypeId;
+
+    static GuiVerticalLayout()
+    {
+        STypeId = ++SBTypeId;
+    }
+
+    public GuiVerticalLayout(string id, Gui gui, GuiContainer? parent = null) : base(id, gui, parent)
     {
     }
 
     internal override void ProcessLayout()
     {
-        if (Children.Count == 0)
-        {
-            return;
-        }
+        base.ProcessLayout();
 
-        _lastLayoutPos = 0;
+        var lastLayoutPos = 0;
 
         int totalHeight = 0;
 
         for (var i = 0; i < Children.Count; ++i)
         {
-            totalHeight += Children[i].Height;
+            var child = Children[i];
+
+            if (child.Anchor != GuiAnchoring.None)
+            {
+                continue;
+            }
+
+            totalHeight += child.Height;
         }
 
         totalHeight += (Children.Count - 1) * Spacing;
@@ -31,40 +42,55 @@ public class GuiVerticalLayout : GuiLayout
                 {
                     var child = Children[i];
 
-                    child.SetPosition(Padding, Padding + _lastLayoutPos + (Spacing * i));
+                    if (child.Anchor != GuiAnchoring.None)
+                    {
+                        continue;
+                    }
+
+                    child.SetPosition(Padding, Padding + lastLayoutPos + (Spacing * i));
                     child.Resize(Width - (2 * Padding), child.Height);
 
-                    _lastLayoutPos += child.Height;
+                    lastLayoutPos += child.Height;
                 }
 
                 break;
             case GuiLayoutMode.AlignCenter:
 
-                _lastLayoutPos = (Height / 2) - (totalHeight / 2);
+                lastLayoutPos = (Height / 2) - (totalHeight / 2);
 
                 for (var i = 0; i < Children.Count; ++i)
                 {
                     var child = Children[i];
 
-                    child.SetPosition(Padding, _lastLayoutPos + (Spacing * i));
+                    if (child.Anchor != GuiAnchoring.None)
+                    {
+                        continue;
+                    }
+
+                    child.SetPosition(Padding, lastLayoutPos + (Spacing * i));
                     child.Resize(Width - (2 * Padding), child.Height);
 
-                    _lastLayoutPos += child.Height;
+                    lastLayoutPos += child.Height;
                 }
 
                 break;
             case GuiLayoutMode.AlignEnd:
 
-                _lastLayoutPos = Height - Padding - totalHeight;
+                lastLayoutPos = Height - Padding - totalHeight;
 
                 for (var i = 0; i < Children.Count; ++i)
                 {
                     var child = Children[i];
 
-                    child.SetPosition(Padding, _lastLayoutPos + (Spacing * i));
+                    if (child.Anchor != GuiAnchoring.None)
+                    {
+                        continue;
+                    }
+
+                    child.SetPosition(Padding, lastLayoutPos + (Spacing * i));
                     child.Resize(Width - (2 * Padding), child.Height);
 
-                    _lastLayoutPos += child.Height;
+                    lastLayoutPos += child.Height;
                 }
 
                 break;
@@ -76,15 +102,19 @@ public class GuiVerticalLayout : GuiLayout
                 {
                     var child = Children[i];
 
-                    child.SetPosition(Padding, Padding + _lastLayoutPos + (Spacing * i));
+                    if (child.Anchor != GuiAnchoring.None)
+                    {
+                        continue;
+                    }
+
+                    child.SetPosition(Padding, Padding + lastLayoutPos + (Spacing * i));
                     child.Resize(Width - (2 * Padding), height);
 
-                    _lastLayoutPos += height;
+                    lastLayoutPos += height;
                 }
 
                 break;
         }
-    }
 
-    private int _lastLayoutPos;
+    }
 }

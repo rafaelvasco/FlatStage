@@ -1,7 +1,9 @@
+using FlatStage.Content;
 using System;
 using System.Numerics;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace FlatStage.Graphics;
 
@@ -9,6 +11,7 @@ namespace FlatStage.Graphics;
 /// Describes a 32-bit packed color.
 /// </summary>
 [Serializable]
+[JsonConverter(typeof(ColorJsonConverter))]
 public struct Color : IEquatable<Color>
 {
     static Color()
@@ -199,7 +202,7 @@ public struct Color : IEquatable<Color>
     {
         if ((alpha & 0xFFFFFF00) != 0)
         {
-            var clampedA = (uint)Calc.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
+            var clampedA = (uint)MathUtils.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
 
             _packedValue = (color._packedValue & 0x00FFFFFF) | (clampedA << 24);
         }
@@ -254,9 +257,9 @@ public struct Color : IEquatable<Color>
 
         if (((r | g | b) & 0xFFFFFF00) != 0)
         {
-            var clampedR = (uint)Calc.Clamp(r, Byte.MinValue, Byte.MaxValue);
-            var clampedG = (uint)Calc.Clamp(g, Byte.MinValue, Byte.MaxValue);
-            var clampedB = (uint)Calc.Clamp(b, Byte.MinValue, Byte.MaxValue);
+            var clampedR = (uint)MathUtils.Clamp(r, Byte.MinValue, Byte.MaxValue);
+            var clampedG = (uint)MathUtils.Clamp(g, Byte.MinValue, Byte.MaxValue);
+            var clampedB = (uint)MathUtils.Clamp(b, Byte.MinValue, Byte.MaxValue);
 
             _packedValue |= (clampedB << 16) | (clampedG << 8) | (clampedR);
         }
@@ -277,10 +280,10 @@ public struct Color : IEquatable<Color>
     {
         if (((r | g | b | alpha) & 0xFFFFFF00) != 0)
         {
-            var clampedR = (uint)Calc.Clamp(r, Byte.MinValue, Byte.MaxValue);
-            var clampedG = (uint)Calc.Clamp(g, Byte.MinValue, Byte.MaxValue);
-            var clampedB = (uint)Calc.Clamp(b, Byte.MinValue, Byte.MaxValue);
-            var clampedA = (uint)Calc.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
+            var clampedR = (uint)MathUtils.Clamp(r, Byte.MinValue, Byte.MaxValue);
+            var clampedG = (uint)MathUtils.Clamp(g, Byte.MinValue, Byte.MaxValue);
+            var clampedB = (uint)MathUtils.Clamp(b, Byte.MinValue, Byte.MaxValue);
+            var clampedA = (uint)MathUtils.Clamp(alpha, Byte.MinValue, Byte.MaxValue);
 
             _packedValue = (clampedA << 24) | (clampedB << 16) | (clampedG << 8) | (clampedR);
         }
@@ -1710,12 +1713,12 @@ public struct Color : IEquatable<Color>
     /// <returns>Interpolated <see cref="Color"/>.</returns>
     public static Color Lerp(Color value1, Color value2, Single amount)
     {
-        amount = Calc.Clamp(amount, 0, 1);
+        amount = MathUtils.Clamp(amount, 0, 1);
         return new Color(
-            (int)Calc.Lerp(value1.R, value2.R, amount),
-            (int)Calc.Lerp(value1.G, value2.G, amount),
-            (int)Calc.Lerp(value1.B, value2.B, amount),
-            (int)Calc.Lerp(value1.A, value2.A, amount));
+            MathUtils.Interpolate(value1.R, value2.R, amount),
+            MathUtils.Interpolate(value1.G, value2.G, amount),
+            MathUtils.Interpolate(value1.B, value2.B, amount),
+            MathUtils.Interpolate(value1.A, value2.A, amount));
     }
 
     /// <summary>
@@ -1908,5 +1911,55 @@ public struct Color : IEquatable<Color>
     public static implicit operator Color(uint value)
     {
         return new Color(value);
+    }
+
+    public static Color FromHex(ReadOnlySpan<char> hex)
+    {
+        if (hex.Length > 0 && hex[0] == '#')
+        {
+            hex = hex.Slice(1);
+        }
+
+        if (hex.Length == 6) //RRGGBB
+        {
+            uint hexInt = (uint)HexStringConverter.HexStringToInt(hex);
+
+            uint abgr =
+
+                (255u << 24) |
+                ((hexInt & 0x000000ffu) << 16) |
+                (hexInt & 0x0000ff00u) |
+                ((hexInt & 0x00ff0000u) >> 16);
+
+            return new Color(abgr);
+        }
+        else if (hex.Length == 8) //RRGGBBAA
+        {
+            uint hexInt = (uint)HexStringConverter.HexStringToInt(hex);
+
+            uint abgr =
+                ((hexInt & 0x000000ffu) << 24) |
+                ((hexInt & 0x0000ff00u) << 8) |
+                ((hexInt & 0x00ff0000u) >> 8) |
+                ((hexInt & 0xff000000u) >> 24);
+
+            return new Color(abgr);
+        }
+        else
+        {
+            throw new Exception("Invalid Color Hex Format");
+        }
+    }
+
+    public string ToHex()
+    {
+        uint hexInt = ((uint)R << 24) | ((uint)G << 16) | ((uint)B << 8) | (uint)A;
+        return HexStringConverter.ToHex(hexInt, 8);
+    }
+
+    public int ToHex(Span<char> str)
+    {
+        uint hexInt = ((uint)R << 24) | ((uint)G << 16) | ((uint)B << 8) | (uint)A;
+        return HexStringConverter.ToHex(hexInt, str, 8);
     }
 }

@@ -405,10 +405,10 @@ public struct GamePadThumbSticks
 
     private void ApplySquareClamp()
     {
-        _left.X = Calc.Clamp(_left.X, -1.0f, 1.0f);
-        _left.Y = Calc.Clamp(_left.Y, -1.0f, 1.0f);
-        _right.X = Calc.Clamp(_right.X, -1.0f, 1.0f);
-        _right.Y = Calc.Clamp(_right.Y, -1.0f, 1.0f);
+        _left.X = MathUtils.Clamp(_left.X, -1.0f, 1.0f);
+        _left.Y = MathUtils.Clamp(_left.Y, -1.0f, 1.0f);
+        _right.X = MathUtils.Clamp(_right.X, -1.0f, 1.0f);
+        _right.Y = MathUtils.Clamp(_right.Y, -1.0f, 1.0f);
     }
 
     private void ApplyCircularClamp()
@@ -492,8 +492,8 @@ public readonly struct GamePadTriggers
 
     public GamePadTriggers(float leftTrigger, float rightTrigger)
     {
-        Left = Calc.Clamp(leftTrigger, 0.0f, 1.0f);
-        Right = Calc.Clamp(rightTrigger, 0.0f, 1.0f);
+        Left = MathUtils.Clamp(leftTrigger, 0.0f, 1.0f);
+        Right = MathUtils.Clamp(rightTrigger, 0.0f, 1.0f);
     }
 
     internal GamePadTriggers(
@@ -508,12 +508,12 @@ public readonly struct GamePadTriggers
          */
         if (deadZoneMode == GamePadDeadZone.None)
         {
-            Left = Calc.Clamp(leftTrigger, 0.0f, 1.0f);
-            Right = Calc.Clamp(rightTrigger, 0.0f, 1.0f);
+            Left = MathUtils.Clamp(leftTrigger, 0.0f, 1.0f);
+            Right = MathUtils.Clamp(rightTrigger, 0.0f, 1.0f);
         }
         else
         {
-            Left = Calc.Clamp(
+            Left = MathUtils.Clamp(
                 Gamepad.ExcludeAxisDeadZone(
                     leftTrigger,
                     Gamepad.TriggerThreshold
@@ -521,7 +521,7 @@ public readonly struct GamePadTriggers
                 0.0f,
                 1.0f
             );
-            Right = Calc.Clamp(
+            Right = MathUtils.Clamp(
                 Gamepad.ExcludeAxisDeadZone(
                     rightTrigger,
                     Gamepad.TriggerThreshold
@@ -544,8 +544,8 @@ public readonly struct GamePadTriggers
     /// </returns>
     public static bool operator ==(GamePadTriggers left, GamePadTriggers right)
     {
-        return ((Calc.ApproximatelyEqual(left.Left, right.Left)) &&
-                (Calc.ApproximatelyEqual(left.Right, right.Right)));
+        return ((MathUtils.ApproximatelyEqual(left.Left, right.Left)) &&
+                (MathUtils.ApproximatelyEqual(left.Right, right.Right)));
     }
 
     /// <summary>

@@ -1,7 +1,6 @@
-using FlatStage.ContentPipeline;
+using FlatStage.Content;
 using System;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace FlatStage.Graphics;
 
@@ -56,19 +55,19 @@ public class Canvas
     {
         _instance = this;
 
-        if (!Calc.IsPowerOfTwo(maxQuads))
+        if (!MathUtils.IsPowerOfTwo(maxQuads))
         {
-            maxQuads = Calc.NextPowerOfTwo(maxQuads);
+            maxQuads = MathUtils.NextPowerOfTwo(maxQuads);
         }
 
         GraphicsContext.BackBufferSizeChanged = CalculateSizeFromDisplaySize;
 
-        _width = Stage.Settings.CanvasWidth;
-        _height = Stage.Settings.CanvasHeight;
+        _width = Game.Instance.Settings.CanvasWidth;
+        _height = Game.Instance.Settings.CanvasHeight;
 
         _quadBatcher = new QuadBatcher(maxQuads);
 
-        _defaultShader = Content.Get<ShaderProgram>("canvas2d", embeddedAsset: true);
+        _defaultShader = Assets.Get<ShaderProgram>("canvas2d", embeddedAsset: true);
 
         _primitiveTexture = GraphicsContext.CreateTexture("primitiveTex", new TextureProps()
         {
@@ -92,7 +91,7 @@ public class Canvas
 
         _transformMatrix = Matrix.Identity;
 
-        CalculateSizeFromDisplaySize(Stage.WindowSize.Width, Stage.WindowSize.Height);
+        CalculateSizeFromDisplaySize(Game.WindowSize.Width, Game.WindowSize.Height);
     }
 
     #region SET_STATE
@@ -109,7 +108,19 @@ public class Canvas
     {
         Submit();
 
-        _renderPass++;
+        if (viewport != null)
+        {
+            _renderPass++;
+        }
+        else
+        {
+            _renderPass = 0;
+        }
+
+        if (_renderPass > _maxRenderPass)
+        {
+            _maxRenderPass = _renderPass;
+        }
 
         if (viewport != null)
         {
@@ -120,9 +131,8 @@ public class Canvas
             _currentViewport = _mainViewport;
         }
 
-        GraphicsContext.Touch(_renderPass);
-        GraphicsContext.SetViewClear(_renderPass, _currentViewport.BackgroundColor);
         GraphicsContext.SetRenderTarget(_renderPass, _currentViewport.RenderTarget);
+        GraphicsContext.SetViewClear(_renderPass, _currentViewport.BackgroundColor);
         GraphicsContext.SetViewRect(_renderPass, 0, 0, _currentViewport.Width, _currentViewport.Height);
         GraphicsContext.SetViewTransform(_renderPass, _transformMatrix, _currentViewport.ProjectionMatrix);
     }
@@ -182,7 +192,7 @@ public class Canvas
 
         float dx, dy, w, h;
 
-        if (textureRegion.HasValue)
+        if (!srcRect.IsEmpty)
         {
             _texCoordTL.X = srcRect.X * texture.TexelWidth;
             _texCoordTL.Y = srcRect.Y * texture.TexelHeight;
@@ -222,10 +232,10 @@ public class Canvas
     {
         CheckValid(texture);
 
-        if (textureRegion.HasValue)
-        {
-            var srcRect = textureRegion.GetValueOrDefault();
+        var srcRect = textureRegion.GetValueOrDefault();
 
+        if (!srcRect.IsEmpty)
+        {
             _texCoordTL.X = srcRect.X * texture.TexelWidth;
             _texCoordTL.Y = srcRect.Y * texture.TexelHeight;
             _texCoordBR.X = (srcRect.X + srcRect.Width) * texture.TexelWidth;
@@ -261,7 +271,7 @@ public class Canvas
         Vec2 origin,
         Vec2 scale,
         FlipMode flipMode,
-        float layerDepth
+        float depth
 
     )
     {
@@ -269,10 +279,10 @@ public class Canvas
 
         float w, h;
 
-        if (textureRegion.HasValue)
-        {
-            var srcRect = textureRegion.GetValueOrDefault();
+        var srcRect = textureRegion.GetValueOrDefault();
 
+        if (!srcRect.IsEmpty)
+        {
             w = srcRect.Width * scale.X;
             h = srcRect.Height * scale.Y;
 
@@ -317,7 +327,7 @@ public class Canvas
                 color,
                 _texCoordTL,
                 _texCoordBR,
-                layerDepth
+                depth
             );
             PushQuad(texture, ref quad);
             return;
@@ -329,14 +339,14 @@ public class Canvas
                 position.Y,
                 dx,
                 dy,
-                w * scale.X,
-                h * scale.Y,
-                Calc.Sin(rotation),
-                Calc.Cos(rotation),
+                w,
+                h,
+                MathUtils.FastSin(rotation),
+                MathUtils.FastCos(rotation),
                 color,
                 _texCoordTL,
                 _texCoordBR,
-                layerDepth
+                depth
             );
             PushQuad(texture, ref quad);
             return;
@@ -345,31 +355,8 @@ public class Canvas
     #endregion
 
     #region TEXT_DRAW
-    public void DrawText(TextureFont font, string text, Vec2 position, Color color)
-    {
-        var charSource = new CharSource(text);
-        DrawText(font, in charSource, position, color);
-    }
 
-    public void DrawText(TextureFont font, string text, Vec2 position, Vec2 scale, Color color)
-    {
-        var charSource = new CharSource(text);
-        DrawText(font, in charSource, position, scale, color);
-    }
-
-    public void DrawText(TextureFont font, StringBuilder text, Vec2 position, Color color)
-    {
-        var charSource = new CharSource(text);
-        DrawText(font, in charSource, position, color);
-    }
-
-    public void DrawText(TextureFont font, StringBuilder text, Vec2 position, Vec2 scale, Color color)
-    {
-        var charSource = new CharSource(text);
-        DrawText(font, in charSource, position, scale, color);
-    }
-
-    internal unsafe void DrawText(TextureFont font, in CharSource text, Vec2 position, Color color)
+    public unsafe void DrawText(TextureFont font, ReadOnlySpan<char> text, Vec2 position, Color color)
     {
         CheckValid(font, text);
 
@@ -390,7 +377,7 @@ public class Canvas
                 if (c == '\n')
                 {
                     offset.X = 0;
-                    offset.Y = font.LineSpacing;
+                    offset.Y += font.LineSpacing;
                     firstGlyphOfLine = true;
                     continue;
                 }
@@ -404,7 +391,7 @@ public class Canvas
                 //  so that text does not hang off the left side of its rectangle.
                 if (firstGlyphOfLine)
                 {
-                    offset.X = Calc.Max(currentGlyphPtr->LeftSideBearing, 0);
+                    offset.X = MathUtils.Max(currentGlyphPtr->LeftSideBearing, 0);
                     firstGlyphOfLine = false;
                 }
                 else
@@ -442,7 +429,7 @@ public class Canvas
 
     }
 
-    internal unsafe void DrawText(TextureFont font, in CharSource text, Vec2 position, Vec2 scale, Color color)
+    public unsafe void DrawText(TextureFont font, ReadOnlySpan<char> text, Vec2 position, Vec2 scale, Color color)
     {
         CheckValid(font, text);
 
@@ -484,7 +471,7 @@ public class Canvas
                 //  so that text does not hang off the left side of its rectangle.
                 if (firstGlyphOfLine)
                 {
-                    offset.X = Calc.Max(currentGlyphPtr->LeftSideBearing, 0);
+                    offset.X = MathUtils.Max(currentGlyphPtr->LeftSideBearing, 0);
                     firstGlyphOfLine = false;
                 }
                 else
@@ -552,6 +539,8 @@ public class Canvas
     {
         _renderPass = 0;
 
+        _maxRenderPass = 0;
+
         _drawCalls = 0;
 
         SetViewport();
@@ -561,7 +550,7 @@ public class Canvas
     {
         Submit();
 
-        _renderPass++;
+        _renderPass = (ushort)(_maxRenderPass + 1);
 
         RenderMainViewport();
     }
@@ -570,7 +559,7 @@ public class Canvas
     {
         GraphicsContext.SetViewClear(_renderPass, Color.Black);
         GraphicsContext.SetRenderTarget(_renderPass);
-        GraphicsContext.SetViewRect(_renderPass, 0, 0, Stage.WindowSize.Width, Stage.WindowSize.Height);
+        GraphicsContext.SetViewRect(_renderPass, 0, 0, Game.WindowSize.Width, Game.WindowSize.Height);
         GraphicsContext.SetViewTransform(_renderPass, Matrix.Identity, _mainProjectionMatrix);
 
         var quad = BuildQuad(
@@ -599,7 +588,7 @@ public class Canvas
             throw new ArgumentNullException("texture");
     }
 
-    private static void CheckValid(TextureFont font, in CharSource? text)
+    private static void CheckValid(TextureFont font, ReadOnlySpan<char> text)
     {
         if (font == null)
             throw new ArgumentNullException("font");
@@ -795,8 +784,8 @@ public class Canvas
                     float aspectRatioCanvas = (float)Width / Height;
                     float aspectRatioDisplay = (float)displayWidth / displayHeight;
 
-                    int scaleW = (int)Calc.Round((float)displayWidth / Width);
-                    int scaleH = (int)Calc.Round((float)displayHeight / Height);
+                    int scaleW = (int)MathF.Round((float)displayWidth / Width);
+                    int scaleH = (int)MathF.Round((float)displayHeight / Height);
 
                     if (aspectRatioDisplay > aspectRatioCanvas)
                     {
@@ -820,18 +809,6 @@ public class Canvas
 
                     _viewportScaleX = scaleW;
                     _viewportScaleY = scaleH;
-
-                    Console.WriteLine($"Display Size: {displayWidth}, {displayHeight}");
-                    Console.WriteLine($"Canvas Size: {Width}, {Height}");
-                    Console.WriteLine($"AR Canvas: {aspectRatioCanvas}");
-                    Console.WriteLine($"AR Display: {aspectRatioDisplay}");
-
-                    Console.WriteLine($"ScaleW: {scaleW}");
-                    Console.WriteLine($"ScaleH: {scaleH}");
-
-                    Console.WriteLine($"MarginX: {marginX}");
-                    Console.WriteLine($"MarginY: {marginY}");
-
                 }
                 else
                 {
@@ -866,18 +843,6 @@ public class Canvas
 
                     _viewportScaleX = scaleW;
                     _viewportScaleY = scaleH;
-
-                    Console.WriteLine($"Display Size: {displayWidth}, {displayHeight}");
-                    Console.WriteLine($"Canvas Size: {Width}, {Height}");
-                    Console.WriteLine($"AR Canvas: {aspectRatioCanvas}");
-                    Console.WriteLine($"AR Display: {aspectRatioDisplay}");
-
-                    Console.WriteLine($"ScaleW: {scaleW}");
-                    Console.WriteLine($"ScaleH: {scaleH}");
-
-                    Console.WriteLine($"MarginX: {marginX}");
-                    Console.WriteLine($"MarginY: {marginY}");
-
                 }
                 else
                 {
@@ -906,6 +871,7 @@ public class Canvas
     private float _viewportScaleY = 1.0f;
 
     private ushort _renderPass = 0;
+    private ushort _maxRenderPass = 0;
 
     private Vec2 _texCoordTL = new();
     private Vec2 _texCoordBR = new();

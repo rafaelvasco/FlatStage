@@ -98,7 +98,7 @@ public class TetrisController
         {
             _ticks += TickIncrease;
 
-            float delay = Calc.Max(MinDelay, MaxDelay - (Score * DelayDecrease));
+            float delay = MathUtils.Max(MinDelay, MaxDelay - (Score * DelayDecrease));
 
             if (!(_ticks > delay)) return;
 
@@ -166,7 +166,7 @@ public class TetrisController
                 }
         }
 
-        index = Calc.Clamp(index, 0, _mainMenuItems.Length - 1);
+        index = MathUtils.Clamp(index, 0, _mainMenuItems.Length - 1);
 
         _lastHoveredMenuIndex = _currentHoveredMenuIndex;
 
@@ -303,7 +303,7 @@ public class TetrisController
 
         foreach (GridPos p in CurrentBlock.TilePositions())
         {
-            drop = Calc.Min(drop, TileDropDistance(CurrentBlock, p));
+            drop = MathUtils.Min(drop, TileDropDistance(CurrentBlock, p));
         }
 
         return drop;

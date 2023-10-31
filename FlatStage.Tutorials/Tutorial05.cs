@@ -5,34 +5,26 @@ using System;
 namespace FlatStage.Tutorials;
 public class Tutorial05 : BaseTutorial
 {
-    private readonly Gui _gui;
+    private Gui _gui = null!;
 
     public override void Load()
     {
-
-    }
-
-    public Tutorial05(string name) : base(name)
-    {
         _gui = new Gui();
 
-        var container = new GuiPanel("panel", _gui);
+        var container = new GuiPanel("panel", _gui, _gui.Desktop)
+        {
+            Padding = 5
+        };
 
-        var layout = new GuiVerticalLayout("verticalLayout", _gui, container);
+        var layout = new GuiVerticalLayout("mainLayout", _gui, container);
 
         container.Resize(300, 500);
 
-        container.SetPosition(
-            (_gui.Width / 2) - (container.Width / 2),
-            (_gui.Height / 2) - (container.Height / 2)
-        );
-
-        layout.SetPosition(1, 1);
-
-        layout.Resize(container.Width - 2, container.Height - 2);
+        container.Anchor = GuiAnchoring.Center;
 
         layout.Spacing = 4;
-        layout.Padding = 10;
+
+        layout.Anchor = GuiAnchoring.Fill;
 
         var button = new GuiButton("button", _gui, layout);
 
@@ -55,6 +47,10 @@ public class Tutorial05 : BaseTutorial
         var slider1 = new GuiSlider("slider", _gui, layout);
 
         var textbox = new GuiTextbox("textbox", _gui, layout);
+    }
+
+    public Tutorial05(string name) : base(name)
+    {
 
     }
 
@@ -63,9 +59,12 @@ public class Tutorial05 : BaseTutorial
         _gui.Update(dt);
     }
 
-    public override void Draw(Canvas canvas, float dt)
+    public override void Draw(Canvas canvas)
     {
         _gui.Draw(canvas);
     }
 
+    public override void Update(float dt)
+    {
+    }
 }

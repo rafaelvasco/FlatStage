@@ -3,17 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34003.232
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlatStage", "FlatStage\FlatStage.csproj", "{BB4AC731-56FB-499E-9034-2FFC1ABD3B99}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlatStage.Engine", "FlatStage\FlatStage.Engine.csproj", "{BB4AC731-56FB-499E-9034-2FFC1ABD3B99}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlatStage.Tutorials", "FlatStage.Tutorials\FlatStage.Tutorials.csproj", "{5C935D02-DEF1-4FF3-940F-1A24EABF083B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlatStage.Core.Tutorials", "FlatStage.Tutorials\FlatStage.Core.Tutorials.csproj", "{5C935D02-DEF1-4FF3-940F-1A24EABF083B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlatStage.Editor", "FlatStage.Editor\FlatStage.Editor.csproj", "{E2B04419-892F-4FC8-983C-78B65EDE68D2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{95FB25E7-8B53-49C6-852E-D8538F8B71FA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Games", "Games", "{95FB25E7-8B53-49C6-852E-D8538F8B71FA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlatStage.Demos.Tetris", "FlatStage.Demos.Tetris\FlatStage.Demos.Tetris.csproj", "{42C34973-2E57-461E-859A-C41B12CD07D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlatStage.Games.Tetris", "FlatStage.Demos.Tetris\FlatStage.Games.Tetris.csproj", "{42C34973-2E57-461E-859A-C41B12CD07D7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlatStage.Player", "FlatStage.Player\FlatStage.Player.csproj", "{3E482C38-4704-4305-9FBB-A515E713B7E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlatStage.Toolkit.Tutorials", "FlatStage.Toolkit.Tutorials\FlatStage.Toolkit.Tutorials.csproj", "{BB5CC2BB-E539-4F60-95E6-461E72D6B4D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,10 @@ Global
 		{3E482C38-4704-4305-9FBB-A515E713B7E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E482C38-4704-4305-9FBB-A515E713B7E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E482C38-4704-4305-9FBB-A515E713B7E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB5CC2BB-E539-4F60-95E6-461E72D6B4D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB5CC2BB-E539-4F60-95E6-461E72D6B4D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB5CC2BB-E539-4F60-95E6-461E72D6B4D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB5CC2BB-E539-4F60-95E6-461E72D6B4D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

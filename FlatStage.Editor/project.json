@@ -1,0 +1,79 @@
+{
+  "GameSettings": {
+    "AppTitle": "FlatStage Editor",
+    "CanvasWidth": 1024,
+    "CanvasHeight": 768
+  },
+  "Gui": {
+    "Main": {
+      "Id":  "Main",
+      "Children": [
+        {
+          "$type": "window",
+          "Id": "aboutWindow",
+          "Title": "About",
+          "TitleHorizontalAlignment": "Left",
+          "TitleVerticalAlignment": "Center",
+          "Children": [
+            {
+              "$type": "text",
+              "Id": "aboutWindowText",
+              "Text": "FlatStage Editor V0.1",
+              "Anchor": "Fill",
+              "HorizontalAlign": "Center",
+              "VerticalAlign":  "Top"
+            }
+          ]
+        },
+        {
+          "$type": "menubar",
+          "Id": "menuBar",
+          "Height":  35,
+          "MenuItems": [
+            {
+              "Id": "project",
+              "Label": "PROJECT",
+              "SubMenuItems": [
+                {
+                  "Id": "newProject",
+                  "Label": "NEW"
+                },
+                {
+                  "Id": "save",
+                  "Label": "SAVE"
+                },
+                {
+                  "Id": "saveAs",
+                  "Label": "SAVE AS"
+                },
+                {
+                  "Id": "quit",
+                  "Label": "QUIT"
+                }
+              ]
+            },
+            {
+              "Id": "help",
+              "Label": "HELP",
+              "SubMenuItems": [
+                {
+                  "Id": "about",
+                  "Label": "ABOUT"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "StartingScene": "Main",
+  "Scenes": [
+    {
+      "Name": "Main",
+      "Children": [
+        
+      ]
+    }
+  ]
+}

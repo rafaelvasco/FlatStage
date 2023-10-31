@@ -1,16 +1,23 @@
 ﻿using FlatStage.Graphics;
 using FlatStage.Input;
+using System;
 
 namespace FlatStage.Toolkit;
 
 public delegate void MouseButtonEventHandler(MouseButton mouseButton);
 public delegate void MouseMoveEventHandler(int x, int y);
 
-public abstract class GuiControl
+public abstract class GuiControl : BaseGameEntity
 {
+    internal static int SBTypeId = 0;
+
+    internal abstract int TypeId { get; }
+
     public event MouseButtonEventHandler? OnMouseDown;
     public event MouseButtonEventHandler? OnMouseUp;
     public event MouseMoveEventHandler? OnMouseMove;
+    public event EventHandler? OnMouseEntered;
+    public event EventHandler? OnMouseExited;
 
     public string Id { get; private set; }
 
@@ -19,11 +26,23 @@ public abstract class GuiControl
     public int Width { get; internal set; }
     public int Height { get; internal set; }
 
-    public int Depth { get; internal set; }
+    public int ZIndex
+    {
+        get => _zIndex;
+        set
+        {
+            if (_zIndex != value)
+            {
+                _zIndex = value;
+
+                Gui.InvalidateZIndexes();
+            }
+        }
+    }
 
     public bool ProcessUpdate { get; set; } = false;
 
-    public bool TrackInputOutsideArea { get; set; } = false;
+    public GuiMouseMoveEventBehavior MouseMoveEventBehavior { get; set; } = GuiMouseMoveEventBehavior.MouseDown;
 
     public bool ReceiveTextInputEvents { get; set; } = false;
 
@@ -64,50 +83,56 @@ public abstract class GuiControl
 
     public bool Focused { get; internal set; }
 
+    public bool MouseFocused { get; internal set; }
+
     public bool FixedSize { get; set; }
+
+    public bool Hidden { get; set; } = false;
+
+    internal bool GlobalHidden => (Parent?.GlobalHidden ?? false) | Hidden;
+
+    public bool Interactive { get; set; } = true;
 
     public Rect BoundingRect => new(GlobalX, GlobalY, Width, Height);
 
-    internal int LayoutWidth { get; set; }
-
-    internal int LayoutHeight { get; set; }
-
-    public GuiDocking Docking
+    public GuiAnchoring Anchor
     {
-        get => _docking;
+        get => _anchor;
         set
         {
-            if (value != _docking)
+            if (value != _anchor)
             {
-                _docking = value;
-
+                _anchor = value;
+                Gui.InvalidateLayout();
             }
         }
     }
 
-    public GuiControl? Parent
+    public GuiContainer? Parent
     {
         get => _parent;
-        set
+        internal set
         {
             if (_parent != value)
             {
+                _parent?.Remove(this);
                 _parent = value;
-                _parent?.InternalProcessChildAdded(this);
-                RecalculateDepth(this);
+                _parent?.Add(this);
+                RecalculateZIndex(this);
             }
         }
     }
 
-    protected GuiControl(string id, Gui gui, GuiControl? parent = null)
+    protected GuiControl(string id, Gui gui, GuiContainer? parent)
     {
         Id = id;
         Gui = gui;
-        Parent = parent;
         Width = SizeHint.Width;
         Height = SizeHint.Height;
 
-        Gui.Register(this);
+        Parent = parent;
+
+        gui.RegisterControl(this);
     }
 
     public void SetPosition(int x, int y)
@@ -132,6 +157,17 @@ public abstract class GuiControl
         Height = height;
 
         OnResize(width, height);
+
+        Gui.InvalidateLayout();
+    }
+
+    public void AddInteraction<T>() where T : GuiInteraction
+    {
+        _customInteractions ??= new ComponentsRegistry<GuiInteraction>(this);
+
+        var interaction = (Activator.CreateInstance(typeof(T), this) as GuiInteraction)!;
+
+        _customInteractions.AddComponent(interaction);
     }
 
     public virtual bool ContainsPoint(int x, int y)
@@ -139,9 +175,22 @@ public abstract class GuiControl
         return BoundingRect.Contains(x, y);
     }
 
-    protected (int X, int Y) ToLocalPos(int x, int y)
+    internal virtual void InitFromDefinition(GuiControlDef definition)
     {
-        return (x - GlobalX, y - GlobalY);
+        X = definition.X;
+        Y = definition.Y;
+
+        if (definition.Width > 0)
+        {
+            Width = definition.Width;
+        }
+
+        if (definition.Height > 0)
+        {
+            Height = definition.Height;
+        }
+
+        Anchor = definition.Anchor;
     }
 
     internal bool InternalProcessMouseButton(GuiMouseState mouseState)
@@ -155,14 +204,56 @@ public abstract class GuiControl
             OnMouseUp?.Invoke(mouseState.LastMouseButton);
         }
 
-        return ProcessMouseButton(mouseState);
+        bool changed = false;
+
+        if (_customInteractions != null)
+        {
+            var interactions = _customInteractions.AllComponents.ReadOnlySpan;
+
+            foreach (var interaction in interactions)
+            {
+                changed |= interaction.ProcessMouseButton(mouseState);
+            }
+        }
+
+        changed |= ProcessMouseButton(mouseState);
+
+        return changed;
     }
 
     internal bool InternalProcessMouseMove(GuiMouseState mouseState)
     {
         OnMouseMove?.Invoke(mouseState.MouseX, mouseState.MouseY);
 
-        return ProcessMouseMove(mouseState);
+        bool changed = false;
+
+        if (_customInteractions != null)
+        {
+            var interactions = _customInteractions.AllComponents.ReadOnlySpan;
+
+            foreach (var interaction in interactions)
+            {
+                changed |= interaction.ProcessMouseMove(mouseState);
+            }
+        }
+
+        changed |= ProcessMouseMove(mouseState);
+
+        return changed;
+    }
+
+    internal void InternalProcessMouseEntered()
+    {
+        OnMouseEntered?.Invoke(this, EventArgs.Empty);
+
+        ProcessMouseEntered();
+    }
+
+    internal void InternalProcessMouseExited()
+    {
+        OnMouseExited?.Invoke(this, EventArgs.Empty);
+
+        ProcessMouseExited();
     }
 
     internal void InternalProcessFocusChanged(bool focused)
@@ -172,19 +263,10 @@ public abstract class GuiControl
         ProcessFocusChanged(focused);
     }
 
-    internal bool InternalProcessUpdate(float dt)
+    internal void InternalProcessMouseFocusChanged(bool focused)
     {
-        return Update(dt);
-    }
-
-    internal void InternalProcessDraw(Canvas canvas, GuiSkin skin)
-    {
-        Draw(canvas, skin);
-    }
-
-    internal void InternalProcessChildAdded(GuiControl control)
-    {
-        OnChildAdded(control);
+        MouseFocused = focused;
+        ProcessMouseFocusChanged(focused);
     }
 
     internal bool InternalProcessKeyboardKey(Key key, bool down)
@@ -197,11 +279,14 @@ public abstract class GuiControl
         return ProcessTextInput(args);
     }
 
-    protected virtual void OnChildAdded(GuiControl control) { }
+    internal virtual bool Update(float dt) { return false; }
 
-    protected virtual bool Update(float dt) { return false; }
+    internal virtual void Draw(Canvas canvas, GuiSkin skin) { }
 
-    protected virtual void Draw(Canvas canvas, GuiSkin skin) { }
+    protected (int X, int Y) ToLocalPos(int x, int y)
+    {
+        return (x - GlobalX, y - GlobalY);
+    }
 
     protected virtual void OnResize(int width, int height) { }
 
@@ -211,18 +296,26 @@ public abstract class GuiControl
 
     protected virtual bool ProcessMouseMove(GuiMouseState mouseState) { return false; }
 
+    protected virtual void ProcessMouseEntered() { }
+
+    protected virtual void ProcessMouseExited() { }
+
     protected virtual void ProcessFocusChanged(bool focused) { }
+
+    protected virtual void ProcessMouseFocusChanged(bool focused) { }
 
     protected virtual bool ProcessTextInput(TextInputEventArgs args) { return false; }
 
-    private void RecalculateDepth(GuiControl control)
+    private void RecalculateZIndex(GuiControl control)
     {
         if (control.Parent == null) return;
-        Depth++;
-        RecalculateDepth(control.Parent);
+        _zIndex++;
+        RecalculateZIndex(control.Parent);
     }
 
-    private GuiControl? _parent;
+    private ComponentsRegistry<GuiInteraction>? _customInteractions;
+    private int _zIndex;
+    private GuiContainer? _parent;
     protected readonly Gui Gui;
-    private GuiDocking _docking;
+    private GuiAnchoring _anchor;
 }

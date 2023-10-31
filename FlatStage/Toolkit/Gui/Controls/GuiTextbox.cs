@@ -1,10 +1,21 @@
 ﻿using FlatStage.Graphics;
 using FlatStage.Input;
-using System.Text;
+using System;
 
 namespace FlatStage.Toolkit;
 public class GuiTextbox : GuiControl
 {
+    internal static readonly int STypeId;
+
+    static GuiTextbox()
+    {
+        STypeId = ++SBTypeId;
+    }
+
+    internal override int TypeId => STypeId;
+
+    internal const string CaretCustomElementId = "Caret";
+
     public int CaretDelay
     {
         get => _tickDelay;
@@ -19,14 +30,14 @@ public class GuiTextbox : GuiControl
         }
     }
 
-    internal StringBuilder InternalText => _text;
+    internal ReadOnlySpan<char> InternalText => _text.ReadOnlySpan;
     internal bool ShowCursor => _showCursor && SelectionStartIndex == SelectionEndIndex;
 
     internal int CaretOffset => _caretOffset;
 
-    internal int SelectionStartIndex => _tempSelectionStartIndex != -1 ? Calc.Min(_tempSelectionStartIndex, _tempSelectionEndIndex) : _selectionStartIndex;
+    internal int SelectionStartIndex => _tempSelectionStartIndex != -1 ? MathUtils.Min(_tempSelectionStartIndex, _tempSelectionEndIndex) : _selectionStartIndex;
 
-    internal int SelectionEndIndex => _tempSelectionEndIndex != -1 ? Calc.Max(_tempSelectionStartIndex, _tempSelectionEndIndex) : _selectionEndIndex;
+    internal int SelectionEndIndex => _tempSelectionEndIndex != -1 ? MathUtils.Max(_tempSelectionStartIndex, _tempSelectionEndIndex) : _selectionEndIndex;
 
     internal bool SelectionEmpty => _selectionStartIndex == _selectionEndIndex;
 
@@ -34,17 +45,25 @@ public class GuiTextbox : GuiControl
     internal const int CaretHeight = 30;
     internal const int Padding = 10;
 
-    public GuiTextbox(string id, Gui gui, GuiControl? parent = null) : base(id, gui, parent)
+    public GuiTextbox(string id, Gui gui, GuiContainer? parent = null) : base(id, gui, parent)
     {
-        _text = new StringBuilder();
+        _text = new StringBuffer();
 
         CanGetFocus = true;
 
         ProcessUpdate = true;
 
         ReceiveTextInputEvents = true;
+    }
 
-        TrackInputOutsideArea = true;
+    internal override void InitFromDefinition(GuiControlDef definition)
+    {
+        base.InitFromDefinition(definition);
+
+        if (definition is GuiTextboxDef textBoxDef)
+        {
+            CaretDelay = textBoxDef.CaretDelay;
+        }
     }
 
     public override Size SizeHint => new(250, 40);
@@ -57,12 +76,12 @@ public class GuiTextbox : GuiControl
         {
             case Key.Left when down:
                 Select();
-                _caretOffset = Calc.Max(--_caretOffset, 0);
+                _caretOffset = MathUtils.Max(--_caretOffset, 0);
                 return true;
 
             case Key.Right when down:
                 Select();
-                _caretOffset = Calc.Min(++_caretOffset, _text!.Length);
+                _caretOffset = MathUtils.Min(++_caretOffset, _text!.Length);
                 return true;
 
             case Key.Home when down:
@@ -106,6 +125,15 @@ public class GuiTextbox : GuiControl
 
         if (mouseState.MouseButtonDown)
         {
+            Gui.MouseFocus(this);
+        }
+        else
+        {
+            Gui.MouseFocus(null);
+        }
+
+        if (mouseState.MouseButtonDown)
+        {
             _selecting = true;
 
             _showCursor = true;
@@ -140,7 +168,7 @@ public class GuiTextbox : GuiControl
 
         var textLocalX = localX - Padding;
 
-        var textSize = Gui.Skin.MeasureText(_text, _text.Length);
+        var textSize = Gui.Skin.MeasureText(_text.ReadOnlySpan, _text.Length);
 
         float percentage = textLocalX / textSize.X;
 
@@ -150,7 +178,7 @@ public class GuiTextbox : GuiControl
         {
             _caretOffset = newCaretOffset;
 
-            _caretOffset = Calc.Clamp(_caretOffset, 0, _text.Length);
+            _caretOffset = MathUtils.Clamp(_caretOffset, 0, _text.Length);
 
             return true;
         }
@@ -195,7 +223,7 @@ public class GuiTextbox : GuiControl
 
                 else if (_caretOffset < _text.Length)
                 {
-                    _text.Insert(_caretOffset, args.Character);
+                    _text.Insert(_caretOffset, new ReadOnlySpan<char>(args.Character));
                 }
 
                 _caretOffset++;
@@ -205,7 +233,7 @@ public class GuiTextbox : GuiControl
         return true;
     }
 
-    protected override bool Update(float dt)
+    internal override bool Update(float dt)
     {
         if (!Focused || !SelectionEmpty)
         {
@@ -244,18 +272,18 @@ public class GuiTextbox : GuiControl
         }
     }
 
-    protected override void Draw(Canvas canvas, GuiSkin skin)
+    internal override void Draw(Canvas canvas, GuiSkin skin)
     {
         skin.DrawTextbox(canvas, this);
     }
 
     private void Select(int start = 0, int end = 0)
     {
-        _selectionStartIndex = Calc.Min(start, end);
-        _selectionEndIndex = Calc.Max(start, end);
+        _selectionStartIndex = MathUtils.Min(start, end);
+        _selectionEndIndex = MathUtils.Max(start, end);
 
-        _selectionStartIndex = Calc.Max(_selectionStartIndex, 0);
-        _selectionEndIndex = Calc.Min(_selectionEndIndex, _text.Length);
+        _selectionStartIndex = MathUtils.Max(_selectionStartIndex, 0);
+        _selectionEndIndex = MathUtils.Min(_selectionEndIndex, _text.Length);
     }
 
     private void DeleteSelection()
@@ -290,7 +318,7 @@ public class GuiTextbox : GuiControl
         }
     }
 
-    private readonly StringBuilder _text;
+    private readonly StringBuffer _text;
 
     private bool _showCursor;
     private int _ticks;

@@ -41,7 +41,7 @@ internal static partial class PlatformContext
     public static Action WindowMinimized = null!;
     public static Action WindowRestored = null!;
 
-    private static void CreateWindow(StageSettings settings)
+    private static void CreateWindow(GameSettings settings)
     {
         var windowFlags =
             SDL_WindowFlags.SDL_WINDOW_HIDDEN |

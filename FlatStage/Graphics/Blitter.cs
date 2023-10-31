@@ -185,7 +185,7 @@ public static unsafe class Blitter
 
         if (ex < sx)
         {
-            Calc.Swap(ref ex, ref sx);
+            MathUtils.Swap(ref ex, ref sx);
         }
 
         ref var col = ref _drawColor;
@@ -285,7 +285,7 @@ public static unsafe class Blitter
     {
         CheckReady();
 
-        lineSize = Calc.Max(lineSize, 1);
+        lineSize = MathUtils.Max(lineSize, 1);
 
         if (lineSize == 1)
         {
@@ -309,8 +309,8 @@ public static unsafe class Blitter
 
         void OnePxLine()
         {
-            int dx = Calc.Abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-            int dy = -Calc.Abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+            int dx = MathUtils.Abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+            int dy = -MathUtils.Abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
             int err = dx + dy;
 
             while (true)
@@ -334,10 +334,10 @@ public static unsafe class Blitter
 
         void ThickLine()
         {
-            int dx = Calc.Abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-            int dy = Calc.Abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+            int dx = MathUtils.Abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+            int dy = MathUtils.Abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
             int err = dx - dy;
-            float ed = dx + dy == 0 ? 1 : Calc.Sqrt((float)dx * dx + (float)dy * dy);
+            float ed = dx + dy == 0 ? 1 : MathF.Sqrt((float)dx * dx + (float)dy * dy);
 
             for (lineSize = (lineSize + 1) / 2; ;)
             {
@@ -471,10 +471,10 @@ public static unsafe class Blitter
             var sr = *(ptrIdx + 2) + r;
             var sa = *(ptrIdx + 3) + a;
 
-            *ptrIdx = (byte)Calc.Clamp(sb, 0, 255);
-            *(ptrIdx + 1) = (byte)Calc.Clamp(sg, 0, 255);
-            *(ptrIdx + 2) = (byte)Calc.Clamp(sr, 0, 255);
-            *(ptrIdx + 3) = (byte)Calc.Clamp(sa, 0, 255);
+            *ptrIdx = (byte)MathUtils.Clamp(sb, 0, 255);
+            *(ptrIdx + 1) = (byte)MathUtils.Clamp(sg, 0, 255);
+            *(ptrIdx + 2) = (byte)MathUtils.Clamp(sr, 0, 255);
+            *(ptrIdx + 3) = (byte)MathUtils.Clamp(sa, 0, 255);
         }
     }
 
@@ -498,10 +498,10 @@ public static unsafe class Blitter
             var sr = *(ptrIdx + 2) * r;
             var sa = *(ptrIdx + 3) * a;
 
-            *ptrIdx = (byte)Calc.Clamp(sb, 0, 255);
-            *(ptrIdx + 1) = (byte)Calc.Clamp(sg, 0, 255);
-            *(ptrIdx + 2) = (byte)Calc.Clamp(sr, 0, 255);
-            *(ptrIdx + 3) = (byte)Calc.Clamp(sa, 0, 255);
+            *ptrIdx = (byte)MathUtils.Clamp(sb, 0, 255);
+            *(ptrIdx + 1) = (byte)MathUtils.Clamp(sg, 0, 255);
+            *(ptrIdx + 2) = (byte)MathUtils.Clamp(sr, 0, 255);
+            *(ptrIdx + 3) = (byte)MathUtils.Clamp(sa, 0, 255);
         }
     }
 

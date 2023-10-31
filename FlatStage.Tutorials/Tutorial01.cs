@@ -1,4 +1,4 @@
-﻿using FlatStage.ContentPipeline;
+﻿using FlatStage.Content;
 using FlatStage.Graphics;
 using FlatStage.Input;
 
@@ -44,7 +44,7 @@ public class Tutorial01 : BaseTutorial
         Canvas.SetViewRegion(new Rect(_x, _y, Canvas.Width, Canvas.Height));
     }
 
-    public override void Draw(Canvas canvas, float dt)
+    public override void Draw(Canvas canvas)
     {
         canvas.Draw(_texture!, new Vec2(Canvas.Width / 2f, Canvas.Height / 2f), new Vec2(0.5f, 0.5f), Color.White);
     }

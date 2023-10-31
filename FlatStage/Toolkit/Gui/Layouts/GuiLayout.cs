@@ -1,29 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace FlatStage.Toolkit;
-
-public enum GuiLayoutMode
+﻿namespace FlatStage.Toolkit;
+public abstract class GuiLayout : GuiContainer
 {
-    AlignStart,
-    AlignCenter,
-    AlignEnd,
-    Fill
-}
-
-public abstract class GuiLayout : GuiControl
-{
-    public int Padding
-    {
-        get => _padding;
-        set
-        {
-            if (_padding != value)
-            {
-                _padding = value;
-                Gui.InvalidateLayout();
-            }
-        }
-    }
 
     public int Spacing
     {
@@ -51,31 +28,22 @@ public abstract class GuiLayout : GuiControl
         }
     }
 
-    public List<GuiControl> Children => _children;
-
-    public GuiLayout(string id, Gui gui, GuiControl? parent = null) : base(id, gui, parent)
+    internal override void InitFromDefinition(GuiControlDef definition)
     {
+        base.InitFromDefinition(definition);
+
+        if (definition is GuiLayoutDef layoutDef)
+        {
+            Spacing = layoutDef.Spacing;
+            LayoutMode = layoutDef.LayoutMode;
+        }
+
     }
 
-    public override Size SizeHint => new(200, 200);
-
-    protected override void OnChildAdded(GuiControl control)
-    {
-        _children.Add(control);
-        Gui.InvalidateLayout();
-    }
-
-    protected override void OnResize(int width, int height)
-    {
-        Gui.InvalidateLayout();
-    }
-
-    internal abstract void ProcessLayout();
-
-    private GuiLayoutMode _layoutMode = GuiLayoutMode.AlignStart;
-    private int _padding = 0;
     private int _spacing = 0;
+    private GuiLayoutMode _layoutMode = GuiLayoutMode.AlignStart;
 
-    private readonly List<GuiControl> _children = new();
-
+    protected GuiLayout(string id, Gui gui, GuiContainer? parent) : base(id, gui, parent)
+    {
+    }
 }

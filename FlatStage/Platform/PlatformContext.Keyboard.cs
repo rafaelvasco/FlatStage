@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Text;
-
 using FlatStage.Input;
 using static FlatStage.Foundation.SDL2.SDL;
 
@@ -14,11 +13,11 @@ internal static partial class PlatformContext
 
     private static readonly HashSet<Key> KeyPressBuffer = new();
 
-    private static readonly Dictionary<int, Key> KeyMap;
+    private static readonly FastDictionary<int, Key> KeyMap;
 
     static PlatformContext()
     {
-        KeyMap = new Dictionary<int, Key>
+        KeyMap = new FastDictionary<int, Key>
         {
             { 8, Key.Back },
             { 9, Key.Tab },
