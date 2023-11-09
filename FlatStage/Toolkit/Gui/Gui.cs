@@ -103,6 +103,8 @@ public class Gui
 
         Mouse.OnMouseMove += ProcessMouseMoveEvent;
 
+        Mouse.OnMouseExited += ProcessMouseExitedEvent;
+
         Keyboard.OnKeyDown += (Key key) =>
         {
             ProcessKeyboardEvent(key, true);
@@ -346,6 +348,10 @@ public class Gui
         {
             gui.CreateOrSet<GuiText>(textDef, parent);
         }
+        else if (definition is GuiTreeDef treeDef)
+        {
+            gui.CreateOrSet<GuiTree>(treeDef, parent);
+        }
         else if (definition is GuiLayoutDef layoutDef)
         {
             switch (layoutDef.Direction)
@@ -474,6 +480,14 @@ public class Gui
             Invalidate();
         }
 
+    }
+
+    private void ProcessMouseExitedEvent(int x, int y)
+    {
+        if (_hoveredControl != null && !_hoveredControl.MouseFocused)
+        {
+            ProcessHover(null);
+        }
     }
 
     private void ProcessTextInputEvent(TextInputEventArgs args)

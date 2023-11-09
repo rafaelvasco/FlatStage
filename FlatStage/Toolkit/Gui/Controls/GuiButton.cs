@@ -42,8 +42,6 @@ public class GuiButton : GuiControl
 
     public override Size SizeHint => new(100, 40);
 
-
-
     internal override void Draw(Canvas canvas, GuiSkin skin)
     {
         skin.DrawButton(canvas, this);

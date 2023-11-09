@@ -40,6 +40,8 @@ internal static partial class PlatformContext
     public static Action<Size> WindowResized = null!;
     public static Action WindowMinimized = null!;
     public static Action WindowRestored = null!;
+    public static Action WindowEntered = null!;
+    public static Action WindowExited = null!;
 
     private static void CreateWindow(GameSettings settings)
     {
@@ -203,6 +205,12 @@ internal static partial class PlatformContext
                 break;
             case SDL_WindowEventID.SDL_WINDOWEVENT_RESTORED:
                 WindowRestored.Invoke();
+                break;
+            case SDL_WindowEventID.SDL_WINDOWEVENT_ENTER:
+                WindowEntered.Invoke();
+                break;
+            case SDL_WindowEventID.SDL_WINDOWEVENT_LEAVE:
+                WindowExited.Invoke();
                 break;
         }
     }

@@ -1,262 +1,121 @@
-﻿using FlatStage.Graphics;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace FlatStage.Toolkit;
 
 public class GuiStyleSheet
 {
-    public Dictionary<int, StateStyleMap> BaseStyles { get; }
-
-    public Dictionary<string, StateStyleMap> CustomStyles { get; }
-
-    public void SetCustomStyle(string elementId, StateStyleMap styles)
-    {
-        CustomStyles.Add(elementId, styles);
-    }
-
     public GuiStyleSheet()
     {
-        BaseStyles = new Dictionary<int, StateStyleMap>()
-        {
-            {
-                GuiButton.STypeId, new StateStyleMap(new(){
-                {
-                    GuiControlState.Idle, new Style()
-                    {
-                        BackgroundColor = new Color(30,30,30),
-                        BorderColor = new Color(60,60,60),
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                    }
-                },
-                {
-                    GuiControlState.Hover, new Style()
-                    {
-                        BackgroundColor = new Color(40,40,40),
-                        BorderColor = new Color(60,60,60),
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                    }
-                }})
-            },
-            {
-                GuiCheckbox.STypeId, new StateStyleMap(new(){
-                {
-                    GuiControlState.Idle, new Style()
-                    {
-                        BackgroundColor = new Color(30,30,30),
-                        BorderColor = new Color(60,60,60),
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                        CustomElements = new ()
-                        {
-                            {
-                                GuiCheckbox.CheckCustomElementId, Color.DodgerBlue
-                            }
-                        }
-                    }
-                },
-                {
-                    GuiControlState.Hover, new Style()
-                    {
-                        BackgroundColor = new Color(40,40,40),
-                        BorderColor = new Color(60,60,60),
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                        CustomElements = new ()
-                        {
-                            {
-                                GuiCheckbox.CheckCustomElementId, Color.DodgerBlue
-                            }
-                        }
-                    }
-                }})
-            },
-            {
-                GuiPanel.STypeId, new StateStyleMap(new(){
-                {
-                    GuiControlState.Idle, new Style()
-                    {
-                        BackgroundColor = new Color(30,30,30),
-                        BorderColor = new Color(60,60,60),
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                    }
-                },
-                {
-                    GuiControlState.Hover, new Style()
-                    {
-                        BackgroundColor = new Color(40,40,40),
-                        BorderColor = new Color(60,60,60),
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                    }
-                }})
-            },
-            {
-                GuiSlider.STypeId, new StateStyleMap(new(){
-                {
-                    GuiControlState.Idle, new Style()
-                    {
-                        BackgroundColor = new Color(30,30,30),
-                        BorderColor = new Color(60,60,60),
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                        CustomElements = new ()
-                        {
-                            {
-                                GuiSlider.ThumbCustomElementId, Color.DodgerBlue
-                            }
-                        }
-                    }
-                },
-                {
-                    GuiControlState.Hover, new Style()
-                    {
-                        BackgroundColor = new Color(40,40,40),
-                        BorderColor = new Color(60,60,60),
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                        CustomElements = new ()
-                        {
-                            {
-                                GuiSlider.ThumbCustomElementId, Color.DodgerBlue
-                            }
-                        }
-                    }
-                }})
-            },
-            {
-                GuiTextbox.STypeId, new StateStyleMap(new(){
-                {
-                    GuiControlState.Idle, new Style()
-                    {
-                        BackgroundColor = new Color(30,30,30),
-                        BorderColor = new Color(60,60,60),
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                        CustomElements = new ()
-                        {
-                            {
-                                GuiTextbox.CaretCustomElementId, Color.DodgerBlue
-                            }
-                        }
-                    }
-                },
-                {
-                    GuiControlState.Hover, new Style()
-                    {
-                        BackgroundColor = new Color(40,40,40),
-                        BorderColor = new Color(60,60,60),
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                        CustomElements = new ()
-                        {
-                            {
-                                GuiTextbox.CaretCustomElementId, Color.DodgerBlue
-                            }
-                        }
-                    }
-                }})
-            },
-            {
-                GuiMenuBar.STypeId, new StateStyleMap(new(){
-                {
-                    GuiControlState.Idle, new Style()
-                    {
-                        BackgroundColor = new Color(30,30,30),
-                        BorderColor = new Color(60,60,60),
-                        TextColor = new Color(255,255,255),
-                        CustomElements = new ()
-                        {
-                            {
-                                GuiMenuBar.MenuItemCustomElementId, Color.DodgerBlue
-                            }
-                        }
-                    }
-                },
-                {
-                    GuiControlState.Hover, new Style()
-                    {
-                        BackgroundColor = new Color(30,30,30),
-                        BorderColor = new Color(60,60,60),
-                        TextColor = new Color(255,255,255),
-                        CustomElements = new ()
-                        {
-                            {
-                                GuiMenuBar.MenuItemCustomElementId, Color.DodgerBlue
-                            }
-                        }
-                    }
-                }})
-            },
-            {
-                GuiWindow.STypeId, new StateStyleMap(new(){
-                {
-                    GuiControlState.Idle, new Style()
-                    {
-                        BackgroundColor = new Color(30,30,30),
-                        BorderColor = new Color(60,60,60),
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                        CustomElements = new ()
-                        {
-                            {
-                                GuiWindow.TopBarCustomElementId, Color.DodgerBlue
-                            }
-                        }
-                    }
-                },
-                {
-                    GuiControlState.Hover, new Style()
-                    {
-                        BackgroundColor = new Color(30,30,30),
-                        BorderColor = new Color(60,60,60),
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                        CustomElements = new ()
-                        {
-                            {
-                                GuiWindow.TopBarCustomElementId, Color.DodgerBlue
-                            }
-                        }
-                    }
-                }})
-            },
-            {
-                GuiText.STypeId, new StateStyleMap(new(){
-                {
-                    GuiControlState.Idle, new Style()
-                    {
-                        TextColor = new Color(255,255,255),
-                    }
-                }})
-            }
-        };
-
-        CustomStyles = new Dictionary<string, StateStyleMap>();
+        _styles = new Dictionary<int, Dictionary<GuiControlState, Style>>();
+        _baseStyles = new Dictionary<int, Dictionary<GuiControlState, Style>>();
     }
 
-    public StateStyleMap GetControlStyle(GuiControl control)
+    public void SetProperty<T>(GuiControl control, GuiControlState state, string propertyId, T value) where T : struct
     {
-        if (CustomStyles.TryGetValue(control.Id, out var style))
+        if (!_styles.ContainsKey(control.UId))
         {
-            return style;
+            _styles.Add(control.UId, new Dictionary<GuiControlState, Style>());
         }
 
-        return BaseStyles[control.TypeId];
+        if (!_styles[control.UId].ContainsKey(state))
+        {
+            _styles[control.UId][state] = new Style();
+        }
 
+        _styles[control.UId][state].SetValue(propertyId, value);
     }
+
+    public void SetProperty<T>(int typeId, GuiControlState state, string propertyId, T value) where T : struct
+    {
+        if (!_baseStyles.ContainsKey(typeId))
+        {
+            _baseStyles.Add(typeId, new Dictionary<GuiControlState, Style>());
+        }
+
+        if (!_baseStyles[typeId].ContainsKey(state))
+        {
+            _baseStyles[typeId][state] = new Style();
+        }
+
+        _baseStyles[typeId][state].SetValue(propertyId, value);
+    }
+
+    public T GetProperty<T>(GuiControl control, string propertyId, GuiControlState? state = null) where T : struct
+    {
+        bool TryToFindPropertyForState(GuiControl control, GuiControlState state, out T value)
+        {
+            var style = GetCustom(control, state);
+
+            if (style?.TryGet<T>(propertyId, out var valueCustom) == true)
+            {
+                value = (T)valueCustom!;
+                return true;
+            }
+
+            style = GetBase(control.TypeId, state);
+
+            if (style?.TryGet<T>(propertyId, out var valueBaseType) == true)
+            {
+                value = (T)valueBaseType!;
+                return true;
+            }
+
+            style = GetBase(GuiControl.AllControlsTypeId, state);
+
+            if (style?.TryGet<T>(propertyId, out var valueRootStyle) == true)
+            {
+                value = (T)valueRootStyle!;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        var _state = state ?? control.State;
+
+        if (TryToFindPropertyForState(control, _state, out var valueOnDefinedState))
+        {
+            return valueOnDefinedState;
+        }
+
+        if (TryToFindPropertyForState(control, GuiControlState.Idle, out var valueOnIdleState))
+        {
+            return valueOnIdleState;
+        }
+
+        FlatException.Throw("Could not find Property in StyleSheet");
+
+        return default;
+    }
+
+    private Style? GetCustom(GuiControl control, GuiControlState state)
+    {
+        if (_styles.TryGetValue(control.UId, out var styleMapCustom))
+        {
+            if (styleMapCustom.TryGetValue(state, out var styleOfState))
+            {
+                return styleOfState;
+            }
+        }
+
+        return null;
+    }
+
+    private Style? GetBase(int typeId, GuiControlState state)
+    {
+        if (_baseStyles.TryGetValue(typeId, out var styleMapBase))
+        {
+            if (styleMapBase.TryGetValue(state, out var styleOfState))
+            {
+                return styleOfState;
+            }
+        }
+
+        return null;
+    }
+
+    private readonly Dictionary<int, Dictionary<GuiControlState, Style>> _baseStyles;
+    private readonly Dictionary<int, Dictionary<GuiControlState, Style>> _styles;
+
 }

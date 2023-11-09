@@ -70,8 +70,6 @@ public class GuiMenuBar : GuiControl
 
     internal override int TypeId => STypeId;
 
-    internal const string MenuItemCustomElementId = "menuItem";
-
     public override Size SizeHint => new(Canvas.Width, 30);
 
     private const int SubMenuPadding = 50;
@@ -205,7 +203,7 @@ public class GuiMenuBar : GuiControl
         }
         else
         {
-            if (item == _hoveredItem)
+            if (item == _hoveredItem && !item.IsExpanded)
             {
                 ProcessHover(item, false);
                 return true;
@@ -386,7 +384,6 @@ public class GuiMenuBar : GuiControl
     }
 
     private GuiMenuItem? _hoveredItem = null;
-
     private readonly List<GuiMenuItem> _menuItems = new();
     private readonly Dictionary<string, GuiMenuItem> _menuItemsById = new();
 }

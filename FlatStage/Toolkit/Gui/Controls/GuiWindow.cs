@@ -1,5 +1,4 @@
 ﻿using FlatStage.Graphics;
-using System.Collections.Generic;
 
 namespace FlatStage.Toolkit;
 public class GuiWindow : GuiContainer
@@ -15,12 +14,12 @@ public class GuiWindow : GuiContainer
 
     public override Size SizeHint => new(400, 300);
 
-    internal const int TopBarHeight = 40;
-
-    internal const string TopBarCustomElementId = "topBar";
+    private readonly int _topBarHeight;
 
     public GuiWindow(string id, Gui gui, GuiContainer? parent = null) : base(id, gui, parent)
     {
+        _topBarHeight = Gui.Skin.StyleSheet.GetProperty<int>(this, DefaultStyleProperties.WindowTopBarHeight);
+
         AddInteraction<GuiDragInteraction>();
         Padding = 1;
         Hidden = true;
@@ -33,7 +32,7 @@ public class GuiWindow : GuiContainer
 
         var topBar = new GuiPanel($"{id}_topBar", gui, windowLayout)
         {
-            Height = TopBarHeight,
+            Height = _topBarHeight,
             Interactive = false,
         };
 
@@ -54,13 +53,13 @@ public class GuiWindow : GuiContainer
         _closeButton = new GuiButton($"{id}_closeButton", gui, topLayout)
         {
             Label = "X",
-            Width = TopBarHeight
+            Width = _topBarHeight
         };
 
         _mainContainer = new GuiContainer($"{id}_mainContainer", gui, windowLayout)
         {
             Padding = 10,
-            Height = this.Height - TopBarHeight
+            Height = this.Height - _topBarHeight
 
         };
 
@@ -69,57 +68,21 @@ public class GuiWindow : GuiContainer
         var topBarBgColor = Color.DodgerBlue;
         var exitButtonBgColor = Color.FromHex("e63946");
 
-        Gui.Skin.StyleSheet.SetCustomStyle(topBar.Id, new(
-            new Dictionary<GuiControlState, Style>
-            {
-                {
-                    GuiControlState.Idle, new Style()
-                    {
-                        BackgroundColor = topBarBgColor,
-                        BorderColor = topBarBgColor * 1.5f,
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                    }
-                },
-                {
-                    GuiControlState.Hover, new Style()
-                    {
-                        BackgroundColor = topBarBgColor * 1.5f,
-                        BorderColor = topBarBgColor * 2f,
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                    }
-                }
-            }
-        ));
+        Gui.Skin.StyleSheet.SetProperty(topBar, GuiControlState.Idle, DefaultStyleProperties.BackgroundColor, topBarBgColor);
+        Gui.Skin.StyleSheet.SetProperty(topBar, GuiControlState.Idle, DefaultStyleProperties.BorderColor, topBarBgColor * 0.3f);
+        Gui.Skin.StyleSheet.SetProperty(topBar, GuiControlState.Idle, DefaultStyleProperties.InnerBorderColor, topBarBgColor * 1.5f);
 
-        Gui.Skin.StyleSheet.SetCustomStyle(_closeButton.Id, new(
-            new Dictionary<GuiControlState, Style>
-            {
-                {
-                    GuiControlState.Idle, new Style()
-                    {
-                        BackgroundColor = exitButtonBgColor,
-                        BorderColor = exitButtonBgColor * 2f,
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                    }
-                },
-                {
-                    GuiControlState.Hover, new Style()
-                    {
-                        BackgroundColor = exitButtonBgColor * 1.5f,
-                        BorderColor = exitButtonBgColor * 2f,
-                        InnerBorderColor = new Color(40,40,40),
-                        TextColor = new Color(255,255,255),
-                        ShadowColor = new Color(0,0,0),
-                    }
-                }
-            }
-        ));
+        Gui.Skin.StyleSheet.SetProperty(_closeButton, GuiControlState.Idle, DefaultStyleProperties.BackgroundColor, exitButtonBgColor);
+        Gui.Skin.StyleSheet.SetProperty(_closeButton, GuiControlState.Idle, DefaultStyleProperties.BorderColor, exitButtonBgColor * 0.3f);
+        Gui.Skin.StyleSheet.SetProperty(_closeButton, GuiControlState.Idle, DefaultStyleProperties.InnerBorderColor, exitButtonBgColor * 2.0f);
+
+        Gui.Skin.StyleSheet.SetProperty(_closeButton, GuiControlState.Hover, DefaultStyleProperties.BackgroundColor, exitButtonBgColor * 1.5f);
+        Gui.Skin.StyleSheet.SetProperty(_closeButton, GuiControlState.Hover, DefaultStyleProperties.BorderColor, exitButtonBgColor * 0.5f);
+        Gui.Skin.StyleSheet.SetProperty(_closeButton, GuiControlState.Hover, DefaultStyleProperties.InnerBorderColor, exitButtonBgColor * 2.0f);
+
+        Gui.Skin.StyleSheet.SetProperty(_closeButton, GuiControlState.Active, DefaultStyleProperties.BackgroundColor, exitButtonBgColor * 0.7f);
+        Gui.Skin.StyleSheet.SetProperty(_closeButton, GuiControlState.Active, DefaultStyleProperties.BorderColor, exitButtonBgColor * 0.9f);
+        Gui.Skin.StyleSheet.SetProperty(_closeButton, GuiControlState.Active, DefaultStyleProperties.InnerBorderColor, exitButtonBgColor * 0.5f);
 
     }
 

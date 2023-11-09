@@ -1,22 +1,37 @@
-﻿using FlatStage.Graphics;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace FlatStage.Toolkit;
 
 public class Style
 {
-    public Color BackgroundColor { get; set; }
+    public T GetValue<T>(string propertyId) where T : struct
+    {
+        if (_values.TryGetValue(propertyId, out var value) == true)
+        {
+            return (T)value;
+        }
 
-    public Color BorderColor { get; set; }
+        FlatException.Throw($"Style doesn't contain value: {propertyId}");
 
-    public Color InnerBorderColor { get; set; }
+        return default!;
+    }
 
-    public Color TextColor { get; set; }
+    public void SetValue<T>(string valueId, T value) where T : struct
+    {
+        _values[valueId] = value;
+    }
 
-    public Color ShadowColor { get; set; }
+    public bool TryGet<T>(string propertyId, out T? value) where T : struct
+    {
+        if (_values.TryGetValue(propertyId, out var result))
+        {
+            value = (T)result!;
+            return true;
+        }
 
-    public int BorderSize { get; set; } = 1;
+        value = default;
+        return false;
+    }
 
-    public Dictionary<string, Color>? CustomElements { get; set; }
-
+    private readonly Dictionary<string, object> _values = new();
 }

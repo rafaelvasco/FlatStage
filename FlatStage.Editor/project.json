@@ -28,7 +28,7 @@
         {
           "$type": "menubar",
           "Id": "menuBar",
-          "Height":  35,
+          "Height": 35,
           "MenuItems": [
             {
               "Id": "project",
@@ -59,6 +59,51 @@
                 {
                   "Id": "about",
                   "Label": "ABOUT"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "$type": "tree",
+          "Y": 200,
+          "Id": "tree",
+          "Nodes": [
+            {
+              "Id": "Node1",
+              "Label": "Node1",
+              "ChildNodes": [
+                {
+                  "Id": "Node11",
+                  "Label": "Node11",
+                  "ChildNodes": [
+                    {
+                      "Id": "Node111",
+                      "Label": "Node111"
+                    },
+                    {
+                      "Id": "Node121",
+                      "Label": "Node121"
+                    }
+                  ]
+                },
+                {
+                  "Id": "Node12",
+                  "Label":  "Node12"
+                }
+              ]
+            },
+            {
+              "Id": "Node2",
+              "Label": "Node2",
+              "ChildNodes": [
+                {
+                  "Id": "Node21",
+                  "Label": "Node21"
+                },
+                {
+                  "Id": "Node22",
+                  "Label": "Node22"
                 }
               ]
             }

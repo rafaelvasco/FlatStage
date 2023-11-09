@@ -13,8 +13,6 @@ public class GuiSlider : GuiControl
 
     internal override int TypeId => STypeId;
 
-    public const string ThumbCustomElementId = "Thumb";
-
     public float Value
     {
         get => _value;

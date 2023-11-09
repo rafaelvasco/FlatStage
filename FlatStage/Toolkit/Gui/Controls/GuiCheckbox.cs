@@ -13,9 +13,35 @@ public class GuiCheckbox : GuiControl
 
     internal override int TypeId => STypeId;
 
-    public const string CheckCustomElementId = "Check";
-
     public bool Checked { get; set; }
+
+    public override GuiControlState State
+    {
+        get
+        {
+            if (Checked)
+            {
+                return GuiControlState.Checked;
+            }
+
+            if (Focused)
+            {
+                return GuiControlState.Focused;
+            }
+
+            if (!Hovered && !Active)
+            {
+                return GuiControlState.Idle;
+            }
+
+            if (Hovered && !Active)
+            {
+                return GuiControlState.Hover;
+            }
+
+            return GuiControlState.Active;
+        }
+    }
 
     public GuiCheckbox(string id, Gui gui, GuiContainer? parent = null) : base(id, gui, parent)
     {

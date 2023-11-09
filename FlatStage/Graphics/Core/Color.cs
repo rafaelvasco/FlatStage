@@ -1732,6 +1732,11 @@ public struct Color : IEquatable<Color>
         return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
     }
 
+    public Color WithAlpha(float alpha)
+    {
+        return new Color(this, alpha);
+    }
+
     /// <summary>
     /// Multiply <see cref="Color"/> by value.
     /// </summary>
@@ -1740,12 +1745,17 @@ public struct Color : IEquatable<Color>
     /// <returns>Multiplication result.</returns>
     public static Color operator *(Color value, float scale)
     {
-        return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+        return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A));
+    }
+
+    public static Color operator *(Color value, double scale)
+    {
+        return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A));
     }
 
     public static Color operator *(float scale, Color value)
     {
-        return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A * scale));
+        return new Color((int)(value.R * scale), (int)(value.G * scale), (int)(value.B * scale), (int)(value.A));
     }
 
     /// <summary>
@@ -1797,7 +1807,7 @@ public struct Color : IEquatable<Color>
     /// <returns><see cref="String"/> representation of this <see cref="Color"/>.</returns>
     public override string ToString()
     {
-        StringBuilder sb = new StringBuilder(25);
+        StringBuilder sb = new(25);
         sb.Append("{R:");
         sb.Append(R);
         sb.Append(" G:");

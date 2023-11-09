@@ -23,4 +23,6 @@ public abstract class GuiSkin
     public abstract void DrawWindow(Canvas canvas, GuiWindow window);
 
     public abstract void DrawText(Canvas canvas, GuiText text);
+
+    public abstract void DrawTree(Canvas canvas, GuiTree tree);
 }

@@ -14,8 +14,6 @@ public class GuiTextbox : GuiControl
 
     internal override int TypeId => STypeId;
 
-    internal const string CaretCustomElementId = "Caret";
-
     public int CaretDelay
     {
         get => _tickDelay;
@@ -40,10 +38,6 @@ public class GuiTextbox : GuiControl
     internal int SelectionEndIndex => _tempSelectionEndIndex != -1 ? MathUtils.Max(_tempSelectionStartIndex, _tempSelectionEndIndex) : _selectionEndIndex;
 
     internal bool SelectionEmpty => _selectionStartIndex == _selectionEndIndex;
-
-    internal const int CaretWidth = 15;
-    internal const int CaretHeight = 30;
-    internal const int Padding = 10;
 
     public GuiTextbox(string id, Gui gui, GuiContainer? parent = null) : base(id, gui, parent)
     {
@@ -166,7 +160,9 @@ public class GuiTextbox : GuiControl
     {
         var (localX, _) = ToLocalPos(mouseState.MouseX, mouseState.MouseY);
 
-        var textLocalX = localX - Padding;
+        var caretPadding = Gui.Skin.StyleSheet.GetProperty<int>(this, DefaultStyleProperties.TextboxCaretPadding);
+
+        var textLocalX = localX - caretPadding;
 
         var textSize = Gui.Skin.MeasureText(_text.ReadOnlySpan, _text.Length);
 

@@ -175,6 +175,8 @@ public static class Mouse
     public static event MouseButtonEvent? OnMouseDown;
     public static event MouseButtonEvent? OnMouseUp;
     public static event MouseEvent? OnMouseMove;
+    public static event MouseEvent? OnMouseEntered;
+    public static event MouseEvent? OnMouseExited;
 
     public static bool EnableMouse { get; set; } = true;
 
@@ -216,10 +218,18 @@ public static class Mouse
 
         PlatformContext.MouseMove = (x, y) =>
         {
-
             (float transformedX, float transformedY) = Canvas.TransformPointToViewportTransform(x, y);
-
             OnMouseMove?.Invoke((int)transformedX, (int)transformedY);
+        };
+
+        PlatformContext.WindowEntered = () =>
+        {
+            OnMouseEntered?.Invoke(MousePos.X, MousePos.Y);
+        };
+
+        PlatformContext.WindowExited = () =>
+        {
+            OnMouseExited?.Invoke(MousePos.X, MousePos.Y);
         };
     }
 

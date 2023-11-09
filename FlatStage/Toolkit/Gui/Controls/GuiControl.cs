@@ -9,7 +9,9 @@ public delegate void MouseMoveEventHandler(int x, int y);
 
 public abstract class GuiControl : BaseGameEntity
 {
-    internal static int SBTypeId = 0;
+    internal static int AllControlsTypeId = 0;
+
+    protected static int SBTypeId = 0;
 
     internal abstract int TypeId { get; }
 
@@ -54,7 +56,7 @@ public abstract class GuiControl : BaseGameEntity
 
     public int GlobalY => Parent?.GlobalY + Y ?? Y;
 
-    public GuiControlState State
+    public virtual GuiControlState State
     {
         get
         {

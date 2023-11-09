@@ -13,6 +13,7 @@ namespace FlatStage.Toolkit;
 [JsonDerivedType(typeof(GuiLayoutDef), typeDiscriminator: "layout")]
 [JsonDerivedType(typeof(GuiPanelDef), typeDiscriminator: "panel")]
 [JsonDerivedType(typeof(GuiWindowDef), typeDiscriminator: "window")]
+[JsonDerivedType(typeof(GuiTreeDef), typeDiscriminator: "tree")]
 public abstract class GuiControlDef : IDefinitionData
 {
     [JsonRequired]
