@@ -12,7 +12,13 @@ namespace FlatStage.Content;
 
 internal static class ShaderCompiler
 {
-    private const string CompilerPath = "ShaderCompiler/shaderc.exe";
+    private static readonly string CompilerPath;
+
+    static ShaderCompiler()
+    {
+        CompilerPath = OperatingSystem.IsWindows() ? "./ShaderCompiler/shaderc.exe" : "./ShaderCompiler/shaderc";
+    }
+
     private const string IncludePath = "ShaderCompiler";
     private const string SamplerRegexVar = "sampler";
     private const string SamplerRegex = @"SAMPLER2D\s*\(\s*(?<sampler>\w+)\s*\,\s*(?<index>\d+)\s*\)\s*\;";
@@ -24,6 +30,9 @@ internal static class ShaderCompiler
 
     private const string GlslCompileParams =
         "--platform linux --type $type -f $path -o $output -i $include";
+
+    private const string MetalCompileParams =
+        "--platform osx -p metal --type $type -f $path -o $output -i $include";
 
     public static ShaderCompileResult Compile(string vsSrcPath, string fsSrcPath, GraphicsBackend graphicsBackend)
     {
@@ -41,7 +50,8 @@ internal static class ShaderCompiler
         var compileParams = graphicsBackend switch
         {
             GraphicsBackend.Direct3D11 => D3DCompileParams,
-            GraphicsBackend.OpenGl => GlslCompileParams,
+            GraphicsBackend.OpenGL => GlslCompileParams,
+            GraphicsBackend.Metal => MetalCompileParams,
             _ => throw new ApplicationException($"Unsupported Graphics Backend for shader compilation: {graphicsBackend}")
         };
 

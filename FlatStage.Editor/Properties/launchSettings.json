@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "FlatStage.Editor": {
-      "commandName": "Project",
-      "hotReloadEnabled": false
-    }
-  }
-}

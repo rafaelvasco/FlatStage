@@ -7,7 +7,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
-    <ItemGroup Condition="'$(OS)' == 'Windows_NT'">
+    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
         <ContentWithTargetPath Include=".\Runtime\win-x64\BGFX.dll">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
             <TargetPath>BGFX.dll</TargetPath>
@@ -23,6 +23,25 @@
         <ContentWithTargetPath Include=".\Runtime\win-x64\freetype.dll">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
           <TargetPath>freetype.dll</TargetPath>
+        </ContentWithTargetPath>
+    </ItemGroup>
+
+    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+        <ContentWithTargetPath Include=".\Runtime\mac-arm64\BGFX.dylib">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>BGFX.dylib</TargetPath>
+        </ContentWithTargetPath>
+        <ContentWithTargetPath Include=".\Runtime\mac-arm64\SDL2.dylib">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>SDL2.dylib</TargetPath>
+        </ContentWithTargetPath>
+        <ContentWithTargetPath Include=".\Runtime\mac-arm64\miniaudio.dylib">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>miniaudio.dylib</TargetPath>
+        </ContentWithTargetPath>
+        <ContentWithTargetPath Include=".\Runtime\mac-arm64\freetype.dylib">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>freetype.dylib</TargetPath>
         </ContentWithTargetPath>
     </ItemGroup>
 

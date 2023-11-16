@@ -15,7 +15,7 @@ internal class FontBuilder : AssetBuilderAgent<FontData, FontAssetInfo>
         _fontCompiler = new FontCompiler();
     }
 
-    protected override string Build(string rootPath, FontAssetInfo assetInfoType)
+    protected override void Build(string rootPath, FontAssetInfo assetInfoType)
     {
         IDefinitionData.ThrowIfInValid(assetInfoType, $"AssetBuilder::{Name}");
 
@@ -45,7 +45,6 @@ internal class FontBuilder : AssetBuilderAgent<FontData, FontAssetInfo>
 
         Console.WriteLine($"Asset {assetInfoType.Id} built successfully on path {assetOutPutPath}");
 
-        return assetOutPutPath;
     }
 
     protected override FontData BuildAssetData(string rootPath, FontAssetInfo assetInfoType)

@@ -66,7 +66,13 @@ internal unsafe class FontCompiler : IDisposable
                 continue;
             }
 
-            FT.FT_Load_Glyph(face, glyphIndex, FT_Load.FT_LOAD_NO_BITMAP);
+            FT_Error loadGlyphResult;
+
+            if ((loadGlyphResult = FT.FT_Load_Glyph(face, glyphIndex, FT_Load.FT_LOAD_NO_BITMAP)) != FT_Error.FT_Err_Ok)
+            {
+                FlatException.Throw($@"Error on FreeType LoadGlyph: {loadGlyphResult}");
+                return default!;
+            }
 
             int glyphW = face->glyph->metrics.width / 64;
             int glyphH = face->glyph->metrics.height / 64;
@@ -206,7 +212,7 @@ internal unsafe class FontCompiler : IDisposable
 
     private static byte[] BuildFontImage(byte[] fontBitmapData, int width, int height)
     {
-        // Convert RgbaToBgra
+        // Convert Rgba To Bgra
         Blitter.Begin(fontBitmapData, width, height);
         Blitter.ConvertRgbaToBgra(premultiplyAlpha: true);
         Blitter.End();

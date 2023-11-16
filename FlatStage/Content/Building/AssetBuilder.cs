@@ -29,28 +29,23 @@ internal static partial class AssetBuilder
             Path.Combine(rootFolder, ContentProperties.AssetsFolder, ContentProperties.AssetsManifestFile);
         var assetsManifest = Assets.LoadDefinitionData<AssetsManifest>(manifestPath);
 
-        var builtPath = string.Empty;
-
         try
         {
             var assetInfo = assetsManifest.GetAssetInfo(assetId);
 
-            builtPath = BuildAsset(rootFolder, assetInfo);
+            BuildAsset(rootFolder, assetInfo);
         }
         catch (Exception e)
         {
             Console.WriteLine($"Failed to build asset {assetId}: {e.Message}");
 
-            if (!string.IsNullOrEmpty(builtPath))
-            {
-                File.Delete(builtPath);
-            }
+            Cleanup(rootFolder);
         }
     }
 
-    private static string BuildAsset<T>(string rootFolder, T assetInfo) where T : AssetInfo
+    private static void BuildAsset<T>(string rootFolder, T assetInfo) where T : AssetInfo
     {
-        return _builders[typeof(T)].Build(rootFolder, assetInfo);
+        _builders[typeof(T)].Build(rootFolder, assetInfo);
     }
 
     private static AssetDataType BuildAsset<AssetInfoType, AssetDataType>(string rootFolder, AssetInfoType assetInfo) where AssetInfoType : AssetInfo where AssetDataType : AssetData
@@ -70,33 +65,46 @@ internal static partial class AssetBuilder
             return;
         }
 
+        //Cleanup(rootFolder);
+
         Console.WriteLine("\nBuilding Assets:\n");
 
-        var nonPackedImages = assetsManifest.Images?.Values.Where(obj => string.IsNullOrEmpty(obj.TargetAssetPack));
-        var nonPackedShaders = assetsManifest.Shaders?.Values.Where(obj => string.IsNullOrEmpty(obj.TargetAssetPack));
-        var nonPackedFonts = assetsManifest.Fonts?.Values.Where(obj => string.IsNullOrEmpty(obj.TargetAssetPack));
-        var nonPackedAudios = assetsManifest.Audios?.Values.Where(obj => string.IsNullOrEmpty(obj.TargetAssetPack));
+        try
+        {
+            var nonPackedImages = assetsManifest.Images?.Values.Where(obj => string.IsNullOrEmpty(obj.TargetAssetPack));
+            var nonPackedShaders = assetsManifest.Shaders?.Values.Where(obj => string.IsNullOrEmpty(obj.TargetAssetPack));
+            var nonPackedFonts = assetsManifest.Fonts?.Values.Where(obj => string.IsNullOrEmpty(obj.TargetAssetPack));
+            var nonPackedAudios = assetsManifest.Audios?.Values.Where(obj => string.IsNullOrEmpty(obj.TargetAssetPack));
 
-        BuildDirect(
-            nonPackedImages,
-            nonPackedShaders,
-            nonPackedFonts,
-            nonPackedAudios
-        );
+            BuildDirect(
+                nonPackedImages,
+                nonPackedShaders,
+                nonPackedFonts,
+                nonPackedAudios
+            );
 
-        var packedImages = assetsManifest.Images?.Values.Where(obj => !string.IsNullOrEmpty(obj.TargetAssetPack));
-        var packedShaders = assetsManifest.Shaders?.Values.Where(obj => !string.IsNullOrEmpty(obj.TargetAssetPack));
-        var packedFonts = assetsManifest.Fonts?.Values.Where(obj => !string.IsNullOrEmpty(obj.TargetAssetPack));
-        var packedAudios = assetsManifest.Audios?.Values.Where(obj => !string.IsNullOrEmpty(obj.TargetAssetPack));
+            var packedImages = assetsManifest.Images?.Values.Where(obj => !string.IsNullOrEmpty(obj.TargetAssetPack));
+            var packedShaders = assetsManifest.Shaders?.Values.Where(obj => !string.IsNullOrEmpty(obj.TargetAssetPack));
+            var packedFonts = assetsManifest.Fonts?.Values.Where(obj => !string.IsNullOrEmpty(obj.TargetAssetPack));
+            var packedAudios = assetsManifest.Audios?.Values.Where(obj => !string.IsNullOrEmpty(obj.TargetAssetPack));
 
-        BuildPacked(
-            packedImages,
-            packedShaders,
-            packedFonts,
-            packedAudios
-        );
+            BuildPacked(
+                packedImages,
+                packedShaders,
+                packedFonts,
+                packedAudios
+            );
 
-        Console.WriteLine("\nAll assets built successfully.\n");
+            Console.WriteLine("\nAll assets built successfully.\n");
+        }
+        catch (FlatException)
+        {
+            Console.WriteLine("Build Failed.");
+            //Cleanup(rootFolder);
+            throw;
+        }
+
+        return;
 
         void BuildDirect(
             IEnumerable<ImageAssetInfo>? images,
@@ -114,16 +122,6 @@ internal static partial class AssetBuilder
                 return;
             }
 
-            List<string> _builtFilePaths = new();
-
-            void Cleanup()
-            {
-                foreach (var path in _builtFilePaths)
-                {
-                    File.Delete(path);
-                }
-            }
-
             if (images != null)
             {
                 Console.WriteLine("\nBuilding Images: \n");
@@ -131,13 +129,12 @@ internal static partial class AssetBuilder
                 {
                     try
                     {
-                        var path = BuildAsset(rootFolder, imageAssetInfo);
-                        _builtFilePaths.Add(path);
+                        BuildAsset(rootFolder, imageAssetInfo);
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"Failed to build image {imageAssetInfo.Id}: {e.Message}");
-                        Cleanup();
+                        FlatException.Throw($"Failed to build image {imageAssetInfo.Id}: {e.Message}");
+                        return;
                     }
                 }
             }
@@ -149,13 +146,11 @@ internal static partial class AssetBuilder
                 {
                     try
                     {
-                        var path = BuildAsset(rootFolder, shaderAssetInfo);
-                        _builtFilePaths.Add(path);
+                        BuildAsset(rootFolder, shaderAssetInfo);
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"Failed to build shader {shaderAssetInfo.Id}: {e.Message}");
-                        Cleanup();
+                        FlatException.Throw($"Failed to build shader {shaderAssetInfo.Id}: {e.Message}");
                         return;
                     }
                 }
@@ -168,13 +163,11 @@ internal static partial class AssetBuilder
                 {
                     try
                     {
-                        var path = BuildAsset(rootFolder, audioAssetInfo);
-                        _builtFilePaths.Add(path);
+                        BuildAsset(rootFolder, audioAssetInfo);
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"Failed to build audio {audioAssetInfo.Id}: {e.Message}");
-                        Cleanup();
+                        FlatException.Throw($"Failed to build audio {audioAssetInfo.Id}: {e.Message}");
                         return;
                     }
                 }
@@ -187,13 +180,11 @@ internal static partial class AssetBuilder
                 {
                     try
                     {
-                        var path = BuildAsset(rootFolder, fontAssetInfo);
-                        _builtFilePaths.Add(path);
+                        BuildAsset(rootFolder, fontAssetInfo);
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"Failed to build font {fontAssetInfo.Id}: {e.Message}");
-                        Cleanup();
+                        FlatException.Throw($"Failed to build font {fontAssetInfo.Id}: {e.Message}");
                         return;
                     }
                 }
@@ -242,7 +233,8 @@ internal static partial class AssetBuilder
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"Failed to build image {imageAssetInfo.Id}: {e.Message}");
+                        FlatException.Throw($"Failed to build image {imageAssetInfo.Id}: {e.Message}");
+                        return;
                     }
                 }
             }
@@ -260,7 +252,7 @@ internal static partial class AssetBuilder
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"Failed to build shader {shaderAssetInfo.Id}: {e.Message}");
+                        FlatException.Throw($"Failed to build shader {shaderAssetInfo.Id}: {e.Message}");
                         return;
                     }
                 }
@@ -279,7 +271,7 @@ internal static partial class AssetBuilder
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"Failed to build audio {audioAssetInfo.Id}: {e.Message}");
+                        FlatException.Throw($"Failed to build audio {audioAssetInfo.Id}: {e.Message}");
                         return;
                     }
                 }
@@ -298,7 +290,7 @@ internal static partial class AssetBuilder
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"Failed to build font {fontAssetInfo.Id}: {e.Message}");
+                        FlatException.Throw($"Failed to build font {fontAssetInfo.Id}: {e.Message}");
                         return;
                     }
                 }
@@ -311,6 +303,18 @@ internal static partial class AssetBuilder
                 AssetDataIO.SaveAssetData(path, pak);
             }
         }
+    }
 
+    private static void Cleanup(string assetsFolder)
+    {
+        var assetFiles = Directory.GetFiles(
+            assetsFolder,
+            $"*{ContentProperties.BinaryExt}",
+            SearchOption.AllDirectories);
+
+        foreach (var file in assetFiles)
+        {
+            File.Delete(file);
+        }
     }
 }

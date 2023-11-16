@@ -511,100 +511,102 @@ public unsafe struct FT_Vector
 
 internal static unsafe class FT
 {
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    private const string DllName = "freetype";
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Init_FreeType(FT_LibraryRec** alibrary);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Done_FreeType(FT_LibraryRec* library);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_New_Face(FT_LibraryRec* library, byte* filepathname, int face_index, FT_FaceRec** aface);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_New_Memory_Face(FT_LibraryRec* library, byte* file_base, int file_size, int face_index, FT_FaceRec** aface);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Open_Face(FT_LibraryRec* library, FT_Open_Args* args, int face_index, FT_FaceRec** aface);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Attach_File(FT_FaceRec* face, byte* filepathname);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Attach_Stream(FT_FaceRec* face, FT_Open_Args* parameters);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Reference_Face(FT_FaceRec* face);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Done_Face(FT_FaceRec* face);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Select_Size(FT_FaceRec* face, int strike_index);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Request_Size(FT_FaceRec* face, FT_Size_RequestRec* req);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Set_Char_Size(FT_FaceRec* face, int char_width, int char_height, uint horz_resolution, uint vert_resolution);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Set_Pixel_Sizes(FT_FaceRec* face, uint pixel_width, uint pixel_height);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Load_Glyph(FT_FaceRec* face, uint glyph_index, FT_Load load_flags);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Load_Char(FT_FaceRec* face, uint char_code, FT_Load load_flags);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void FT_Set_Transform(FT_FaceRec* face, FT_Matrix* matrix, FT_Vector* delta);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void FT_Get_Transform(FT_FaceRec* face, FT_Matrix* matrix, FT_Vector* delta);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Render_Glyph(FT_GlyphSlotRec* slot, FT_Render_Mode render_mode);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Get_Kerning(FT_FaceRec* face, uint left_glyph, uint right_glyph, uint kern_mode, FT_Vector* akerning);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Get_Track_Kerning(FT_FaceRec* face, int point_size, int degree, int* akerning);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Select_Charmap(FT_FaceRec* face, FT_Encoding encoding);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Set_Charmap(FT_FaceRec* face, FT_CharMapRec* charmap);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern int FT_Get_Charmap_Index(FT_CharMapRec* charmap);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint FT_Get_Char_Index(FT_FaceRec* face, uint charcode);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint FT_Get_First_Char(FT_FaceRec* face, uint* agindex);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint FT_Get_Next_Char(FT_FaceRec* face, uint char_code, uint* agindex);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Face_Properties(FT_FaceRec* face, uint num_properties, FT_Parameter* properties);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint FT_Get_Name_Index(FT_FaceRec* face, byte* glyph_name);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Get_Glyph_Name(FT_FaceRec* face, uint glyph_index, void* buffer, uint buffer_max);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern byte* FT_Get_Postscript_Name(FT_FaceRec* face);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern FT_Error FT_Get_SubGlyph_Info(FT_GlyphSlotRec* glyph, uint sub_index, int* p_index, uint* p_flags, int* p_arg1, int* p_arg2, FT_Matrix* p_transform);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern ushort FT_Get_FSType_Flags(FT_FaceRec* face);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint FT_Face_GetCharVariantIndex(FT_FaceRec* face, uint charcode, uint variantSelector);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern int FT_Face_GetCharVariantIsDefault(FT_FaceRec* face, uint charcode, uint variantSelector);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint* FT_Face_GetVariantSelectors(FT_FaceRec* face);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint* FT_Face_GetVariantsOfChar(FT_FaceRec* face, uint charcode);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern uint* FT_Face_GetCharsOfVariant(FT_FaceRec* face, uint variantSelector);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern int FT_MulDiv(int a, int b, int c);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern int FT_MulFix(int a, int b);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern int FT_DivFix(int a, int b);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern int FT_RoundFix(int a);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern int FT_CeilFix(int a);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern int FT_FloorFix(int a);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void FT_Vector_Transform(FT_Vector* vector, FT_Matrix* matrix);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void FT_Library_Version(FT_LibraryRec* library, int* amajor, int* aminor, int* apatch);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern byte FT_Face_CheckTrueTypePatents(FT_FaceRec* face);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern byte FT_Face_SetUnpatentedHinting(FT_FaceRec* face, byte value);
-    [DllImport("freetype.dll", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
     public static extern byte* FT_Error_String(FT_Error error_code);
 }

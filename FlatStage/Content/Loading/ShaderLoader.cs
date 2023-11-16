@@ -26,7 +26,7 @@ internal class ShaderLoader : AssetLoader<ShaderProgram, ShaderData>
 
         if (fileStream == null)
         {
-            throw new ApplicationException($"Could not load embedded asset: {id}");
+            throw new ApplicationException($"Could not load embedded asset {id} on path {path}");
         }
 
         var shaderData = Assets.LoadAssetData<ShaderData>(id, fileStream);

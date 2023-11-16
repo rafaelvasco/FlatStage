@@ -23,8 +23,6 @@ internal partial class ShaderData : AssetData
     {
         return
             VertexShader is { Length: > 0 } &&
-            FragmentShader is { Length: > 0 } &&
-            Samplers != null &&
-            Params != null;
+            FragmentShader is { Length: > 0 };
     }
 }

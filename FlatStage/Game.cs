@@ -209,6 +209,7 @@ public abstract class Game : Disposable
         Console.WriteLine(":::::::::::::::::::::::::::::::::::::::::");
 
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
         Assets.Init();
 
         Console.WriteLine(Settings);

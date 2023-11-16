@@ -53,11 +53,10 @@ public static class SDL
 
     #region Marshaling
 
-#if NET6_0_OR_GREATER
     internal static T PtrToStructure<
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors |
                                     DynamicallyAccessedMemberTypes.NonPublicConstructors)]
-    T>(IntPtr ptr)
+        T>(IntPtr ptr)
     {
         return Marshal.PtrToStructure<T>(ptr);
     }
@@ -66,25 +65,11 @@ public static class SDL
     {
         return Marshal.GetDelegateForFunctionPointer<T>(ptr);
     }
-#else
-        internal static T PtrToStructure<T>(IntPtr ptr)
-        {
-            return (T)Marshal.PtrToStructure(ptr, typeof(T));
-        }
 
-        internal static Delegate GetDelegateForFunctionPointer<T>(IntPtr ptr)
-        {
-            return Marshal.GetDelegateForFunctionPointer(ptr, typeof(T));
-        }
-#endif
 
     internal static int SizeOf<T>()
     {
-#if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
         return Marshal.SizeOf<T>();
-#else
-            return Marshal.SizeOf(typeof(T));
-#endif
     }
 
     #endregion
@@ -165,24 +150,13 @@ public static class SDL
          * See the CoreCLR source for more info.
          * -flibit
          */
-#if NETSTANDARD2_0
-            /* Modern C# lets you just send the byte*, nice! */
-            string result = System.Text.Encoding.UTF8.GetString(
-                (byte*) s,
-                (int) (ptr - (byte*) s)
-            );
-#else
-        /* Old C# requires an extra memcpy, bleh! */
-        int len = (int)(ptr - (byte*)s);
-        if (len == 0)
-        {
-            return string.Empty;
-        }
 
-        char* chars = stackalloc char[len];
-        int strLen = Encoding.UTF8.GetChars((byte*)s, len, chars, len);
-        string result = new string(chars, 0, strLen);
-#endif
+        /* Modern C# lets you just send the byte*, nice! */
+        string result = System.Text.Encoding.UTF8.GetString(
+            (byte*)s,
+            (int)(ptr - (byte*)s)
+        );
+
 
         /* Some SDL functions will malloc, we have to free! */
         if (freePtr)
@@ -5496,8 +5470,8 @@ public static class SDL
         public UInt32 timestamp;
 
         public Int32 which; /* joystick id for ADDED,
-                         * else instance id
-                         */
+                             * else instance id
+                             */
     }
 
     /* Game controller touchpad event structure (event.ctouchpad.*) */

@@ -1,7 +1,6 @@
 using FlatStage.Platform;
 using FlatStage.Foundation.BGFX;
 using System;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -13,7 +12,9 @@ public enum GraphicsBackend
     Direct3D12,
     Vulkan,
     Metal,
-    OpenGl
+    OpenGL,
+    OpenGLES,
+    Unknown
 }
 
 public static unsafe partial class GraphicsContext
@@ -165,70 +166,6 @@ public static unsafe partial class GraphicsContext
         Bgfx.set_dynamic_index_buffer(ibo.Handle, (uint)startIndex, (uint)indexCount);
     }
 
-    /// <summary>
-    /// Enables debugging features.
-    /// </summary>
-    /// <param name="features">The set of debug features to enable.</param>
-    public static void SetDebugFeatures(DebugFeatures features)
-    {
-        Bgfx.set_debug((uint)features);
-    }
-
-    /// <summary>
-    /// Clears the debug text buffer.
-    /// </summary>
-    /// <param name="color">The color with which to clear the background.</param>
-    /// <param name="smallText"><c>true</c> to use a small font for debug output; <c>false</c> to use normal sized text.</param>
-    public static void ClearDebugText(DebugColor color = DebugColor.Black, bool smallText = false)
-    {
-        var attr = (byte)((byte)color << 4);
-        Bgfx.dbg_text_clear(attr, smallText);
-    }
-
-    /// <summary>
-    /// Writes debug text to the screen.
-    /// </summary>
-    /// <param name="x">The X position, in cells.</param>
-    /// <param name="y">The Y position, in cells.</param>
-    /// <param name="foreColor">The foreground color of the text.</param>
-    /// <param name="backColor">The background color of the text.</param>
-    /// <param name="format">The format of the message.</param>
-    /// <param name="args">The arguments with which to format the message.</param>
-    public static void DebugTextWrite(int x, int y, DebugColor foreColor, DebugColor backColor, string format,
-        params object[] args)
-    {
-        DebugTextWrite(x, y, foreColor, backColor, string.Format(CultureInfo.CurrentCulture, format, args));
-    }
-
-    /// <summary>
-    /// Writes debug text to the screen.
-    /// </summary>
-    /// <param name="x">The X position, in cells.</param>
-    /// <param name="y">The Y position, in cells.</param>
-    /// <param name="foreColor">The foreground color of the text.</param>
-    /// <param name="backColor">The background color of the text.</param>
-    /// <param name="message">The message to write.</param>
-    public static void DebugTextWrite(int x, int y, DebugColor foreColor, DebugColor backColor, string message)
-    {
-        var attr = (byte)(((byte)backColor << 4) | (byte)foreColor);
-        Bgfx.dbg_text_printf((ushort)x, (ushort)y, attr, "%s", message);
-    }
-
-    /// <summary>
-    /// Draws data directly into the debug text buffer.
-    /// </summary>
-    /// <param name="x">The X position, in cells.</param>
-    /// <param name="y">The Y position, in cells.</param>
-    /// <param name="width">The width of the image to draw.</param>
-    /// <param name="height">The height of the image to draw.</param>
-    /// <param name="data">The image data bytes.</param>
-    /// <param name="pitch">The pitch of each line in the image data.</param>
-    public static void DebugTextImage(int x, int y, int width, int height, byte[] data, int pitch)
-    {
-        fixed (byte* ptr = data)
-            Bgfx.dbg_text_image((ushort)x, (ushort)y, (ushort)width, (ushort)height, ptr, (ushort)pitch);
-    }
-
     public static void SetRenderTarget(int renderPass, RenderTarget? target = null)
     {
         Bgfx.set_view_frame_buffer((ushort)renderPass, target?.Handle ?? BgfxUtils.FrameBufferNone);
@@ -236,7 +173,7 @@ public static unsafe partial class GraphicsContext
 
     public static void SetViewScissor(byte view, int x, int y, int w, int h)
     {
-        Bgfx.set_view_scissor((ushort)view, (ushort)x, (ushort)y, (ushort)w, (ushort)h);
+        Bgfx.set_view_scissor(view, (ushort)x, (ushort)y, (ushort)w, (ushort)h);
     }
 
     public static void Render(int renderPass, ShaderProgram shader)
@@ -330,29 +267,9 @@ public static unsafe partial class GraphicsContext
 
         Bgfx.init_ctor(init);
 
-        var rendererType = GetRendererType();
+        init->vendorId = (ushort)Bgfx.PciIdFlags.None; // Auto Select
 
-        switch (rendererType)
-        {
-            case Bgfx.RendererType.Direct3D11:
-                GraphicsBackend = GraphicsBackend.Direct3D11;
-                break;
-            case Bgfx.RendererType.Direct3D12:
-                GraphicsBackend = GraphicsBackend.Direct3D12;
-                break;
-            case Bgfx.RendererType.Metal:
-                GraphicsBackend = GraphicsBackend.Metal;
-                break;
-            case Bgfx.RendererType.OpenGL:
-                GraphicsBackend = GraphicsBackend.OpenGl;
-                break;
-            case Bgfx.RendererType.Vulkan:
-                GraphicsBackend = GraphicsBackend.Vulkan;
-                break;
-        }
-
-        init->vendorId = (ushort)Bgfx.PciIdFlags.None;
-        init->type = rendererType;
+        init->type = Bgfx.RendererType.Count; // Auto Select
 
         var displaySize = Game.WindowSize;
 
@@ -366,6 +283,11 @@ public static unsafe partial class GraphicsContext
         init->resolution.reset = (uint)Bgfx.ResetFlags.Vsync;
         init->platformData = platformInfo;
 
+        if (PlatformContext.PlatformId == PlatformId.Mac)
+        {
+            Bgfx.render_frame(0);
+        }
+
         if (!Bgfx.init(init))
         {
             throw new ApplicationException("Failed to initialize Graphics Context");
@@ -373,7 +295,30 @@ public static unsafe partial class GraphicsContext
 
         Marshal.FreeHGlobal((IntPtr)init);
 
-        Console.WriteLine($"Graphics Backend: {Bgfx.get_renderer_type()}");
+        var caps = Bgfx.get_caps();
+
+        Console.WriteLine(caps->rendererType);
+
+        GraphicsBackend = GetGraphicsBackend(Bgfx.get_renderer_type());
+
+        Console.WriteLine($"Graphics Backend: {GraphicsBackend}");
+    }
+
+    private static GraphicsBackend GetGraphicsBackend(Bgfx.RendererType rendererType)
+    {
+        switch (rendererType)
+        {
+            case Bgfx.RendererType.OpenGL: return GraphicsBackend.OpenGL;
+            case Bgfx.RendererType.OpenGLES: return GraphicsBackend.OpenGLES;
+            case Bgfx.RendererType.Direct3D11: return GraphicsBackend.Direct3D11;
+            case Bgfx.RendererType.Direct3D12: return GraphicsBackend.Direct3D12;
+            case Bgfx.RendererType.Vulkan: return GraphicsBackend.Vulkan;
+            case Bgfx.RendererType.Metal: return GraphicsBackend.Metal;
+        }
+
+        FlatException.Throw($"Unsupported Renderer Backend: {rendererType}");
+
+        return GraphicsBackend.Unknown;
     }
 
     private static void InitGraphicsState()
@@ -381,21 +326,6 @@ public static unsafe partial class GraphicsContext
         _baseState = Bgfx.StateFlags.WriteRgb | Bgfx.StateFlags.WriteA | Bgfx.StateFlags.WriteZ;
 
         SetViewClear(0, Color.Black);
-
-#if DEBUG
-        Bgfx.set_debug((uint)Bgfx.DebugFlags.Text);
-#endif
-    }
-
-    private static Bgfx.RendererType GetRendererType()
-    {
-        return PlatformContext.PlatformId switch
-        {
-            PlatformId.Windows => Bgfx.RendererType.Direct3D11,
-            PlatformId.Mac => Bgfx.RendererType.Metal,
-            PlatformId.Linux => Bgfx.RendererType.Vulkan,
-            _ => throw new ApplicationException("Can't determine renderer backend. Platform unknown"),
-        };
     }
 
     private static void ApplyGraphicsChanges(GraphicsChanges changes)

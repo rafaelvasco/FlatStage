@@ -50,7 +50,7 @@ internal static class ContentProperties
                 GraphicsBackend.Direct3D12, "_D3D12"
             },
             {
-                GraphicsBackend.OpenGl, "_GL"
+                GraphicsBackend.OpenGL, "_GL"
             },
             {
                 GraphicsBackend.Metal, "_MT"
