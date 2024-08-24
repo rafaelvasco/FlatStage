@@ -1,0 +1,1 @@
+dotnet publish -r osx-arm64 -c Release -o publish_aot

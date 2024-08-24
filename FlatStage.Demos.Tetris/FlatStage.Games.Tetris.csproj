@@ -3,19 +3,22 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <AssemblyName>Vetris</AssemblyName>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>FlatStage.Tetris</RootNamespace>
+        <LangVersion>12</LangVersion>
+        
+        <!-- AOT OPTIONS -->
+        <!--<PublishAot>true</PublishAot>
+        <SelfContained>true</SelfContained>
+        <StripSymbols>true</StripSymbols> -->
+        
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(OS)' == 'Windows_NT' And '$(Configuration)' == 'Release'">
       <OutputType>WinExe</OutputType>
     </PropertyGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\FlatStage\FlatStage.Engine.csproj" />
-    </ItemGroup>
 
     <ItemGroup>
         <Content Include="Assets\**\*.fsb">
@@ -24,12 +27,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Assets\assets.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="settings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FlatStage.Core\FlatStage.Core.csproj" />
     </ItemGroup>
 
 </Project>

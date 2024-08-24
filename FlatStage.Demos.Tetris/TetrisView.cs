@@ -1,6 +1,4 @@
-﻿using FlatStage.Graphics;
-
-namespace FlatStage.Tetris;
+﻿namespace FlatStage.Tetris;
 
 public class TetrisView
 {
@@ -133,7 +131,7 @@ public class TetrisView
 
         for (int i = 0; i < menuItems.Length; i++)
         {
-            string? label = menuItems[i].Label;
+            string label = menuItems[i].Label;
 
             var rect = menuItems[i].Rect;
 

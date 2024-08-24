@@ -1,7 +1,4 @@
-﻿using FlatStage.Content;
-using FlatStage.Graphics;
-
-namespace FlatStage.Tetris;
+﻿namespace FlatStage.Tetris;
 
 public class Tetris : Game
 {
@@ -134,6 +131,6 @@ public class Tetris : Game
     private const string SaveGameId = "VetrisSave";
     private const string MaxScoreSaveId = "MaxScore";
 
-    private TetrisView _tetrisView = null!;
-    private TetrisController _tetrisController = null!;
+    private readonly TetrisView _tetrisView;
+    private readonly TetrisController _tetrisController;
 }

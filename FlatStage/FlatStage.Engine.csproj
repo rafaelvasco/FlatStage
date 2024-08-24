@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <LangVersion>12</LangVersion>
     </PropertyGroup>
 
     <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
@@ -50,7 +51,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="MemoryPack" Version="1.9.16" />
+      <PackageReference Include="MemoryPack" Version="1.21.1" />
     </ItemGroup>
 
 </Project>

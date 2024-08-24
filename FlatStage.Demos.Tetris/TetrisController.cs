@@ -1,5 +1,4 @@
-﻿using FlatStage.Input;
-using System;
+﻿using System;
 
 namespace FlatStage.Tetris;
 
@@ -55,8 +54,8 @@ public class TetrisController
 
     public int CurrentActiveMenuIndex => _currentActiveMenuIndex;
 
-    public GameGrid GameGrid { get; private set; } = null!;
-    public BlockQueue BlockQueue { get; private set; } = null!;
+    public GameGrid GameGrid { get; }
+    public BlockQueue BlockQueue { get; }
 
     public GameStateId GameStateId { get; private set; } = GameStateId.Menu;
 
@@ -573,29 +572,29 @@ public class TetrisController
 
     private Block currentBlock = null!;
     private int _ticks;
-    private int _startInputTicks = 0;
-    private int _inputTicks = 0;
-    private bool _pressingMoveDown = false;
-    private bool _pressingMoveHorizontal = false;
-    private int _currentHorizontalDirection = 0;
+    private int _startInputTicks;
+    private int _inputTicks;
+    private bool _pressingMoveDown;
+    private bool _pressingMoveHorizontal;
+    private int _currentHorizontalDirection;
 
-    private int _tryFitCount = 0;
+    private int _tryFitCount;
 
-    private int _lastHoveredMenuIndex = 0;
-    private int _currentHoveredMenuIndex = 0;
+    private int _lastHoveredMenuIndex;
+    private int _currentHoveredMenuIndex;
     private int _currentActiveMenuIndex = -1;
 
-    private readonly MenuAction[] _mainMenuItems = new[]
-    {
+    private readonly MenuAction[] _mainMenuItems =
+    [
         new MenuAction { ActionId = MenuActionId.Start, Label = "Start", Rect = new Rect() },
         new MenuAction { ActionId = MenuActionId.Options, Label = "Options", Rect = new Rect() },
         new MenuAction { ActionId = MenuActionId.Exit, Label = "Exit", Rect = new Rect() }
-    };
+    ];
 
-    private readonly MenuAction[] _optionsMenuItems = new[]
-    {
-        new MenuAction { ActionId = MenuActionId.Start, Label = "Start", Rect = new Rect() },
-        new MenuAction { ActionId = MenuActionId.Options, Label = "Options", Rect = new Rect() },
-        new MenuAction { ActionId = MenuActionId.Exit, Label = "Exit", Rect = new Rect() }
-    };
+    // private readonly MenuAction[] _optionsMenuItems =
+    // [
+    //     new MenuAction { ActionId = MenuActionId.Start, Label = "Start", Rect = new Rect() },
+    //     new MenuAction { ActionId = MenuActionId.Options, Label = "Options", Rect = new Rect() },
+    //     new MenuAction { ActionId = MenuActionId.Exit, Label = "Exit", Rect = new Rect() }
+    // ];
 }
