@@ -8,15 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="MemoryPack" Version="1.21.1" />
+        <EmbeddedResource Include="Assets\**\*.fsb" />
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Assets\Fonts\chikareGo2.fsb" />
-      <EmbeddedResource Include="Assets\Fonts\koubit001.fsb" />
-      <EmbeddedResource Include="Assets\Fonts\monogram.fsb" />
-      <EmbeddedResource Include="Assets\Shaders\canvas2d_MT.fsb" />
-      <EmbeddedResource Include="Assets\Textures\logo.fsb" />
+      <ProjectReference Include="..\FlatStage.Common\FlatStage.Common.csproj" />
     </ItemGroup>
 
 </Project>

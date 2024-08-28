@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-
-namespace MeltySynth;
+﻿namespace MeltySynth;
 
 internal struct Zone
 {

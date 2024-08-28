@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MeltySynth;
+﻿namespace MeltySynth;
 
 /// <summary>
 /// Defines a common interface for audio rendering.

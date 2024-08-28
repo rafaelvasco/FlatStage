@@ -443,7 +443,7 @@ public class Canvas
                 if (c == '\n')
                 {
                     offset.X = 0;
-                    offset.Y = font.LineSpacing;
+                    offset.Y += font.LineSpacing;
                     firstGlyphOfLine = true;
                     continue;
                 }
@@ -467,7 +467,7 @@ public class Canvas
 
                 var p = offset;
 
-                p.X += currentGlyphPtr->Cropping.X;
+                p.X += currentGlyphPtr->Cropping.X / scale.X;
                 p.Y += currentGlyphPtr->Cropping.Y;
 
                 _texCoordTL.X = currentGlyphPtr->BoundsInTexture.X * font.Texture.TexelWidth;

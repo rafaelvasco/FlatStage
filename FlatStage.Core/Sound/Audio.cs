@@ -5,18 +5,6 @@ public enum AudioParameter
     Pitch
 }
 
-public enum AudioType
-{
-    Effect,
-    Song
-}
-
-public enum AudioFormat
-{
-    Wav,
-    Ogg
-}
-
 public class Audio : Asset
 {
     internal int Handle { get; private set; }
@@ -35,6 +23,12 @@ public class Audio : Asset
     {
         Handle = handle;
         Type = type;
+    }
+
+    public static Audio LoadFromData(AudioData data)
+    {
+        var audio = AudioContext.CreateAudio(data);
+        return audio;
     }
 
     public void Play()

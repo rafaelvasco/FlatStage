@@ -102,6 +102,58 @@ public class TextureFont : Asset
         DefaultCharacter = defaultCharacter;
     }
 
+    public static TextureFont LoadFromData(FontData data)
+    {
+        var decodedImageData = ImageIO.LoadPNGFromMem(data.ImageData.Data);
+
+        var texture = Graphics.CreateTexture(
+            data.Id + "_Texture",
+            new TextureProps()
+            {
+                Data = decodedImageData.Data,
+                Width = data.Width,
+                Height = data.Height
+            }
+        );
+
+        var glyphBounds = new List<Rect>();
+        var cropping = new List<Rect>();
+        var chars = new List<char>();
+        var kerning = new List<Vec3>();
+
+        var orderedKeys = data.Glyphs.Keys.OrderBy(a => a);
+
+        foreach (var key in orderedKeys)
+        {
+            var character = data.Glyphs[key];
+
+            var bounds = new Rect(character.X, character.Y,
+                character.Width,
+                character.Height);
+
+            glyphBounds.Add(bounds);
+            cropping.Add(new Rect(character.XOffset, character.YOffset, bounds.Width, bounds.Height));
+
+            chars.Add((char)key);
+
+            kerning.Add(new Vec3(0, bounds.Width, character.XAdvance - bounds.Width));
+        }
+
+        var textureFont = new TextureFont(
+            data.Id,
+            texture,
+            glyphBounds,
+            cropping,
+            chars,
+            20,
+            0,
+            kerning,
+            ' '
+        );
+
+        return textureFont;
+    }
+
     /// <summary>
     /// Returns the size of the contents of a string when
     /// rendered in this font.
@@ -109,9 +161,9 @@ public class TextureFont : Asset
     /// <param name="text">The text to measure.</param>
     /// <returns>The size, in pixels, of 'text' when rendered in
     /// this font.</returns>
-    public Vec2 MeasureString(ReadOnlySpan<char> text)
+    public Vec2 MeasureString(ReadOnlySpan<char> text, int scale=1)
     {
-        MeasureString(text, text.Length, 0, out var size);
+        MeasureString(text, text.Length, 0, scale, out var size);
         return size;
     }
 
@@ -122,13 +174,13 @@ public class TextureFont : Asset
     /// <param name="text">The text to measure.</param>
     /// <returns>The size, in pixels, of 'text' when rendered in
     /// this font.</returns>
-    public Vec2 MeasureString(ReadOnlySpan<char> text, int length, int startIndex)
+    public Vec2 MeasureString(ReadOnlySpan<char> text, int length, int startIndex, int scale=1)
     {
-        MeasureString(text, length, startIndex, out var size);
+        MeasureString(text, length, startIndex, scale, out var size);
         return size;
     }
 
-    internal unsafe void MeasureString(ReadOnlySpan<char> text, int length, int startIndex, out Vec2 size)
+    internal unsafe void MeasureString(ReadOnlySpan<char> text, int length, int startIndex, int scale,  out Vec2 size)
     {
         if (text.Length == 0 || length == 0)
         {
@@ -181,14 +233,14 @@ public class TextureFont : Asset
                     xOffset += Spacing + pCurrentGlyph->LeftSideBearing;
                 }
 
-                xOffset += pCurrentGlyph->Width + pCurrentGlyph->RightSideBearing;
+                xOffset += (pCurrentGlyph->Width + pCurrentGlyph->RightSideBearing)*scale;
 
                 var proposedWidth = xOffset;
                 if (proposedWidth > width)
                     width = proposedWidth;
 
                 if (pCurrentGlyph->Cropping.Height > height)
-                    height = (pCurrentGlyph->Cropping.Height);
+                    height = (pCurrentGlyph->Cropping.Height * scale);
             }
         }
 

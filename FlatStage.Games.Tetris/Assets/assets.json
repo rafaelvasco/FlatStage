@@ -1,0 +1,49 @@
+{
+  "Images": {
+    "tetris_sheet": {
+      "Id": "tetris_sheet",
+      "Path": "tetris_sheet.png"
+    },
+    "bg": {
+      "Id": "bg",
+      "Path": "bg.png"
+    }
+  },
+  "Audios": {
+    "rotate_sfx": {
+      "Id": "rotate_sfx",
+      "Path": "rotate_sfx.wav",
+      "Type": "Effect"
+    },
+    "lineclear_sfx": {
+      "Id": "lineclear_sfx",
+      "Path": "lineclear_sfx.wav",
+      "Type": "Effect"
+    },
+    "gameover_sfx": {
+      "Id": "gameover_sfx",
+      "Path": "gameover_sfx.wav",
+      "Type": "Effect"
+    },
+    "placeblock_sfx": {
+      "Id": "placeblock_sfx",
+      "Path": "placeblock_sfx.wav",
+      "Type": "Effect"
+    },
+    "clear_max": {
+      "Id": "clear_max",
+      "Path": "clear_max.wav",
+      "Type": "Effect"
+    },
+    "menu_hover": {
+      "Id": "menu_hover",
+      "Path": "menu_hover.wav",
+      "Type": "Effect"
+    },
+    "title_song": {
+      "Id": "title_song",
+      "Path": "title_song.wav",
+      "Type": "Song"
+    }
+  }
+}

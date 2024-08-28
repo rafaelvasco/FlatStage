@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MeltySynth;
+﻿namespace MeltySynth;
 
 /// <summary>
 /// Specifies a set of parameters for synthesis.

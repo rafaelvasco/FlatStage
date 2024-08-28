@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-
-namespace MeltySynth;
+﻿namespace MeltySynth;
 
 /// <summary>
 /// Represents a preset in the SoundFont.

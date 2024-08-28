@@ -68,7 +68,7 @@ public class Stage : Game
 
     private static GameDef LoadDefinition()
     {
-        var gameDef = Content.LoadDefinitionData<GameDef>(ContentProperties.GameProjectFile);
+        var gameDef = DefinitionIO.LoadDefinitionData<GameDef>(ContentProperties.GameProjectFile);
 
         IDefinitionData.ThrowIfInValid(gameDef, "Stage::LoadDefinition [gameDef]");
 
@@ -78,7 +78,7 @@ public class Stage : Game
 
         foreach (var scenePath in gameDef.GameObjectsPaths)
         {
-            var sceneDef = Content.LoadDefinitionData<GameObjectDef>($"{scenePath}.json");
+            var sceneDef = DefinitionIO.LoadDefinitionData<GameObjectDef>($"{scenePath}.json");
 
             IDefinitionData.ThrowIfInValid(sceneDef, "Stage::LoadDefinition [sceneDef]");
 

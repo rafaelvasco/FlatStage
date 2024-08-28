@@ -3,11 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34003.232
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlatStage.Engine", "FlatStage\FlatStage.Engine.csproj", "{BB4AC731-56FB-499E-9034-2FFC1ABD3B99}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Games", "Games", "{95FB25E7-8B53-49C6-852E-D8538F8B71FA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlatStage.Games.Tetris", "FlatStage.Demos.Tetris\FlatStage.Games.Tetris.csproj", "{42C34973-2E57-461E-859A-C41B12CD07D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlatStage.Games.Tetris", "FlatStage.Games.Tetris\FlatStage.Games.Tetris.csproj", "{42C34973-2E57-461E-859A-C41B12CD07D7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlatStage.CLI", "FlatStage.CLI\FlatStage.CLI.csproj", "{4FCF1CAE-9B7A-436E-BDDA-139BA3CE5BC8}"
 EndProject
@@ -17,16 +15,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlatStage.Toolkit", "FlatSt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlatStage.Demos", "FlatStage.Demos\FlatStage.Demos.csproj", "{9AA992FA-55B4-43E1-BD27-A9A373164934}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlatStage.GameTemplate", "FlatStage.GameTemplate\FlatStage.GameTemplate.csproj", "{718D87D0-F67F-40CA-A9AC-B701E360F3FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlatStage.AssetPipeline", "FlatStage.AssetPipeline\FlatStage.AssetPipeline.csproj", "{590FC3F0-5473-4BC1-8723-8F20670D98C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlatStage.Common", "FlatStage.Common\FlatStage.Common.csproj", "{4DB017A0-5E8F-41C3-9B79-92752529B3F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BB4AC731-56FB-499E-9034-2FFC1ABD3B99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BB4AC731-56FB-499E-9034-2FFC1ABD3B99}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BB4AC731-56FB-499E-9034-2FFC1ABD3B99}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB4AC731-56FB-499E-9034-2FFC1ABD3B99}.Release|Any CPU.Build.0 = Release|Any CPU
 		{42C34973-2E57-461E-859A-C41B12CD07D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{42C34973-2E57-461E-859A-C41B12CD07D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42C34973-2E57-461E-859A-C41B12CD07D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -47,6 +47,18 @@ Global
 		{9AA992FA-55B4-43E1-BD27-A9A373164934}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AA992FA-55B4-43E1-BD27-A9A373164934}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AA992FA-55B4-43E1-BD27-A9A373164934}.Release|Any CPU.Build.0 = Release|Any CPU
+		{718D87D0-F67F-40CA-A9AC-B701E360F3FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{718D87D0-F67F-40CA-A9AC-B701E360F3FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{718D87D0-F67F-40CA-A9AC-B701E360F3FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{718D87D0-F67F-40CA-A9AC-B701E360F3FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{590FC3F0-5473-4BC1-8723-8F20670D98C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{590FC3F0-5473-4BC1-8723-8F20670D98C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{590FC3F0-5473-4BC1-8723-8F20670D98C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{590FC3F0-5473-4BC1-8723-8F20670D98C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DB017A0-5E8F-41C3-9B79-92752529B3F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DB017A0-5E8F-41C3-9B79-92752529B3F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DB017A0-5E8F-41C3-9B79-92752529B3F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DB017A0-5E8F-41C3-9B79-92752529B3F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace MeltySynth;
+﻿namespace MeltySynth;
 
 /// <summary>
 /// Represents a sample in the SoundFont.

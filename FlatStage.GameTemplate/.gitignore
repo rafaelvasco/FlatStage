@@ -1,0 +1,8 @@
+.vscode
+.idea
+.vs
+bin
+publish
+obj
+*.csproj.user
+*.DS_Store

@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace MeltySynth;
+﻿namespace MeltySynth;
 
 internal sealed class ZoneInfo
 {

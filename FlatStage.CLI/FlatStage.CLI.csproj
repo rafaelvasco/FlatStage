@@ -2,13 +2,20 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <AssemblyName>FlatCLI</AssemblyName>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FlatStage.Core\FlatStage.Core.csproj" />
+      <None Update="ShaderCompiler\**\*.*">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FlatStage.AssetPipeline\FlatStage.AssetPipeline.csproj" />
     </ItemGroup>
 
 </Project>

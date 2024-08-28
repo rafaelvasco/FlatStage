@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace MeltySynth;
+﻿namespace MeltySynth;
 
 /// <summary>
 /// The information of a SoundFont.

@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <AssemblyName>MyGame</AssemblyName>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(OS)' == 'Windows_NT' And '$(Configuration)' == 'Release'">
+        <OutputType>WinExe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FlatStage.Core\FlatStage.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+        <ContentWithTargetPath Include=".\Runtime\win-x64\BGFX.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>BGFX.dll</TargetPath>
+        </ContentWithTargetPath>
+        <ContentWithTargetPath Include=".\Runtime\win-x64\SDL2.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>SDL2.dll</TargetPath>
+        </ContentWithTargetPath>
+        <ContentWithTargetPath Include=".\Runtime\win-x64\miniaudio.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>miniaudio.dll</TargetPath>
+        </ContentWithTargetPath>
+    </ItemGroup>
+
+    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+        <ContentWithTargetPath Include=".\Runtime\mac-arm64\BGFX.dylib">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>BGFX.dylib</TargetPath>
+        </ContentWithTargetPath>
+        <ContentWithTargetPath Include=".\Runtime\mac-arm64\SDL2.dylib">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>SDL2.dylib</TargetPath>
+        </ContentWithTargetPath>
+        <ContentWithTargetPath Include=".\Runtime\mac-arm64\miniaudio.dylib">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>miniaudio.dylib</TargetPath>
+        </ContentWithTargetPath>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="Assets\**\*.fsb">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+</Project>

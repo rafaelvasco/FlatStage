@@ -48,6 +48,23 @@ public class Texture : Asset, IEquatable<Texture>
         TexelHeight = 1 / (float)Height;
     }
 
+    public static Texture LoadFromData(ImageData data)
+    {
+        var (Data, _, _) = ImageIO.LoadPNGFromMem(data.Data);
+
+        var texture = Graphics.CreateTexture(
+            data.Id,
+            new TextureProps()
+            {
+                Data = Data,
+                Width = data.Width,
+                Height = data.Height
+            }
+        );
+
+        return texture;
+    }
+
     public unsafe void SetData(Memory<byte> pixels, int targetX = 0, int targetY = 0, int targetW = 0, int targetH = 0)
     {
         var data = BgfxUtils.MakeRef(pixels);

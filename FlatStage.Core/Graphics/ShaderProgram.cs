@@ -111,6 +111,19 @@ public sealed class ShaderProgram : Asset
         }
     }
 
+    public static ShaderProgram LoadFromData(ShaderData data)
+    {
+        var shader = Graphics.CreateShader(data.Id, new ShaderProgramProps()
+        {
+            VertexShader = data.VertexShader,
+            FragmentShader = data.FragmentShader,
+            Parameters = data.Params,
+            Samplers = data.Samplers
+        });
+
+        return shader;
+    }
+
     public void SetTexture(int slot, Texture texture)
     {
         slot = MathUtils.Max(slot, 0);

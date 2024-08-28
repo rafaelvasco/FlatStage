@@ -27,7 +27,7 @@ public abstract class Executor
             {
                 if (i < parameters.Length - 1)
                 {
-                    if (!parameters[i + 1].StartsWith("-"))
+                    if (!parameters[i + 1].StartsWith('-'))
                     {
                         return parameters[i + 1];
                     }
@@ -107,7 +107,6 @@ public static class CliExecutor
         }
         catch (Exception e)
         {
-
             Console.WriteLine(e.Message);
         }
     }

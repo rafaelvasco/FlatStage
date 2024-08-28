@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MeltySynth;
+﻿namespace MeltySynth;
 
 /// <summary>
 /// An instance of the MIDI file sequencer.

@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Rafael Vasco",
+  "classifications": [ "Common", "Console" ],
+  "identity": "FlatStage.GameTemplate",
+  "name": "FlatStage Game Template",
+  "shortName": "FlatStageGame",
+  "sourceName":"MyGame",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  }
+}
