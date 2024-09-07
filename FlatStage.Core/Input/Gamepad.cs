@@ -51,21 +51,21 @@ public enum GamePadButtons
     /// </summary>
     BigButton = 0x00000800,
     /// <summary>
-    /// A button.
+    /// South button.
     /// </summary>
-    A = 0x00001000,
+    South = 0x00001000,
     /// <summary>
-    /// B button.
+    /// East button.
     /// </summary>
-    B = 0x00002000,
+    East = 0x00002000,
     /// <summary>
-    /// X button.
+    /// West button.
     /// </summary>
-    X = 0x00004000,
+    West = 0x00004000,
     /// <summary>
-    /// Y button.
+    /// North button.
     /// </summary>
-    Y = 0x00008000,
+    North = 0x00008000,
     /// <summary>
     /// Left stick is towards the left.
     /// </summary>
@@ -110,13 +110,7 @@ public enum GamePadButtons
 
 public struct GamePadCapabilities
 {
-    public bool IsConnected
-    {
-        get;
-        internal set;
-    }
-
-    public bool HasAButton
+    public bool HasSouthButton
     {
         get;
         internal set;
@@ -128,7 +122,7 @@ public struct GamePadCapabilities
         internal set;
     }
 
-    public bool HasBButton
+    public bool HasEastButton
     {
         get;
         internal set;
@@ -188,13 +182,13 @@ public struct GamePadCapabilities
         internal set;
     }
 
-    public bool HasXButton
+    public bool HasWestButton
     {
         get;
         internal set;
     }
 
-    public bool HasYButton
+    public bool HasNorthButton
     {
         get;
         internal set;
@@ -242,19 +236,7 @@ public struct GamePadCapabilities
         internal set;
     }
 
-    public bool HasLeftVibrationMotor
-    {
-        get;
-        internal set;
-    }
-
-    public bool HasRightVibrationMotor
-    {
-        get;
-        internal set;
-    }
-
-    public bool HasVoiceSupport
+    public bool HasRumble
     {
         get;
         internal set;
@@ -303,46 +285,17 @@ public enum GamePadIndex
 
 public enum GamePadType
 {
-    /// <summary>
-    /// Unknown.
-    /// </summary>
     Unknown,
-    /// <summary>
-    /// GamePad is the XBOX controller.
-    /// </summary>
-    GamePad,
-    /// <summary>
-    /// GamePad is a wheel.
-    /// </summary>
-    Wheel,
-    /// <summary>
-    /// GamePad is an arcade stick.
-    /// </summary>
-    ArcadeStick,
-    /// <summary>
-    /// GamePad is a flight stick.
-    /// </summary>
-    FlightStick,
-    /// <summary>
-    /// GamePad is a dance pad.
-    /// </summary>
-    DancePad,
-    /// <summary>
-    /// GamePad is a guitar.
-    /// </summary>
-    Guitar,
-    /// <summary>
-    /// GamePad is an alternate guitar.
-    /// </summary>
-    AlternateGuitar,
-    /// <summary>
-    /// GamePad is a drum kit.
-    /// </summary>
-    DrumKit,
-    /// <summary>
-    /// GamePad is a big button pad.
-    /// </summary>
-    BigButtonPad,
+    Standard,
+    XBox360,
+    XBoxOne,
+    PS3,
+    PS4,
+    PS5,
+    SwitchPro,
+    SwitchJoyLeft,
+    SwitchJoyRight,
+    SwitchJoyPair
 }
 
 public struct GamePadThumbSticks
@@ -719,12 +672,9 @@ public static class Gamepad
         _gpState = new GamePadState[MaxCount];
         _lastGpState = new GamePadState[MaxCount];
 
-        //TODO:
-        //var gamepad_mappings_text_file = Engine.Content.Get<TextFile>("gamecontrollerdb");
+        var gamepadMapping = Content.LoadEmbeddedRaw("Controller", "gamecontrollerdb.txt");
 
-        //var gamepad_mappings_text_content = gamepad_mappings_text_file.JoinedText;
-
-        //PlatformContext.SetGamePadMappingsFile(gamepad_mappings_text_content);
+        Platform.SetGamePadMappingsFile(gamepadMapping);
 
         Platform.PreLookForGamepads();
 

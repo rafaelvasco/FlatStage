@@ -1,7 +1,7 @@
 
 using System.Runtime.InteropServices;
-
-using static SDL2.SDL;
+using SDL;
+using static SDL.SDL3;
 
 namespace FlatStage;
 
@@ -9,7 +9,8 @@ public enum PlatformId
 {
     Windows,
     Mac,
-    Linux
+    LinuxX11,
+    LinuxWayland
 }
 
 public delegate void FileDropEvent(FileDropEventArgs args);
@@ -22,7 +23,7 @@ public readonly struct FileDropEventArgs(string[] files)
     public string[] Files { get; } = files;
 }
 
-internal static partial class Platform
+internal static unsafe partial class Platform
 {
     public static Action? OnQuit;
     public static Action<FileDropEventArgs>? OnFileDrop;
@@ -37,19 +38,10 @@ internal static partial class Platform
 
         SDL_SetMainReady();
 
-#if DEBUG
-
-        if (PlatformId == PlatformId.Windows)
-        {
-            SDL_SetHint(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, "1");
-        }
-
-#endif
-
         SDL_SetHint("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
         SDL_SetHint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
 
-        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0)
+        if (SDL_Init((SDL_InitFlags)(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) < 0)
         {
             SDL_Quit();
             throw new ApplicationException("Failed to initialize SDL");
@@ -57,7 +49,6 @@ internal static partial class Platform
 
         CreateWindow(settings);
 
-        InitMouse();
         InitGamePad();
     }
 
@@ -71,36 +62,42 @@ internal static partial class Platform
 
     public static void ProcessEvents()
     {
-        while (SDL_PollEvent(out SDL_Event evt) != 0)
+        SDL_Event evt;
+        while (SDL_PollEvent(&evt) != 0)
         {
             switch (evt.type)
             {
-                case SDL_EventType.SDL_KEYDOWN or SDL_EventType.SDL_KEYUP:
+                case (uint)SDL_EventType.SDL_EVENT_KEY_DOWN or (uint)SDL_EventType.SDL_EVENT_KEY_UP:
                     ProcessKeyEvent(evt);
                     break;
-                case SDL_EventType.SDL_MOUSEMOTION
-                    or SDL_EventType.SDL_MOUSEBUTTONDOWN
-                    or SDL_EventType.SDL_MOUSEBUTTONUP
-                    or SDL_EventType.SDL_MOUSEWHEEL:
+                case (uint)SDL_EventType.SDL_EVENT_MOUSE_MOTION
+                    or (uint)SDL_EventType.SDL_EVENT_MOUSE_BUTTON_DOWN
+                    or (uint)SDL_EventType.SDL_EVENT_MOUSE_BUTTON_UP
+                    or (uint)SDL_EventType.SDL_EVENT_MOUSE_WHEEL:
                     ProcessMouseEvent(evt);
                     break;
-                case SDL_EventType.SDL_WINDOWEVENT:
+                case (uint)SDL_EventType.SDL_EVENT_WINDOW_RESIZED or
+                    (uint)SDL_EventType.SDL_EVENT_WINDOW_MINIMIZED or
+                    (uint)SDL_EventType.SDL_EVENT_WINDOW_RESTORED or
+                    (uint)SDL_EventType.SDL_EVENT_WINDOW_MOUSE_ENTER or
+                    (uint)SDL_EventType.SDL_EVENT_WINDOW_MOUSE_LEAVE:
+
                     ProcessWindowEvent(evt);
                     break;
-                case SDL_EventType.SDL_CONTROLLERDEVICEADDED
-                    or SDL_EventType.SDL_CONTROLLERDEVICEREMOVED:
+                case (uint)SDL_EventType.SDL_EVENT_GAMEPAD_ADDED
+                    or (uint)SDL_EventType.SDL_EVENT_GAMEPAD_REMOVED:
                     ProcessGamePadEvent(evt);
                     break;
-                case SDL_EventType.SDL_TEXTINPUT:
+                case (uint)SDL_EventType.SDL_EVENT_TEXT_INPUT:
                     ProcessTextInputEvent(evt);
                     break;
-                case SDL_EventType.SDL_DROPFILE:
+                case (uint)SDL_EventType.SDL_EVENT_DROP_FILE:
                     ProcessDropFile(evt);
                     break;
-                case SDL_EventType.SDL_DROPCOMPLETE:
+                case (uint)SDL_EventType.SDL_EVENT_DROP_COMPLETE:
                     CompleteDropFile(evt);
                     break;
-                case SDL_EventType.SDL_QUIT:
+                case (uint)SDL_EventType.SDL_EVENT_QUIT:
                     OnQuit?.Invoke();
                     break;
             }
@@ -114,10 +111,11 @@ internal static partial class Platform
             return;
         }
 
-        string path = UTF8_ToManaged(evt.drop.file, freePtr: true);
+        string? path = evt.drop.GetData();
 
-        _dropList ??= new List<string>();
+        if (string.IsNullOrEmpty(path)) return;
 
+        _dropList ??= [];
         _dropList.Add(path);
     }
 
@@ -141,7 +139,7 @@ internal static partial class Platform
             SDL_MessageBoxFlags.SDL_MESSAGEBOX_ERROR,
             title,
             message,
-            IntPtr.Zero
+            _windowHandle
         );
     }
 
@@ -151,7 +149,7 @@ internal static partial class Platform
             SDL_MessageBoxFlags.SDL_MESSAGEBOX_INFORMATION,
             title,
             message,
-            IntPtr.Zero
+            _windowHandle
         );
     }
 
@@ -177,7 +175,24 @@ internal static partial class Platform
         }
         else if (OperatingSystem.IsLinux())
         {
-            PlatformId = PlatformId.Linux;
+            var currentVideoDriver = SDL_GetCurrentVideoDriver();
+
+            if (!string.IsNullOrEmpty(currentVideoDriver))
+            {
+                if (currentVideoDriver.Equals("x11"))
+                {
+                    PlatformId = PlatformId.LinuxX11;
+                }
+                else if (currentVideoDriver.Equals("wayland"))
+                {
+                    PlatformId = PlatformId.LinuxWayland;
+                }
+
+                return;
+            }
+
+            throw new Exception($"Unsupported Linux Platform: {currentVideoDriver}");
+
         }
         else
         {

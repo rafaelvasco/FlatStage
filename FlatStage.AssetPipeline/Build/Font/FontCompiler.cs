@@ -222,7 +222,5 @@ internal unsafe class FontCompiler : IDisposable
     public void Dispose()
     {
         FT.FT_Done_FreeType(_ftLibrary);
-
-        Marshal.FreeHGlobal((nint)_ftLibrary);
     }
 }

@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <RuntimeIdentifiers>win-x64;osx-arm64</RuntimeIdentifiers>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -9,10 +10,41 @@
 
     <ItemGroup>
         <EmbeddedResource Include="Assets\**\*.fsb" />
+        <EmbeddedResource Include="Assets\Controller\gamecontrollerdb.txt" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\FlatStage.Common\FlatStage.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="ppy.SDL3-CS" Version="2024.807.1" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+        <ContentWithTargetPath Include=".\Runtime\win-x64\BGFX.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>BGFX.dll</TargetPath>
+        </ContentWithTargetPath>
+        <ContentWithTargetPath Include=".\Runtime\win-x64\miniaudio.dll">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>miniaudio.dll</TargetPath>
+        </ContentWithTargetPath>
+    </ItemGroup>
+
+    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+        <ContentWithTargetPath Include=".\Runtime\osx-arm64\BGFX.dylib">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>BGFX.dylib</TargetPath>
+        </ContentWithTargetPath>
+        <ContentWithTargetPath Include=".\Runtime\osx-arm64\miniaudio.dylib">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <TargetPath>miniaudio.dylib</TargetPath>
+        </ContentWithTargetPath>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Foundation\SDL3\" />
     </ItemGroup>
 
 </Project>

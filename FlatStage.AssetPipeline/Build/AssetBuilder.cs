@@ -127,6 +127,11 @@ public static class AssetBuilder
             throw;
         }
 
+        foreach (var (_, value) in _builders)
+        {
+            value.Cleanup();
+        }
+
         return;
 
         void BuildDirect(
@@ -313,11 +318,6 @@ public static class AssetBuilder
                 string path = Path.Combine(rootFolder, ContentProperties.AssetsFolder, $"{pakName}{ContentProperties.BinaryExt}");
 
                 AssetDataIO.SaveAssetData(path, pak);
-            }
-
-            foreach (var (_, value) in _builders)
-            {
-                value.Cleanup();
             }
 
             return;

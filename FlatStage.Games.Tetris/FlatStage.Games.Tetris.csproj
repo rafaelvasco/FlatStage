@@ -3,21 +3,22 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <AssemblyName>Vetris</AssemblyName>
+        <RuntimeIdentifiers>win-x64;osx-arm64</RuntimeIdentifiers>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <RootNamespace>FlatStage.Tetris</RootNamespace>
         <LangVersion>12</LangVersion>
-        
+
         <!-- AOT OPTIONS -->
         <!--<PublishAot>true</PublishAot>
         <SelfContained>true</SelfContained>
         <StripSymbols>true</StripSymbols> -->
-        
+
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(OS)' == 'Windows_NT' And '$(Configuration)' == 'Release'">
-      <OutputType>WinExe</OutputType>
+        <OutputType>WinExe</OutputType>
     </PropertyGroup>
 
     <ItemGroup>

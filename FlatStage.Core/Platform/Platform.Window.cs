@@ -1,4 +1,6 @@
-using static SDL2.SDL;
+
+using SDL;
+using static SDL.SDL3;
 
 namespace FlatStage;
 
@@ -33,7 +35,8 @@ public enum WindowFlags
     MouseCapture = 0x00004000
 }
 
-internal static partial class Platform
+
+internal static unsafe partial class Platform
 {
     public static Action<Size>? WindowResized;
     public static Action? WindowMinimized;
@@ -41,28 +44,31 @@ internal static partial class Platform
     public static Action? WindowEntered;
     public static Action? WindowExited;
 
+
     private static void CreateWindow(GameSettings settings)
     {
         var windowFlags =
-            SDL_WindowFlags.SDL_WINDOW_HIDDEN |
-            SDL_WindowFlags.SDL_WINDOW_INPUT_FOCUS |
-            SDL_WindowFlags.SDL_WINDOW_MOUSE_FOCUS;
+            (SDL_WINDOW_HIDDEN |
+                              SDL_WINDOW_INPUT_FOCUS |
+                              SDL_WINDOW_MOUSE_FOCUS);
 
         if (settings.Fullscreen)
         {
-            windowFlags |= SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP;
+            windowFlags |= SDL_WINDOW_FULLSCREEN;
         }
 
-        _windowHandle = SDL_CreateWindow(
-            settings.AppTitle,
-            SDL_WINDOWPOS_CENTERED,
-            SDL_WINDOWPOS_CENTERED,
-            settings.CanvasWidth,
-            settings.CanvasHeight,
-            windowFlags
-        );
+        SDL_PropertiesID windowProps = SDL_CreateProperties();
 
-        if (_windowHandle == IntPtr.Zero)
+        SDL_SetStringProperty(windowProps, "title", settings.AppTitle);
+        SDL_SetNumberProperty(windowProps, "x", SDL_WINDOWPOS_CENTERED);
+        SDL_SetNumberProperty(windowProps, "y", SDL_WINDOWPOS_CENTERED);
+        SDL_SetNumberProperty(windowProps, "width", settings.CanvasWidth);
+        SDL_SetNumberProperty(windowProps, "height", settings.CanvasHeight);
+        SDL_SetNumberProperty(windowProps, "flags", (long)windowFlags);
+
+        _windowHandle = SDL_CreateWindowWithProperties(windowProps);
+
+        if (_windowHandle == null)
         {
             throw new ApplicationException("Could not create Window");
         }
@@ -84,13 +90,13 @@ internal static partial class Platform
 
     public static WindowMode GetWindowMode()
     {
-        _ = SDL_GetWindowDisplayMode(_windowHandle, out SDL_DisplayMode mode);
+        var mode = SDL_GetWindowFullscreenMode(_windowHandle);
 
         return new WindowMode
         {
             Fullscreen = IsFullscreen(),
-            Width = mode.w,
-            Height = mode.h,
+            Width = mode->w,
+            Height = mode->h,
         };
     }
 
@@ -103,7 +109,7 @@ internal static partial class Platform
     {
         if (IsFullscreen() != fullscreen)
         {
-            _ = SDL_SetWindowFullscreen(_windowHandle, (uint)(fullscreen ? WindowFlags.FullscreenDesktop : 0));
+            _ = SDL_SetWindowFullscreen(_windowHandle, fullscreen ? SDL_bool.SDL_TRUE : SDL_bool.SDL_FALSE);
         }
     }
 
@@ -115,12 +121,15 @@ internal static partial class Platform
         }
 
         SDL_SetWindowSize(_windowHandle, width, height);
-        SDL_SetWindowPosition(_windowHandle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+        SDL_SetWindowPosition(_windowHandle, (int)SDL_WINDOWPOS_CENTERED, (int)SDL_WINDOWPOS_CENTERED);
     }
 
     public static Size GetWindowSize()
     {
-        SDL_GetWindowSize(_windowHandle, out var w, out var h);
+        int w;
+        int h;
+
+        SDL_GetWindowSize(_windowHandle, &w, &h);
         return new Size(w, h);
     }
 
@@ -141,18 +150,24 @@ internal static partial class Platform
 
     public static string GetWindowTitle()
     {
-        return SDL_GetWindowTitle(_windowHandle);
+        return SDL_GetWindowTitle(_windowHandle) ?? string.Empty;
     }
 
     public static void ShowCursor(bool show)
     {
-        _ = SDL_ShowCursor(show ? 1 : 0);
+        if (show)
+        {
+            SDL_ShowCursor();
+        }
+        else
+        {
+            SDL_HideCursor();
+        }
     }
 
     public static bool CursorVisible()
     {
-        var state = SDL_ShowCursor(SDL_QUERY);
-        return state == SDL_ENABLE;
+        return SDL_CursorVisible() == SDL_bool.SDL_TRUE;
     }
 
     public static WindowFlags GetWindowFlags()
@@ -162,52 +177,63 @@ internal static partial class Platform
 
     internal static NativeDisplayHandles GetDisplayNativeHandles()
     {
-        var info = new SDL_SysWMinfo();
-
-        SDL_GetWindowWMInfo(_windowHandle, ref info);
-
-        return PlatformId switch
+        string GetWindowHandlePropName()
         {
-            PlatformId.Windows => new NativeDisplayHandles
+            return PlatformId switch
             {
-                WindowHandle = info.info.win.window,
-                DisplayType = null
-            },
-            PlatformId.Linux => new NativeDisplayHandles
+                PlatformId.Windows => "SDL.window.win32.hwnd",
+                PlatformId.Mac => "SDL.window.cocoa.window",
+                PlatformId.LinuxX11 => "SDL.window.x11.window",
+                PlatformId.LinuxWayland => "SDL.window.wayland.window",
+                _ => throw new Exception($"Can't get WindowHandlePropName for this Platform: {PlatformId}")
+            };
+        }
+
+        string GetDisplayHandlePropName()
+        {
+            return PlatformId switch
             {
-                WindowHandle = info.info.x11.window,
-                DisplayType = info.info.x11.display
-            },
-            PlatformId.Mac => new NativeDisplayHandles
-            {
-                WindowHandle = info.info.cocoa.window,
-                DisplayType = null
-            },
-            _ => throw new ApplicationException("Could not retrieve native window handle")
+                PlatformId.Windows => string.Empty,
+                PlatformId.Mac => string.Empty,
+                PlatformId.LinuxX11 => "SDL.window.x11.display",
+                PlatformId.LinuxWayland => "SDL.window.wayland.display",
+                _ => throw new Exception($"Can't get WindowHandlePropName for this Platform: {PlatformId}")
+            };
+        }
+
+        var windowProps = SDL_GetWindowProperties(_windowHandle);
+
+        var nativeWindowHandle = SDL_GetPointerProperty(windowProps, GetWindowHandlePropName(), nint.Zero);
+        var nativeDisplayHandle = SDL_GetPointerProperty(windowProps, GetDisplayHandlePropName(), nint.Zero);
+
+        return new NativeDisplayHandles()
+        {
+            WindowHandle = nativeWindowHandle,
+            DisplayType = nativeDisplayHandle
         };
     }
 
     private static void ProcessWindowEvent(SDL_Event ev)
     {
-        switch (ev.window.windowEvent)
+        switch (ev.window.type)
         {
-            case SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED:
+            case SDL_EventType.SDL_EVENT_WINDOW_RESIZED:
 
                 var newW = ev.window.data1;
                 var newH = ev.window.data2;
                 WindowResized?.Invoke(new Size(newW, newH));
                 break;
 
-            case SDL_WindowEventID.SDL_WINDOWEVENT_MINIMIZED:
+            case SDL_EventType.SDL_EVENT_WINDOW_MINIMIZED:
                 WindowMinimized?.Invoke();
                 break;
-            case SDL_WindowEventID.SDL_WINDOWEVENT_RESTORED:
+            case SDL_EventType.SDL_EVENT_WINDOW_RESTORED:
                 WindowRestored?.Invoke();
                 break;
-            case SDL_WindowEventID.SDL_WINDOWEVENT_ENTER:
+            case SDL_EventType.SDL_EVENT_WINDOW_MOUSE_ENTER:
                 WindowEntered?.Invoke();
                 break;
-            case SDL_WindowEventID.SDL_WINDOWEVENT_LEAVE:
+            case SDL_EventType.SDL_EVENT_WINDOW_MOUSE_LEAVE:
                 WindowExited?.Invoke();
                 break;
         }
@@ -215,12 +241,13 @@ internal static partial class Platform
 
     private static void DestroyWindow()
     {
-        if (_windowHandle != IntPtr.Zero)
+        if (_windowHandle != null)
         {
             SDL_DestroyWindow(_windowHandle);
+            _windowHandle = null;
         }
     }
 
-    private static IntPtr _windowHandle;
-    private static uint _windowId;
+    private static SDL_Window* _windowHandle;
+    private static SDL_WindowID _windowId;
 }

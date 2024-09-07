@@ -1,3 +1,6 @@
+using System.Reflection;
+using System.Text;
+
 namespace FlatStage;
 
 public static class Content
@@ -153,6 +156,30 @@ public static class Content
         var asset = assetLoader.Load(RootPath, assetId);
 
         return (T)asset;
+    }
+
+    internal static string LoadEmbeddedRaw(string folderName, string fileName)
+    {
+        var path = new StringBuilder();
+
+        path.Append(ContentProperties.EmbeddedAssetsNamespace);
+        path.Append('.');
+        path.Append(folderName);
+        path.Append('.');
+        path.Append(fileName);
+
+        using var fileStream = Assembly.GetExecutingAssembly()
+            .GetManifestResourceStream(path.ToString());
+
+        if (fileStream == null)
+        {
+            throw new ApplicationException($"Could not load embedded asset on folder {folderName} with file name {fileName}");
+        }
+
+        using var reader = new StreamReader(fileStream);
+
+        return reader.ReadToEnd();
+
     }
 
     private static T LoadEmbedded<T>(string assetId) where T : Asset

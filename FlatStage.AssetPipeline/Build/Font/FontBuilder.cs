@@ -66,7 +66,7 @@ internal class FontBuilder : AssetBuilderAgent<FontData, FontAssetInfo>
 
         if (assetInfoType.CharRange != null)
         {
-            CharRange? rangeFromName = CharRange.FromName(assetInfoType.CharRange);
+            var rangeFromName = CharRange.FromName(assetInfoType.CharRange);
 
             if (rangeFromName == null)
             {

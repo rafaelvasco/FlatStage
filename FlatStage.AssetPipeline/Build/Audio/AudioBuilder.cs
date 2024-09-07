@@ -12,14 +12,12 @@ internal class AudioBuilder() : AssetBuilderAgent<AudioData, AudioAssetInfo>("Au
 
         var ext = Path.GetExtension(assetFilePath);
 
-        AudioFormat format;
-
-        switch (ext)
+        AudioFormat format = ext switch
         {
-            case WavExt: format = AudioFormat.Wav; break;
-            case OggExt: format = AudioFormat.Ogg; break;
-            default: throw new Exception($"Unsupported Audio Extension: {ext}");
-        }
+            WavExt => AudioFormat.Wav,
+            OggExt => AudioFormat.Ogg,
+            _ => throw new Exception($"Unsupported Audio Extension: {ext}")
+        };
 
         var result = new AudioData()
         {

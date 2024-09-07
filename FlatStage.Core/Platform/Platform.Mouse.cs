@@ -1,11 +1,10 @@
-using static SDL2.SDL;
+using SDL;
+using static SDL.SDL3;
 
 namespace FlatStage;
 
-internal static partial class Platform
+internal static unsafe partial class Platform
 {
-    private static bool _supportsGlobalMouse;
-
     public static Action<MouseButton>? MouseUp;
     public static Action<MouseButton>? MouseDown;
     public static Action<int, int>? MouseMove;
@@ -14,29 +13,27 @@ internal static partial class Platform
 
     public static MouseState GetMouseState()
     {
-        uint flags;
-        int x, y;
+        SDL_MouseButtonFlags flags;
+        float x, y;
         if (GetRelativeMouseMode())
         {
-            flags = SDL_GetRelativeMouseState(out x, out y);
-        }
-        else if (_supportsGlobalMouse)
-        {
-            flags = SDL_GetGlobalMouseState(out x, out y);
-            SDL_GetWindowPosition(_windowHandle, out int wx, out int wy);
-            x -= wx;
-            y -= wy;
+            flags = SDL_GetRelativeMouseState(&x, &y);
         }
         else
         {
-            flags = SDL_GetMouseState(out x, out y);
+            flags = SDL_GetGlobalMouseState(&x, &y);
+            int windowX;
+            int windowY;
+            SDL_GetWindowPosition(_windowHandle, &windowX, &windowY);
+            x -= windowX;
+            y -= windowY;
         }
 
-        var left = (flags & SDL_BUTTON_LMASK) > 0;
-        var middle = ((flags & SDL_BUTTON_MMASK) >> 1) > 0;
-        var right = ((flags & SDL_BUTTON_RMASK) >> 2) > 0;
+        var left = (flags & (SDL_MouseButtonFlags)SDL_BUTTON_LMASK) > 0;
+        var middle = (flags & (SDL_MouseButtonFlags)SDL_BUTTON_MMASK) > 0;
+        var right = (flags & (SDL_MouseButtonFlags)SDL_BUTTON_RMASK) > 0;
 
-        return new MouseState(x, y, _mWheelValue, left, middle, right);
+        return new MouseState((int)x, (int)y, _mWheelValue, left, middle, right);
     }
 
     public static void SetMousePosition(int x, int y)
@@ -56,32 +53,26 @@ internal static partial class Platform
         );
     }
 
-    private static void InitMouse()
-    {
-        _supportsGlobalMouse =
-            PlatformId is PlatformId.Windows or PlatformId.Mac or PlatformId.Linux;
-    }
-
     private static void ProcessMouseEvent(SDL_Event evt)
     {
         var button = TranslateBooPlatformMouseButton(evt.button.button);
 
         switch (evt.type)
         {
-            case SDL_EventType.SDL_MOUSEMOTION when MouseMove is not null:
-                MouseMove(evt.motion.x, evt.motion.y);
+            case (uint)SDL_EventType.SDL_EVENT_MOUSE_MOTION when MouseMove is not null:
+                MouseMove((int)evt.motion.x, (int)evt.motion.y);
                 break;
-            case SDL_EventType.SDL_MOUSEBUTTONDOWN when MouseDown is not null:
+            case (uint)SDL_EventType.SDL_EVENT_MOUSE_BUTTON_DOWN when MouseDown is not null:
                 MouseDown(button);
                 break;
-            case SDL_EventType.SDL_MOUSEBUTTONUP when MouseUp is not null:
+            case (uint)SDL_EventType.SDL_EVENT_MOUSE_BUTTON_UP when MouseUp is not null:
                 MouseUp(button);
                 break;
         }
 
-        if (evt.type == SDL_EventType.SDL_MOUSEWHEEL)
+        if (evt.type == (uint)SDL_EventType.SDL_EVENT_MOUSE_WHEEL)
         {
-            _mWheelValue += evt.wheel.y * 120;
+            _mWheelValue += (int)(evt.wheel.y * 120);
         }
     }
 

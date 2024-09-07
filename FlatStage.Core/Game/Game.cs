@@ -246,12 +246,9 @@ public abstract class Game : Disposable
 
     private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
-        ShowExceptionMessage((Exception)e.ExceptionObject);
-    }
-
-    private static void ShowExceptionMessage(Exception ex)
-    {
-        Platform.ShowRuntimeError("FlatStage", $"An Error Occurred: {ex.Message}");
+        Platform.ShowRuntimeError("FlatStage", "We crashed. Check log.txt for more.");
+        Logger.Write(((Exception)e.ExceptionObject).Message, LogLevel.Error);
+        Logger.Flush();
     }
 
     private void InitInput()

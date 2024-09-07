@@ -1,9 +1,10 @@
 using System.Text;
-using static SDL2.SDL;
+using SDL;
+using static SDL.SDL3;
 
 namespace FlatStage;
 
-internal static partial class Platform
+internal static unsafe partial class Platform
 {
     public static KeyEvent? KeyDown;
     public static KeyEvent? KeyUp;
@@ -167,17 +168,17 @@ internal static partial class Platform
     {
         if (active)
         {
-            SDL_StartTextInput();
+            SDL_StartTextInput(_windowHandle);
         }
         else
         {
-            SDL_StopTextInput();
+            SDL_StopTextInput(_windowHandle);
         }
     }
 
     private static void ProcessTextInputEvent(SDL_Event evt)
     {
-        if (evt.type == SDL_EventType.SDL_TEXTINPUT)
+        if (evt.type == (uint)SDL_EventType.SDL_EVENT_TEXT_INPUT)
         {
             unsafe
             {
@@ -210,15 +211,15 @@ internal static partial class Platform
     {
         switch (evt.type)
         {
-            case SDL_EventType.SDL_KEYDOWN:
+            case (uint)SDL_EventType.SDL_EVENT_KEY_DOWN:
                 {
-                    Key key = ConvertKey((int)evt.key.keysym.sym);
+                    Key key = ConvertKey((int)evt.key.key);
 
                     KeyPressBuffer.Add(key);
 
                     if (TextInput != null)
                     {
-                        char character = (char)evt.key.keysym.sym;
+                        char character = (char)evt.key.key;
 
                         if (char.IsControl(character))
                         {
@@ -230,9 +231,9 @@ internal static partial class Platform
 
                     break;
                 }
-            case SDL_EventType.SDL_KEYUP:
+            case (uint)SDL_EventType.SDL_EVENT_KEY_UP:
                 {
-                    Key key = ConvertKey((int)evt.key.keysym.sym);
+                    Key key = ConvertKey((int)evt.key.key);
 
                     KeyPressBuffer.Remove(key);
 

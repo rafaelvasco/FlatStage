@@ -30,8 +30,8 @@ public static class Logger
         _log.AppendLine(message);
     }
 
-    internal static void Flush()
+    public static void Flush()
     {
-        File.WriteAllText("log.txt", _log.ToString());
+        File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "log.txt"), _log.ToString());
     }
 }

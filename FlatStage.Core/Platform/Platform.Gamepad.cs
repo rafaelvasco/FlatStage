@@ -1,30 +1,20 @@
-using static SDL2.SDL;
+using System.Runtime.CompilerServices;
+using SDL;
+using static SDL.SDL3;
 
 namespace FlatStage;
 
-internal static partial class Platform
+internal static unsafe partial class Platform
 {
     public static int ConnectedGamePads { get; set; }
 
-    private static readonly IntPtr[] GamepadDevices = new IntPtr[Gamepad.MaxCount];
+    private static readonly nint[] GamepadDevices = new nint[Gamepad.MaxCount];
     private static readonly Dictionary<int, int> GamepadInstances = new();
     private static readonly string[] GamepadGuids = GenStringArray();
     private static readonly string[] GamepadLightBars = GenStringArray();
     private static readonly GamePadState[] GamepadStates = new GamePadState[Gamepad.MaxCount];
     private static readonly GamePadCapabilities[] GamepadCaps = new GamePadCapabilities[Gamepad.MaxCount];
 
-    private static readonly GamePadType[] GamepadTypes =
-    [
-        GamePadType.Unknown,
-        GamePadType.GamePad,
-        GamePadType.Wheel,
-        GamePadType.ArcadeStick,
-        GamePadType.FlightStick,
-        GamePadType.DancePad,
-        GamePadType.Guitar,
-        GamePadType.DrumKit,
-        GamePadType.BigButtonPad
-    ];
 
     public static GamePadCapabilities GetGamePadCapabilities(int index)
     {
@@ -35,42 +25,42 @@ internal static partial class Platform
     {
         index = MathUtils.Clamp(index, 0, GamepadDevices.Length - 1);
 
-        return SDL_GameControllerName(GamepadDevices[index]);
+        return SDL_GetGamepadName((SDL_Gamepad*)GamepadDevices[index]) ?? "Unknown";
     }
 
     public static GamePadState GetGamePadState(int index, GamePadDeadZone deadZoneMode)
     {
-        IntPtr device = GamepadDevices[index];
-        if (device == IntPtr.Zero)
+        var device = (SDL_Gamepad*)GamepadDevices[index];
+        if (device == null)
         {
             return new GamePadState();
         }
 
-        GamePadButtons gcButtonState = 0;
+        GamePadButtons gamepadButtonState = 0;
 
         // Sticks
         var stickLeft = new Vec2(
-            SDL_GameControllerGetAxis(
+            SDL_GetGamepadAxis(
                 device,
-                SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTX
+                SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFTX
             ) / 32767.0f,
-            SDL_GameControllerGetAxis(
+            SDL_GetGamepadAxis(
                 device,
-                SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTY
+                SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFTY
             ) / -32767.0f
         );
         var stickRight = new Vec2(
-            SDL_GameControllerGetAxis(
+            SDL_GetGamepadAxis(
                 device,
-                SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTX
+                SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTX
             ) / 32767.0f,
-            SDL_GameControllerGetAxis(
+            SDL_GetGamepadAxis(
                 device,
-                SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTY
+                SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTY
             ) / -32767.0f
         );
 
-        gcButtonState |= ConvertStickValuesToButtons(
+        gamepadButtonState |= ConvertStickValuesToButtons(
             stickLeft,
             GamePadButtons.LeftThumbstickLeft,
             GamePadButtons.LeftThumbstickRight,
@@ -78,7 +68,7 @@ internal static partial class Platform
             GamePadButtons.LeftThumbstickDown,
             Gamepad.LeftDeadZone
         );
-        gcButtonState |= ConvertStickValuesToButtons(
+        gamepadButtonState |= ConvertStickValuesToButtons(
             stickRight,
             GamePadButtons.RightThumbstickLeft,
             GamePadButtons.RightThumbstickRight,
@@ -88,98 +78,99 @@ internal static partial class Platform
         );
 
         // Triggers
-        float triggerLeft = SDL_GameControllerGetAxis(
+        float triggerLeft = SDL_GetGamepadAxis(
             device,
-            SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERLEFT
+            SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFT_TRIGGER
         ) / 32767.0f;
-        float triggerRight = SDL_GameControllerGetAxis(
+        float triggerRight = SDL_GetGamepadAxis(
             device,
-            SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERRIGHT
+            SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHT_TRIGGER
         ) / 32767.0f;
         if (triggerLeft > Gamepad.TriggerThreshold)
         {
-            gcButtonState |= GamePadButtons.LeftTrigger;
+            gamepadButtonState |= GamePadButtons.LeftTrigger;
         }
 
         if (triggerRight > Gamepad.TriggerThreshold)
         {
-            gcButtonState |= GamePadButtons.RightTrigger;
+            gamepadButtonState |= GamePadButtons.RightTrigger;
         }
 
         // Buttons
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_A) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_SOUTH) != 0)
         {
-            gcButtonState |= GamePadButtons.A;
+            gamepadButtonState |= GamePadButtons.South;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_B) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_EAST) != 0)
         {
-            gcButtonState |= GamePadButtons.B;
+            gamepadButtonState |= GamePadButtons.East;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_X) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_WEST) != 0)
         {
-            gcButtonState |= GamePadButtons.X;
+            gamepadButtonState |= GamePadButtons.West;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_Y) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_NORTH) != 0)
         {
-            gcButtonState |= GamePadButtons.Y;
+            gamepadButtonState |= GamePadButtons.North;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_BACK) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_BACK) != 0)
         {
-            gcButtonState |= GamePadButtons.Back;
+            gamepadButtonState |= GamePadButtons.Back;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_GUIDE) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_GUIDE) != 0)
         {
-            gcButtonState |= GamePadButtons.BigButton;
+            gamepadButtonState |= GamePadButtons.BigButton;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_START) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_START) != 0)
         {
-            gcButtonState |= GamePadButtons.Start;
+            gamepadButtonState |= GamePadButtons.Start;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_LEFTSTICK) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_STICK) != 0)
         {
-            gcButtonState |= GamePadButtons.LeftStick;
+            gamepadButtonState |= GamePadButtons.LeftStick;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_RIGHTSTICK) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_STICK) != 0)
         {
-            gcButtonState |= GamePadButtons.RightStick;
+            gamepadButtonState |= GamePadButtons.RightStick;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_LEFTSHOULDER) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_SHOULDER) != 0)
         {
-            gcButtonState |= GamePadButtons.LeftShoulder;
+            gamepadButtonState |= GamePadButtons.LeftShoulder;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) != 0)
+
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER) != 0)
         {
-            gcButtonState |= GamePadButtons.RightShoulder;
+            gamepadButtonState |= GamePadButtons.RightShoulder;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_UP) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_UP) != 0)
         {
-            gcButtonState |= GamePadButtons.DPadUp;
+            gamepadButtonState |= GamePadButtons.DPadUp;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_DOWN) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_DOWN) != 0)
         {
-            gcButtonState |= GamePadButtons.DPadDown;
+            gamepadButtonState |= GamePadButtons.DPadDown;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_LEFT) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_LEFT) != 0)
         {
-            gcButtonState |= GamePadButtons.DPadLeft;
+            gamepadButtonState |= GamePadButtons.DPadLeft;
         }
 
-        if (SDL_GameControllerGetButton(device, SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_RIGHT) != 0)
+        if (SDL_GetGamepadButton(device, SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_RIGHT) != 0)
         {
-            gcButtonState |= GamePadButtons.DPadRight;
+            gamepadButtonState |= GamePadButtons.DPadRight;
         }
 
         // Build the GamePadState, increment PacketNumber if state changed.
@@ -187,7 +178,7 @@ internal static partial class Platform
         GamePadState gcBuiltState = new GamePadState(
             new GamePadThumbSticks(stickLeft, stickRight, deadZoneMode),
             new GamePadTriggers(triggerLeft, triggerRight, deadZoneMode),
-            gcButtonState
+            gamepadButtonState
         )
         {
             IsConnected = true,
@@ -204,13 +195,13 @@ internal static partial class Platform
 
     public static bool SetGamePadVibration(int index, float leftMotor, float rightMotor)
     {
-        IntPtr device = GamepadDevices[index];
-        if (device == IntPtr.Zero)
+        var device = (SDL_Gamepad*)GamepadDevices[index];
+        if (device == null)
         {
             return false;
         }
 
-        return SDL_GameControllerRumble(
+        return SDL_RumbleGamepad(
             device,
             (ushort)(MathUtils.Clamp(leftMotor, 0.0f, 1.0f) * 0xFFFF),
             (ushort)(MathUtils.Clamp(rightMotor, 0.0f, 1.0f) * 0xFFFF),
@@ -218,9 +209,9 @@ internal static partial class Platform
         ) == 0;
     }
 
-    public static string GetGamePadGuid(int index)
+    public static string GetGamePadGuid(int gamepadIndex)
     {
-        return GamepadGuids[index];
+        return GamepadGuids[gamepadIndex];
     }
 
     public static void SetGamePadLightBar(int index, Color color)
@@ -246,26 +237,26 @@ internal static partial class Platform
 
     public static void SetGamePadMappingsFile(string fileContent)
     {
-        SDL_GameControllerAddMapping(fileContent);
+        SDL_AddGamepadMapping(fileContent);
     }
 
     public static void PreLookForGamepads()
     {
-        var evt = new SDL_Event[1];
+        var evt = stackalloc SDL_Event[1];
         SDL_PumpEvents();
         while (SDL_PeepEvents(
-                   evt,
+                   (SDL_Event*)Unsafe.AsPointer(ref evt[0]),
                    1,
-                   SDL_eventaction.SDL_GETEVENT,
-                   SDL_EventType.SDL_CONTROLLERDEVICEADDED,
-                   SDL_EventType.SDL_CONTROLLERDEVICEADDED
+                   SDL_EventAction.SDL_GETEVENT,
+                   (uint)SDL_EventType.SDL_EVENT_GAMEPAD_ADDED,
+                   (uint)SDL_EventType.SDL_EVENT_GAMEPAD_ADDED
                ) == 1)
         {
-            AddGamePadInstance(evt[0].cdevice.which);
+            AddGamePadInstance((int)evt[0].gdevice.which);
         }
     }
 
-    private static void AddGamePadInstance(int deviceId)
+    private static void AddGamePadInstance(int gamepadId)
     {
         if (ConnectedGamePads == Gamepad.MaxCount)
         {
@@ -277,14 +268,12 @@ internal static partial class Platform
         int which = ConnectedGamePads++;
 
         // Open the device!
-        GamepadDevices[which] = SDL_GameControllerOpen(deviceId);
+        var gamepadDevice = GamepadDevices[which] = (IntPtr)SDL_OpenGamepad((SDL_JoystickID)gamepadId);
+        var gamepadDevicePtr = (SDL_Gamepad*)gamepadDevice;
 
-        // We use this when dealing with GUID initialization.
-        IntPtr thisJoystick = SDL_GameControllerGetJoystick(GamepadDevices[which]);
+        SDL_JoystickID joystickId = SDL_GetGamepadID(gamepadDevicePtr);
 
-        int thisInstance = SDL_JoystickInstanceID(thisJoystick);
-
-        GamepadInstances.Add(thisInstance, which);
+        GamepadInstances.Add(gamepadId, which);
 
         // Start with a fresh state.
         GamepadStates[which] = new GamePadState
@@ -293,110 +282,116 @@ internal static partial class Platform
         };
 
         // Initialize the haptics for the joystick, if applicable.
-        bool hasRumble = SDL_GameControllerRumble(
-            GamepadDevices[which],
+        bool hasRumble = SDL_RumbleGamepad(
+            gamepadDevicePtr,
             0,
             0,
             0
         ) == 0;
 
+        var gamepadBindings = SDL_GetGamepadBindings(gamepadDevicePtr);
         var caps = new GamePadCapabilities
         {
-            IsConnected = true,
-            GamePadType = GamepadTypes[(int)SDL_JoystickGetType(thisJoystick)],
-            HasAButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_A
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasBButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_B
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasXButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_X
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasYButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_Y
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasBackButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_BACK
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasBigButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_GUIDE
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasStartButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_START
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasLeftStickButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_LEFTSTICK
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasRightStickButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_RIGHTSTICK
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasLeftShoulderButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_LEFTSHOULDER
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasRightShoulderButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_RIGHTSHOULDER
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasDPadUpButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_UP
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasDPadDownButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_DOWN
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasDPadLeftButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_LEFT
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasDPadRightButton = SDL_GameControllerGetBindForButton(
-                GamepadDevices[which],
-                SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_RIGHT
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasLeftXThumbStick = SDL_GameControllerGetBindForAxis(
-                GamepadDevices[which],
-                SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTX
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasLeftYThumbStick = SDL_GameControllerGetBindForAxis(
-                GamepadDevices[which],
-                SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTY
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasRightXThumbStick = SDL_GameControllerGetBindForAxis(
-                GamepadDevices[which],
-                SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTX
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasRightYThumbStick = SDL_GameControllerGetBindForAxis(
-                GamepadDevices[which],
-                SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTY
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasLeftTrigger = SDL_GameControllerGetBindForAxis(
-                GamepadDevices[which],
-                SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERLEFT
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasRightTrigger = SDL_GameControllerGetBindForAxis(
-                GamepadDevices[which],
-                SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERRIGHT
-            ).bindType != SDL_GameControllerBindType.SDL_CONTROLLER_BINDTYPE_NONE,
-            HasLeftVibrationMotor = hasRumble,
-            HasRightVibrationMotor = hasRumble,
-            HasVoiceSupport = false
+            HasRumble = hasRumble
         };
+
+        if (gamepadBindings != null)
+        {
+            for (int i = 0; i < gamepadBindings.Count; ++i)
+            {
+                var binding = gamepadBindings[i];
+                switch (binding.output.button)
+                {
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_SOUTH:
+                        caps.HasSouthButton = binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_NORTH:
+                        caps.HasNorthButton = binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_EAST:
+                        caps.HasEastButton = binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_WEST:
+                        caps.HasWestButton = binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_BACK:
+                        caps.HasBackButton = binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_GUIDE:
+                        caps.HasBigButton = binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_START:
+                        caps.HasStartButton = binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_STICK:
+                        caps.HasLeftStickButton =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_STICK:
+                        caps.HasRightStickButton =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_SHOULDER:
+                         caps.HasLeftShoulderButton =
+                             binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER:
+                        caps.HasRightShoulderButton =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_UP:
+                        caps.HasDPadUpButton =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_DOWN:
+                        caps.HasDPadDownButton =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_LEFT:
+                        caps.HasDPadLeftButton =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_RIGHT:
+                        caps.HasDPadRightButton =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+
+                }
+
+                switch (binding.output.axis.axis)
+                {
+                    case SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFTX:
+                        caps.HasLeftXThumbStick =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFTY:
+                        caps.HasLeftYThumbStick =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTX:
+                        caps.HasRightXThumbStick =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTY:
+                        caps.HasRightYThumbStick =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFT_TRIGGER:
+                        caps.HasLeftTrigger =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                    case SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHT_TRIGGER:
+                        caps.HasRightTrigger =
+                            binding.output_type != SDL_GamepadBindingType.SDL_GAMEPAD_BINDTYPE_NONE;
+                        break;
+                }
+            }
+        }
 
         GamepadCaps[which] = caps;
 
-        ushort vendor = SDL_JoystickGetVendor(thisJoystick);
-        ushort product = SDL_JoystickGetProduct(thisJoystick);
+        ushort vendor = SDL_GetGamepadVendorForID(joystickId);
+        ushort product = SDL_GetGamepadProductForID(joystickId);
         if (vendor == 0x00 && product == 0x00)
         {
             GamepadGuids[which] = "xinput";
@@ -407,11 +402,11 @@ internal static partial class Platform
         }
 
         // Initialize light bar
-        if (PlatformId == PlatformId.Linux &&
+        if (PlatformId is PlatformId.LinuxX11 or PlatformId.LinuxWayland  &&
             (GamepadGuids[which].Equals("4c05c405") ||
              GamepadGuids[which].Equals("4c05cc09")))
         {
-            // Get all of the individual PS4 LED instances
+            // Get all the individual PS4 LED instances
             var ledList = new List<string>();
             string[] dirs = Directory.GetDirectories("/sys/class/leds/");
             foreach (string dir in dirs)
@@ -444,18 +439,19 @@ internal static partial class Platform
         Console.WriteLine($"{GamepadCaps[which].GamePadType} Added: {GetGamePadName(which)}");
     }
 
-    private static void RemoveGamePadInstance(int dev)
+    private static void RemoveGamePadInstance(int gamepadId)
     {
         Console.WriteLine("GamePad Removed");
-        if (!GamepadInstances.Remove(dev, out int output))
+        if (!GamepadInstances.Remove(gamepadId, out int gamepadIndex))
         {
             return;
         }
 
-        SDL_GameControllerClose(GamepadDevices[output]);
-        GamepadDevices[output] = IntPtr.Zero;
-        GamepadStates[output] = new GamePadState();
-        GamepadGuids[output] = string.Empty;
+        SDL_CloseGamepad((SDL_Gamepad*)GamepadDevices[gamepadIndex]);
+
+        GamepadDevices[gamepadIndex] = IntPtr.Zero;
+        GamepadStates[gamepadIndex] = new GamePadState();
+        GamepadGuids[gamepadIndex] = string.Empty;
 
         SDL_ClearError();
 
@@ -504,7 +500,7 @@ internal static partial class Platform
 
     private static void InitGamePad()
     {
-        string hint = SDL_GetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS);
+        string? hint = SDL_GetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS);
         if (string.IsNullOrEmpty(hint))
         {
             SDL_SetHint(
@@ -513,22 +509,17 @@ internal static partial class Platform
             );
         }
 
-        SDL_SetHintWithPriority(
-            SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS,
-            "0",
-            SDL_HintPriority.SDL_HINT_OVERRIDE
-        );
     }
 
     private static void ProcessGamePadEvent(SDL_Event evt)
     {
         switch (evt.type)
         {
-            case SDL_EventType.SDL_CONTROLLERDEVICEADDED:
-                AddGamePadInstance(evt.cdevice.which);
+            case (uint)SDL_EventType.SDL_EVENT_GAMEPAD_ADDED:
+                AddGamePadInstance((int)evt.gdevice.which);
                 break;
-            case SDL_EventType.SDL_CONTROLLERDEVICEREMOVED:
-                RemoveGamePadInstance(evt.cdevice.which);
+            case (uint)SDL_EventType.SDL_EVENT_GAMEPAD_REMOVED:
+                RemoveGamePadInstance((int)evt.gdevice.which);
                 break;
         }
     }
