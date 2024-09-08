@@ -17,10 +17,6 @@
       <ProjectReference Include="..\FlatStage.Common\FlatStage.Common.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="ppy.SDL3-CS" Version="2024.807.1" />
-    </ItemGroup>
-
     <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
         <ContentWithTargetPath Include=".\Runtime\win-x64\BGFX.dll">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
