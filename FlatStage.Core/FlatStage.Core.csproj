@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\BGFX_CS\BGFX_CS\BGFX_CS.csproj" />
       <ProjectReference Include="..\FlatStage.Common\FlatStage.Common.csproj" />
       <ProjectReference Include="..\SDL3_CS\SDL3_CS\SDL3_CS.csproj" />
     </ItemGroup>
