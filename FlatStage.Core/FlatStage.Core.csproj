@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <RuntimeIdentifiers>win-x64;osx-arm64</RuntimeIdentifiers>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -15,6 +14,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\FlatStage.Common\FlatStage.Common.csproj" />
+      <ProjectReference Include="..\SDL3_CS\SDL3_CS\SDL3_CS.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
@@ -37,10 +37,6 @@
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
             <TargetPath>miniaudio.dylib</TargetPath>
         </ContentWithTargetPath>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Foundation\SDL3\" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
-
+using SDL;
+using static SDL.SDL3;
 
 namespace FlatStage;
 
@@ -46,16 +47,16 @@ internal static unsafe partial class Platform
     private static void CreateWindow(GameSettings settings)
     {
         var windowFlags =
-            (SDL.SDL_WindowFlags.Hidden |
-             SDL.SDL_WindowFlags.InputFocus |
-             SDL.SDL_WindowFlags.MouseFocus);
+            (SDL_WINDOW_HIDDEN |
+             SDL_WINDOW_INPUT_FOCUS |
+             SDL_WINDOW_MOUSE_FOCUS);
 
         if (settings.Fullscreen)
         {
-            windowFlags |= SDL.SDL_WindowFlags.Fullscreen;
+            windowFlags |= SDL_WINDOW_FULLSCREEN;
         }
 
-        SDL_PropertiesID windowProps = SDL.SDL_CreateProperties();
+        SDL_PropertiesID windowProps = SDL_CreateProperties();
 
         SDL_SetStringProperty(windowProps, "title", settings.AppTitle);
         SDL_SetNumberProperty(windowProps, "x", SDL_WINDOWPOS_CENTERED);

@@ -1,0 +1,3 @@
+[submodule "SDL3_CS"]
+	path = SDL3_CS
+	url = git@github.com:rafaelvasco/SDL3_CS.git
