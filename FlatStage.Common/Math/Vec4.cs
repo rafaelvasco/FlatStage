@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace FlatStage;
 
 /// <summary>
@@ -10,32 +12,32 @@ public struct Vec4 : IEquatable<Vec4>
     /// <summary>
     /// Returns a <see cref="Vec4"/> with components 0, 0, 0, 0.
     /// </summary>
-    public static Vec4 Zero => zero;
+    public static Vec4 Zero { get; } = new();
 
     /// <summary>
     /// Returns a <see cref="Vec4"/> with components 1, 1, 1, 1.
     /// </summary>
-    public static Vec4 One => unit;
+    public static Vec4 One { get; } = new(1f, 1f, 1f, 1f);
 
     /// <summary>
     /// Returns a <see cref="Vec4"/> with components 1, 0, 0, 0.
     /// </summary>
-    public static Vec4 UnitX => unitX;
+    public static Vec4 UnitX { get; } = new(1f, 0f, 0f, 0f);
 
     /// <summary>
     /// Returns a <see cref="Vec4"/> with components 0, 1, 0, 0.
     /// </summary>
-    public static Vec4 UnitY => unitY;
+    public static Vec4 UnitY { get; } = new(0f, 1f, 0f, 0f);
 
     /// <summary>
     /// Returns a <see cref="Vec4"/> with components 0, 0, 1, 0.
     /// </summary>
-    public static Vec4 UnitZ => unitZ;
+    public static Vec4 UnitZ { get; } = new(0f, 0f, 1f, 0f);
 
     /// <summary>
     /// Returns a <see cref="Vec4"/> with components 0, 0, 0, 1.
     /// </summary>
-    public static Vec4 UnitW => unitW;
+    public static Vec4 UnitW { get; } = new(0f, 0f, 0f, 1f);
 
     #endregion
 
@@ -72,17 +74,6 @@ public struct Vec4 : IEquatable<Vec4>
     /// The w coordinate of this <see cref="Vec4"/>.
     /// </summary>
     public float W;
-
-    #endregion
-
-    #region Private Static Fields
-
-    private static Vec4 zero = new();
-    private static Vec4 unit = new(1f, 1f, 1f, 1f);
-    private static Vec4 unitX = new(1f, 0f, 0f, 0f);
-    private static Vec4 unitY = new(0f, 1f, 0f, 0f);
-    private static Vec4 unitZ = new(0f, 0f, 1f, 0f);
-    private static Vec4 unitW = new(0f, 0f, 0f, 1f);
 
     #endregion
 
@@ -575,7 +566,7 @@ public struct Vec4 : IEquatable<Vec4>
     }
 
     /// <summary>
-    /// Creates a new <see cref="Vec4"/> that contains subtraction of on <see cref="Vec4"/> from a another.
+    /// Creates a new <see cref="Vec4"/> that contains subtraction of on <see cref="Vec4"/> from another.
     /// </summary>
     /// <param name="value1">Source <see cref="Vec4"/>.</param>
     /// <param name="value2">Source <see cref="Vec4"/>.</param>
@@ -590,7 +581,7 @@ public struct Vec4 : IEquatable<Vec4>
     }
 
     /// <summary>
-    /// Creates a new <see cref="Vec4"/> that contains subtraction of on <see cref="Vec4"/> from a another.
+    /// Creates a new <see cref="Vec4"/> that contains subtraction of on <see cref="Vec4"/> from another.
     /// </summary>
     /// <param name="value1">Source <see cref="Vec4"/>.</param>
     /// <param name="value2">Source <see cref="Vec4"/>.</param>
@@ -732,7 +723,7 @@ public struct Vec4 : IEquatable<Vec4>
     }
 
     /// <summary>
-    /// Apply transformation on all vectors within array of <see cref="Vec4"/> by the specified <see cref="Matrix"/> and places the results in an another array.
+    /// Apply transformation on all vectors within array of <see cref="Vec4"/> by the specified <see cref="Matrix"/> and places the results in another array.
     /// </summary>
     /// <param name="sourceArray">Source array.</param>
     /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
@@ -743,14 +734,8 @@ public struct Vec4 : IEquatable<Vec4>
         Vec4[] destinationArray
     )
     {
-        if (sourceArray == null)
-        {
-            throw new ArgumentNullException("sourceArray");
-        }
-        if (destinationArray == null)
-        {
-            throw new ArgumentNullException("destinationArray");
-        }
+        ArgumentNullException.ThrowIfNull(sourceArray);
+        ArgumentNullException.ThrowIfNull(destinationArray);
         if (destinationArray.Length < sourceArray.Length)
         {
             throw new ArgumentException(
@@ -768,7 +753,7 @@ public struct Vec4 : IEquatable<Vec4>
     }
 
     /// <summary>
-    /// Apply transformation on vectors within array of <see cref="Vec4"/> by the specified <see cref="Matrix"/> and places the results in an another array.
+    /// Apply transformation on vectors within array of <see cref="Vec4"/> by the specified <see cref="Matrix"/> and places the results in another array.
     /// </summary>
     /// <param name="sourceArray">Source array.</param>
     /// <param name="sourceIndex">The starting index of transformation in the source array.</param>
@@ -787,11 +772,11 @@ public struct Vec4 : IEquatable<Vec4>
     {
         if (sourceArray == null)
         {
-            throw new ArgumentNullException("sourceArray");
+            throw new ArgumentNullException(nameof(sourceArray));
         }
         if (destinationArray == null)
         {
-            throw new ArgumentNullException("destinationArray");
+            throw new ArgumentNullException(nameof(destinationArray));
         }
         if (destinationIndex + length > destinationArray.Length)
         {
@@ -900,6 +885,8 @@ public struct Vec4 : IEquatable<Vec4>
         value1.Z *= factor;
         return value1;
     }
-
+    
+    public static implicit operator Vector4(Vec4 value) => new Vector4(value.X, value.Y, value.Z, value.W);
+    public static implicit operator Vec4(Vector4 value) => new Vec4(value.X, value.Y, value.Z, value.W);
     #endregion
 }

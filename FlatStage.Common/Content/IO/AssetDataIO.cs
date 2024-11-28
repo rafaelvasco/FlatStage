@@ -46,12 +46,4 @@ public static class AssetDataIO
 
         writer.Close();
     }
-
-    public static void SaveAssetPak(string rootPath, AssetPak pak)
-    {
-        var fullPath = Path.Combine(rootPath, ContentProperties.AssetsFolder,
-         pak.Id + ContentProperties.BinaryExt);
-
-        SaveAssetData(fullPath, pak);
-    }
 }

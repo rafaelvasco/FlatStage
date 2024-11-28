@@ -28,6 +28,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="Assets\assets.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
       <None Update="settings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>

@@ -42,11 +42,6 @@ public class Stage : Game
     {
         Canvas.StretchMode = Settings.CanvasStretchMode;
 
-        if (!string.IsNullOrEmpty(_gameDef.PreloadPak))
-        {
-            Content.LoadPak(_gameDef.PreloadPak);
-        }
-
         Canvas.MainViewport.BackgroundColor = _gameDef.GameSettings.CanvasBackColor;
 
         PopulateGame(_gameDef);

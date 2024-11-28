@@ -140,8 +140,6 @@ public abstract class AssetInfo : IDefinitionData
 {
     public required string Id { get; init; }
 
-    public string? TargetAssetPack { get; init; }
-
     public abstract string PrimaryPath { get; }
 
     public abstract bool IsValid();
@@ -187,7 +185,7 @@ public class AudioAssetInfo : AssetInfo
 {
     public required string Path { get; init; }
 
-    public AudioType Type { get; set; }
+    public required AudioType Type { get; set; }
 
     public override string PrimaryPath => Path;
 

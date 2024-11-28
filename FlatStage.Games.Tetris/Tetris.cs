@@ -26,13 +26,18 @@ public class Tetris : Game
         _tetrisController.OnRotateBlock = OnRotateBlock;
         _tetrisController.OnGameStateChanged = OnGameStateChanged;
 
-        _tetrisController.OnExitTriggered = () => Exit();
-        _tetrisController.OnMenuHovered = () => GameContent.SfxMenuHover.Play();
+        _tetrisController.OnExitTriggered = Exit;
+        _tetrisController.OnMenuHovered = () =>
+        {
+            Audio.MainSource.Play(GameContent.SfxMenuHover);
+        };
 
         LoadSaveFile();
+        
+        //Audio.MainSource.Play();
 
-        GameContent.SngTitle.Play();
-
+        Audio.MainSource.Play(GameContent.SngTitle);
+        
         Canvas.StretchMode = CanvasStretchMode.LetterBox;
     }
 
@@ -70,21 +75,21 @@ public class Tetris : Game
         {
             case GameStateId.Game:
                 {
-                    if (GameContent.SngTitle.IsPlaying)
-                    {
-                        GameContent.SngTitle.Stop();
-                    }
+                    // if (GameContent.SngTitle.IsPlaying)
+                    // {
+                    //     GameContent.SngTitle.Stop();
+                    // }
 
                     break;
                 }
             case GameStateId.Menu:
                 {
-                    GameContent.SngTitle.Play();
+                    //GameContent.SngTitle.Play();
                     break;
                 }
             case GameStateId.GameOver:
                 {
-                    GameContent.SfxGameOver.Play();
+                    //GameContent.SfxGameOver.Play();
                     break;
                 }
         }
@@ -92,24 +97,24 @@ public class Tetris : Game
 
     private void OnRotateBlock()
     {
-        GameContent.SfxRotate.Play();
+        //GameContent.SfxRotate.Play();
     }
 
     private void OnClearLines(int lineCount, bool doubleScore)
     {
         if (!doubleScore)
         {
-            GameContent.SfxLineClear.Play();
+            //GameContent.SfxLineClear.Play();
         }
         else
         {
-            GameContent.SfxFullLinesClear.Play();
+            //GameContent.SfxFullLinesClear.Play();
         }
     }
 
     private void OnPlaceBlock(int blockId)
     {
-        GameContent.SfxPlaceBlock.Play();
+        //GameContent.SfxPlaceBlock.Play();
     }
 
     protected override void FixedUpdate(float dt)

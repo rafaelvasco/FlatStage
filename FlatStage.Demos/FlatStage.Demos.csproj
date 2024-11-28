@@ -12,4 +12,10 @@
       <ProjectReference Include="..\FlatStage.Core\FlatStage.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Assets\assets.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

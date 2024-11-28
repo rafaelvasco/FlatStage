@@ -93,7 +93,7 @@ public abstract class Game : Disposable
         InternalUnload();
 
         Content.Shutdown();
-        AudioContext.Shutdown();
+        Audio.Shutdown();
         Graphics.Shutdown();
         Platform.Shutdown();
 
@@ -131,7 +131,7 @@ public abstract class Game : Disposable
 
     public static void Exit()
     {
-        AudioContext.StopAll();
+        Audio.StopAll();
 
         Debug.Assert(_instance != null, nameof(_instance) + " != null");
         _instance._loop.Terminate();
@@ -159,6 +159,8 @@ public abstract class Game : Disposable
         }
 
 #endif
+        
+        Audio.Update();
 
         Update(dt);
     }
@@ -225,8 +227,8 @@ public abstract class Game : Disposable
         _canvas = new Canvas();
 
         PerfTimer.Begin();
-
-        AudioContext.Init();
+        
+        Audio.Initialize();
 
         Console.WriteLine($"Audio Init Took: {PerfTimer.End()}");
 

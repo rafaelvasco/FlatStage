@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Numerics;
 using System.Text;
 
 namespace FlatStage;
@@ -13,57 +14,57 @@ public struct Vec3 : IEquatable<Vec3>
     /// <summary>
     /// Returns a <see cref="Vec3"/> with components 0, 0, 0.
     /// </summary>
-    public static Vec3 Zero => zero;
+    public static Vec3 Zero { get; } = new(0f, 0f, 0f);
 
     /// <summary>
     /// Returns a <see cref="Vec3"/> with components 1, 1, 1.
     /// </summary>
-    public static Vec3 One => one;
+    public static Vec3 One { get; } = new(1f, 1f, 1f);
 
     /// <summary>
     /// Returns a <see cref="Vec3"/> with components 1, 0, 0.
     /// </summary>
-    public static Vec3 UnitX => unitX;
+    public static Vec3 UnitX { get; } = new(1f, 0f, 0f);
 
     /// <summary>
     /// Returns a <see cref="Vec3"/> with components 0, 1, 0.
     /// </summary>
-    public static Vec3 UnitY => unitY;
+    public static Vec3 UnitY { get; } = new(0f, 1f, 0f);
 
     /// <summary>
     /// Returns a <see cref="Vec3"/> with components 0, 0, 1.
     /// </summary>
-    public static Vec3 UnitZ => unitZ;
+    public static Vec3 UnitZ { get; } = new(0f, 0f, 1f);
 
     /// <summary>
     /// Returns a <see cref="Vec3"/> with components 0, 1, 0.
     /// </summary>
-    public static Vec3 Up => up;
+    public static Vec3 Up { get; } = new(0f, 1f, 0f);
 
     /// <summary>
     /// Returns a <see cref="Vec3"/> with components 0, -1, 0.
     /// </summary>
-    public static Vec3 Down => down;
+    public static Vec3 Down { get; } = new(0f, -1f, 0f);
 
     /// <summary>
     /// Returns a <see cref="Vec3"/> with components 1, 0, 0.
     /// </summary>
-    public static Vec3 Right => right;
+    public static Vec3 Right { get; } = new(1f, 0f, 0f);
 
     /// <summary>
     /// Returns a <see cref="Vec3"/> with components -1, 0, 0.
     /// </summary>
-    public static Vec3 Left => left;
+    public static Vec3 Left { get; } = new(-1f, 0f, 0f);
 
     /// <summary>
     /// Returns a <see cref="Vec3"/> with components 0, 0, -1.
     /// </summary>
-    public static Vec3 Forward => forward;
+    public static Vec3 Forward { get; } = new(0f, 0f, -1f);
 
     /// <summary>
     /// Returns a <see cref="Vec3"/> with components 0, 0, 1.
     /// </summary>
-    public static Vec3 Backward => backward;
+    public static Vec3 Backward { get; } = new(0f, 0f, 1f);
 
     #endregion
 
@@ -75,22 +76,6 @@ public struct Vec3 : IEquatable<Vec3>
             Y.ToString(), " ",
             Z.ToString()
         );
-
-    #endregion
-
-    #region Private Static Fields
-
-    private static Vec3 zero = new(0f, 0f, 0f);
-    private static Vec3 one = new(1f, 1f, 1f);
-    private static Vec3 unitX = new(1f, 0f, 0f);
-    private static Vec3 unitY = new(0f, 1f, 0f);
-    private static Vec3 unitZ = new(0f, 0f, 1f);
-    private static Vec3 up = new(0f, 1f, 0f);
-    private static Vec3 down = new(0f, -1f, 0f);
-    private static Vec3 right = new(1f, 0f, 0f);
-    private static Vec3 left = new(-1f, 0f, 0f);
-    private static Vec3 forward = new(0f, 0f, -1f);
-    private static Vec3 backward = new(0f, 0f, 1f);
 
     #endregion
 
@@ -590,7 +575,7 @@ public struct Vec3 : IEquatable<Vec3>
     }
 
     /// <summary>
-    /// Creates a new <see cref="Vec3"/> that contains subtraction of on <see cref="Vec3"/> from a another.
+    /// Creates a new <see cref="Vec3"/> that contains subtraction of on <see cref="Vec3"/> from another.
     /// </summary>
     /// <param name="value1">Source <see cref="Vec3"/>.</param>
     /// <param name="value2">Source <see cref="Vec3"/>.</param>
@@ -604,7 +589,7 @@ public struct Vec3 : IEquatable<Vec3>
     }
 
     /// <summary>
-    /// Creates a new <see cref="Vec3"/> that contains subtraction of on <see cref="Vec3"/> from a another.
+    /// Creates a new <see cref="Vec3"/> that contains subtraction of on <see cref="Vec3"/> from another.
     /// </summary>
     /// <param name="value1">Source <see cref="Vec3"/>.</param>
     /// <param name="value2">Source <see cref="Vec3"/>.</param>
@@ -664,7 +649,7 @@ public struct Vec3 : IEquatable<Vec3>
     }
 
     /// <summary>
-    /// Apply transformation on all vectors within array of <see cref="Vec3"/> by the specified <see cref="Matrix"/> and places the results in an another array.
+    /// Apply transformation on all vectors within array of <see cref="Vec3"/> by the specified <see cref="Matrix"/> and places the results in another array.
     /// </summary>
     /// <param name="sourceArray">Source array.</param>
     /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
@@ -699,7 +684,7 @@ public struct Vec3 : IEquatable<Vec3>
     }
 
     /// <summary>
-    /// Apply transformation on vectors within array of <see cref="Vec3"/> by the specified <see cref="Matrix"/> and places the results in an another array.
+    /// Apply transformation on vectors within array of <see cref="Vec3"/> by the specified <see cref="Matrix"/> and places the results in another array.
     /// </summary>
     /// <param name="sourceArray">Source array.</param>
     /// <param name="sourceIndex">The starting index of transformation in the source array.</param>
@@ -881,6 +866,10 @@ public struct Vec3 : IEquatable<Vec3>
         value.Z *= factor;
         return value;
     }
+    
+    public static implicit operator Vec3(Vector3 value) => new(value.X, value.Y, value.Z);
+    public static implicit operator Vector3(Vec3 value) => new(value.X, value.Y, value.Z);
 
     #endregion
+    
 }

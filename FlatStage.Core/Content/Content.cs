@@ -10,6 +10,8 @@ public static class Content
     private static readonly Dictionary<string, Asset> _loadedAssets = new();
 
     private static readonly List<Asset> _runtimeAssets = [];
+    
+    private static AssetsManifest _manifest = null!;
 
     private static readonly Dictionary<Type, IAssetLoader> _assetLoaders = new()
     {
@@ -20,7 +22,7 @@ public static class Content
             typeof(TextureFont), new FontLoader()
         },
         {
-            typeof(Audio), new AudioLoader()
+            typeof(Sound), new AudioLoader()
         },
         {
             typeof(ShaderProgram), new ShaderLoader()
@@ -30,13 +32,8 @@ public static class Content
 
     internal static void Init()
     {
-        //var path = Path.Combine(RootPath, ContentProperties.AssetsManifestFile);
-        //AssetsManifest = LoadDefinitionData<AssetsManifest>(path);
-
-//#if DEBUG
-//        Console.WriteLine("Loaded Assets Manifest: \n");
-//        Console.WriteLine(AssetsManifest);
-//#endif
+        var path = Path.Combine(RootPath, ContentProperties.AssetsManifestFile);
+        _manifest = DefinitionIO.LoadDefinitionData<AssetsManifest>(path);
     }
 
     public static T Get<T>(string assetId) where T : Asset
@@ -59,56 +56,6 @@ public static class Content
         RegisterAsset(assetId, asset);
 
         return (T)asset;
-    }
-
-    public static void LoadPak(string id)
-    {
-        var pakPath = Path.Combine(RootPath, $"{id}{ContentProperties.BinaryExt}");
-
-        if (!File.Exists(pakPath))
-        {
-            throw new FileNotFoundException($"Could not find AssetPak: {id}");
-        }
-
-        using var stream = File.OpenRead(pakPath);
-
-        var assetPak = AssetDataIO.LoadAssetData<AssetPak>(stream);
-
-        if (assetPak.Images.Count > 0)
-        {
-            foreach (var (key, imageData) in assetPak.Images)
-            {
-                var texture = Texture.LoadFromData(imageData);
-                RegisterAsset(key, texture);
-            }
-        }
-
-        if (assetPak.Shaders.Count > 0)
-        {
-            foreach (var (key, shaderData) in assetPak.Shaders)
-            {
-                var shader = ShaderProgram.LoadFromData(shaderData);
-                RegisterAsset(key, shader);
-            }
-        }
-
-        if (assetPak.Fonts.Count > 0)
-        {
-            foreach (var (key, fontData) in assetPak.Fonts)
-            {
-                var font = TextureFont.LoadFromData(fontData);
-                RegisterAsset(key, font);
-            }
-        }
-
-        if (assetPak.Audios.Count > 0)
-        {
-            foreach (var (key, audioData) in assetPak.Audios)
-            {
-                var audio = Audio.LoadFromData(audioData);
-                RegisterAsset(key, audio);
-            }
-        }
     }
 
     private static IAssetLoader GetLoader<T>() where T : Asset
@@ -153,7 +100,9 @@ public static class Content
         Console.WriteLine($"\nLoading Asset: {assetId}");
 #endif
 
-        var asset = assetLoader.Load(RootPath, assetId);
+        var assetInfo = _manifest.GetAssetInfo(assetId);
+        
+        var asset = assetLoader.Load(RootPath, assetInfo);
 
         return (T)asset;
     }

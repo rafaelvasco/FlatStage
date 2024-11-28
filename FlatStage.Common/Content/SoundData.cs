@@ -3,13 +3,11 @@
 namespace FlatStage;
 
 [MemoryPackable]
-public partial class AudioData : AssetData
+public partial class SoundData : AssetData
 {
     public required byte[] Data { get; init; }
 
     public required AudioType Type { get; init; }
-
-    public required AudioFormat Format { get; init; }
 
     public override string ToString()
     {

@@ -5,10 +5,9 @@ namespace FlatStage;
 
 internal interface IAssetLoader
 {
-    Asset Load(Stream stream);
-    Asset Load(string rootPath, string assetId);
+    Asset Load(string rootPath, AssetInfo assetInfo);
 
-    Asset LoadEmbedded(string id);
+    Asset LoadEmbedded(string assetId);
 }
 
 internal abstract class AssetLoader<T> : IAssetLoader where T : Asset
@@ -20,16 +19,16 @@ internal abstract class AssetLoader<T> : IAssetLoader where T : Asset
         return LoadFromStream(stream);
     }
 
-    public Asset Load(string rootPath, string id)
+    public virtual Asset Load(string rootPath, AssetInfo info)
     {
-        var assetFullPath = BuildFullPath(rootPath, id);
+        var assetFullPath = BuildFullPath(rootPath, info.Id);
 
         using var stream = File.OpenRead(assetFullPath);
 
         return LoadFromStream(stream);
     }
 
-    public virtual Asset LoadEmbedded(string id)
+    public virtual Asset LoadEmbedded(string assetId)
     {
         var path = new StringBuilder();
 
@@ -37,7 +36,7 @@ internal abstract class AssetLoader<T> : IAssetLoader where T : Asset
         path.Append('.');
         path.Append(EmbeddedFolderName);
         path.Append('.');
-        path.Append(id);
+        path.Append(assetId);
         path.Append(ContentProperties.BinaryExt);
 
         using var fileStream = Assembly.GetExecutingAssembly()
@@ -45,7 +44,7 @@ internal abstract class AssetLoader<T> : IAssetLoader where T : Asset
 
         if (fileStream == null)
         {
-            throw new ApplicationException($"Could not load embedded asset: {id}");
+            throw new ApplicationException($"Could not load embedded asset: {assetId}");
         }
 
         return LoadFromStream(fileStream);
@@ -91,7 +90,7 @@ internal class ShaderLoader : AssetLoader<ShaderProgram>
         return assetFullBinPath;
     }
 
-    public override Asset LoadEmbedded(string id)
+    public override Asset LoadEmbedded(string assetId)
     {
         var path = new StringBuilder();
 
@@ -99,7 +98,7 @@ internal class ShaderLoader : AssetLoader<ShaderProgram>
         path.Append('.');
         path.Append(EmbeddedFolderName);
         path.Append('.');
-        path.Append(id);
+        path.Append(assetId);
         path.Append(ContentProperties.ShaderAppendStrings[Graphics.GraphicsBackend]);
         path.Append(ContentProperties.BinaryExt);
 
@@ -108,22 +107,30 @@ internal class ShaderLoader : AssetLoader<ShaderProgram>
 
         if (fileStream == null)
         {
-            throw new ApplicationException($"Could not load embedded asset: {id}");
+            throw new ApplicationException($"Could not load embedded asset: {assetId}");
         }
 
         return LoadFromStream(fileStream);
     }
 }
 
-internal class AudioLoader : AssetLoader<Audio>
+internal class AudioLoader : AssetLoader<Sound>
 {
     public override string EmbeddedFolderName => "Audios";
 
-    protected override Audio LoadFromStream(Stream stream)
+    public override Asset Load(string rootPath, AssetInfo info)
     {
-        var assetData = AssetDataIO.LoadAssetData<AudioData>(stream);
+        var fullPath = BuildFullPath(rootPath, info.Id);
 
-        return Audio.LoadFromData(assetData);
+        var streamFromDisk = (info as AudioAssetInfo)!.Type == AudioType.Song;
+        
+        return Sound.LoadFromFile(info.Id, fullPath, streamFromDisk);
+    }
+
+    protected override Sound LoadFromStream(Stream stream)
+    {
+        var assetData = AssetDataIO.LoadAssetData<SoundData>(stream);
+        return Sound.LoadFromData(assetData);
     }
 }
 

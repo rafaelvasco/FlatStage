@@ -10,15 +10,15 @@ public class Tutorial02(string name) : BaseTutorial(name)
     private const float Speed = 90;
     private const float Friction = 0.98f;
 
-    private Audio _bumpEffect = null!;
+    private Sound _bumpEffect = null!;
 
     public override void Load()
     {
         _texture = Content.Get<Texture>("particles");
 
-        _bumpEffect = Content.Get<Audio>("blip");
+        _bumpEffect = Content.Get<Sound>("blip");
 
-        _bumpEffect.Volume = 0.1f;
+        //_bumpEffect.Volume = 0.1f;
     }
 
     public override void Draw(Canvas canvas)
@@ -31,7 +31,7 @@ public class Tutorial02(string name) : BaseTutorial(name)
         var pan = (_particlePos.X - (Canvas.Width / 2f)) / (Canvas.Width / 2f);
         var pitch = (((_delta.X * _delta.X) + (_delta.Y * _delta.Y)) * 0.0005f) + 0.2f;
 
-        _bumpEffect.PlayWithPanPitch(pan, pitch);
+        //_bumpEffect.PlayWithPanPitch(pan, pitch);
     }
 
     public override void Update(float dt)

@@ -15,7 +15,6 @@ public class GameDef : IDefinitionData
 
     [JsonIgnore] public GameObjectDef[] GameObjects { get; internal set; } = null!;
 
-    public string? PreloadPak { get; init; }
     public bool IsValid()
     {
         return GameObjectsPaths.Length > 0 && GameSettings.IsValid();

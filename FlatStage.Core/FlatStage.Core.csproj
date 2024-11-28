@@ -18,26 +18,7 @@
       <ProjectReference Include="..\SDL3_CS\SDL3_CS\SDL3_CS.csproj" />
     </ItemGroup>
 
-    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
-        <ContentWithTargetPath Include=".\Runtime\win-x64\BGFX.dll">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-            <TargetPath>BGFX.dll</TargetPath>
-        </ContentWithTargetPath>
-        <ContentWithTargetPath Include=".\Runtime\win-x64\miniaudio.dll">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-            <TargetPath>miniaudio.dll</TargetPath>
-        </ContentWithTargetPath>
+    <ItemGroup>
+      <Folder Include="Sound\" />
     </ItemGroup>
-
-    <ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
-        <ContentWithTargetPath Include=".\Runtime\osx-arm64\BGFX.dylib">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-            <TargetPath>BGFX.dylib</TargetPath>
-        </ContentWithTargetPath>
-        <ContentWithTargetPath Include=".\Runtime\osx-arm64\miniaudio.dylib">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-            <TargetPath>miniaudio.dylib</TargetPath>
-        </ContentWithTargetPath>
-    </ItemGroup>
-
 </Project>

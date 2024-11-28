@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace FlatStage;
@@ -15,24 +16,24 @@ public struct Vec2 : IEquatable<Vec2>
     /// <summary>
     /// Returns a <see cref="Vec2"/> with components 0, 0.
     /// </summary>
-    public static Vec2 Zero => _zeroVector;
+    public static Vec2 Zero { get; } = new(0f, 0f);
 
     /// <summary>
     /// Returns a <see cref="Vec2"/> with components 1, 1.
     /// </summary>
-    public static Vec2 One => _unitVector;
+    public static Vec2 One { get; } = new(1f, 1f);
 
     /// <summary>
     /// Returns a <see cref="Vec2"/> with components 1, 0.
     /// </summary>
-    public static Vec2 UnitX => _unitXVector;
+    public static Vec2 UnitX { get; } = new(1f, 0f);
 
     /// <summary>
     /// Returns a <see cref="Vec2"/> with components 0, 1.
     /// </summary>
-    public static Vec2 UnitY => _unitYVector;
+    public static Vec2 UnitY { get; } = new(0f, 1f);
 
-    public static Vec2 Half => _halfVector;
+    public static Vec2 Half { get; } = new(0.5f, 0.5f);
 
     #endregion
 
@@ -57,16 +58,6 @@ public struct Vec2 : IEquatable<Vec2>
     /// The y coordinate of this <see cref="Vec2"/>.
     /// </summary>
     public float Y;
-
-    #endregion
-
-    #region Private Static Fields
-
-    private static Vec2 _zeroVector = new(0f, 0f);
-    private static Vec2 _unitVector = new(1f, 1f);
-    private static Vec2 _unitXVector = new(1f, 0f);
-    private static Vec2 _unitYVector = new(0f, 1f);
-    private static Vec2 _halfVector = new(0.5f, 0.5f);
 
     #endregion
 
@@ -96,6 +87,12 @@ public struct Vec2 : IEquatable<Vec2>
     #endregion
 
     #region Public Methods
+    
+    public void Deconstruct(out float x, out float y)
+    {
+        x = X;
+        y = Y;
+    }
 
     /// <summary>
     /// Compares whether current instance is equal to specified <see cref="Object"/>.
@@ -456,7 +453,7 @@ public struct Vec2 : IEquatable<Vec2>
     }
 
     /// <summary>
-    /// Creates a new <see cref="Vec2"/> that contains subtraction of on <see cref="Vec2"/> from a another.
+    /// Creates a new <see cref="Vec2"/> that contains subtraction of on <see cref="Vec2"/> from another.
     /// </summary>
     /// <param name="value1">Source <see cref="Vec2"/>.</param>
     /// <param name="value2">Source <see cref="Vec2"/>.</param>
@@ -469,7 +466,7 @@ public struct Vec2 : IEquatable<Vec2>
     }
 
     /// <summary>
-    /// Creates a new <see cref="Vec2"/> that contains subtraction of on <see cref="Vec2"/> from a another.
+    /// Creates a new <see cref="Vec2"/> that contains subtraction of on <see cref="Vec2"/> from another.
     /// </summary>
     /// <param name="value1">Source <see cref="Vec2"/>.</param>
     /// <param name="value2">Source <see cref="Vec2"/>.</param>
@@ -513,7 +510,7 @@ public struct Vec2 : IEquatable<Vec2>
     }
 
     /// <summary>
-    /// Apply transformation on all vectors within array of <see cref="Vec2"/> by the specified <see cref="Matrix"/> and places the results in an another array.
+    /// Apply transformation on all vectors within array of <see cref="Vec2"/> by the specified <see cref="Matrix"/> and places the results in another array.
     /// </summary>
     /// <param name="sourceArray">Source array.</param>
     /// <param name="matrix">The transformation <see cref="Matrix"/>.</param>
@@ -528,7 +525,7 @@ public struct Vec2 : IEquatable<Vec2>
     }
 
     /// <summary>
-    /// Apply transformation on vectors within array of <see cref="Vec2"/> by the specified <see cref="Matrix"/> and places the results in an another array.
+    /// Apply transformation on vectors within array of <see cref="Vec2"/> by the specified <see cref="Matrix"/> and places the results in another array.
     /// </summary>
     /// <param name="sourceArray">Source array.</param>
     /// <param name="sourceIndex">The starting index of transformation in the source array.</param>
@@ -687,6 +684,11 @@ public struct Vec2 : IEquatable<Vec2>
         value1.Y *= factor;
         return value1;
     }
-
+    
+    public static implicit operator Vector2(Vec2 value) => new(value.X, value.Y);
+    public static implicit operator Vec2(Vector2 value) => new(value.X, value.Y);
+    
     #endregion
+
+    
 }
